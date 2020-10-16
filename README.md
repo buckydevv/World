@@ -1,37 +1,5 @@
 
 
--------------------------------------------
-
-<h1>Owner & Devs</h1>
-
-<table>
-  <colgroup>
-    <col span="2" style="background-color:white">
-    <col style="background-color:white">
-  </colgroup>
-  <tr>
-    <th>User</th>
-    <th>Discriminator</th>
-    <th>Place</th>
-  </tr>
-  <tr>
-    <td>seañ</td>
-    <td>#1718</td>
-    <td>OWNER</td>
-  </tr>
-    <tr>
-    <td>fxcilities</td>
-    <td>#4728</td>
-    <td>DEV</td>
-  </tr>
-    <tr>
-    <td>catnowblue</td>
-    <td>#0001</td>
-    <td>DEV</td>
-</table>
-
-</body>
-
 
 --------------------------------------------
 
