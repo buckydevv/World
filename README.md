@@ -37,9 +37,6 @@ Easy Categories - Example `w/categories` = shows Multiple Categories!
 `w/ping` - Shows The Bots Latency.
 
 ---------
-## 3. Extra
-### His Support Server Is https://discord.gg/zenM2Kd
----------
 <a href="https://top.gg/bot/700292147311542282" >
   <img src="https://top.gg/api/widget/700292147311542282.svg" alt="World" />
 </a>
