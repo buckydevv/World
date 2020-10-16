@@ -1,0 +1,17 @@
+discord.py
+requests
+pymongo
+dnspython
+mysql-connector-python
+python-dotenv
+motor
+akinator.py
+flake8
+flake8-annotations
+flake8-bugbear
+flake8-docstrings
+flake8-import-order
+flake8-string-format
+flake8-tidy-imports
+flake8-todo
+pep8-naming
