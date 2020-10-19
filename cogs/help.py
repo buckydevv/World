@@ -72,7 +72,7 @@ class HelpCog(commands.Cog):
         color=0x2F3136,
         ).add_field(
         name="<:shufflelogo:765652804387471430> | Random Commands",
-        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban`\n|`w/vote` | `w/uptime` | `w/translate` | `w/advice`| `w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo`"
+        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban`\n|`w/vote` | `w/uptime` | `w/translate` | `w/advice`| `w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity`"
         )
       await ctx.send(embed=em)
 
@@ -88,7 +88,7 @@ class HelpCog(commands.Cog):
         value="`w/ban` | `w/kick` | `w/unban` | `w/mute` | `w/unmute` | `w/bans`"
         ).add_field(
         name="<:channellogo:765650652797468682> | Channel Commands",
-        value="`w/slowmode` | `w/lock` | `w/unlock` | `w/nuke` | `w/purge` | `w/snipe` | `w/editsnipe` | `w/poll` | `w/polln` | `w/fm`",
+        value="`w/slowmode` | `w/lock` | `w/unlock` | `w/nuke` | `w/purge` | `w/snipe` | `w/editsnipe` | `w/poll` | `w/polln`",
         inline=False
         )
       await ctx.send(embed=em)
@@ -112,7 +112,7 @@ class HelpCog(commands.Cog):
         color=0x2F3136,
         ).add_field(
         name="<:fun:765647000208801803> | Fun Commands",
-        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme`| \n`w/tweet` | `w/quote`| `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/asktrump` | `w/gif` | `w/rr` | `w/screenshot` | `w/kill` | `w/qr`"
+        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme`| \n`w/tweet` | `w/quote`| `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/asktrump` | `w/gif` | `w/rr` | `w/kill` | `w/qr`"
         )
       await ctx.send(embed=em)
 
