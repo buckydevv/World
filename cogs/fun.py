@@ -413,6 +413,65 @@ class FunCog(commands.Cog):
                 embed.set_footer(text=f"👍 {res['thumbs_up']} | 👎{res['thumbs_down']}")
                 await ctx.send(embed=embed)
 
+
+    @commands.command(name="activity")
+    async def _activity(self, ctx: commands.Context, *, user: discord.Member = None):
+        user = user or ctx.author
+        if user.bot == True:
+        	embed = discord.Embed(
+        		title="Activity",
+        		color=0x2F3136,
+        		description=f"Sorry {ctx.author.mention} that's a bot, please mention a user!"
+        		)
+        	return await ctx.send(embed=embed)
+        if user.activity == None:
+        	embed = discord.Embed(
+        		title="Activity",
+        		color=0x2F3136,
+        		description=f"Sorry {ctx.author.mention} that user does not have a status!"
+        		)
+        	return await ctx.send(embed=embed)
+        for activity in user.activities:
+            if activity.type is discord.ActivityType.playing:
+                embed = discord.Embed(
+                   title=f"Activity",
+                    color=0x2F3136
+                    ).add_field(
+                    name=f"Playing {user.activity.name}",
+                    value=f"{user.activity.state}"
+                    ).set_thumbnail(
+                    url=f"{user.activity.large_image_url}"
+                    )
+                await ctx.send(embed=embed)
+            elif isinstance(activity, Spotify):
+                embed = discord.Embed(
+                    title=f"Activity",
+                    description=f"Listening to {user.activity.name}\n[`{user.activity.artist} - {user.activity.title}`](https://open.spotify.com/track/{user.activity.track_id})",
+                    color=0x2F3136
+                    ).set_thumbnail(
+                    url=activity.album_cover_url
+                    )
+                await ctx.send(embed=embed)
+            elif activity.type is discord.ActivityType.streaming:
+            	embed = discord.Embed(
+            		title=f"Activity",
+            		color=0x2F3136,
+            		description=f"Streaming {user.activity.name}\n[`Watch`]({user.activity.url})"
+            		)
+            	await ctx.send(embed=embed)
+            elif isinstance(activity, discord.CustomActivity):
+            	embed = discord.Embed(
+            		title="Activity",
+            		color=0x2F3136,
+            		description=f"{user.activity.emoji} {user.activity.name}"
+            		)
+            	await ctx.send(embed=embed)
+
+    @_activity.error
+    async def _activity_error(self, ctx, error):
+    	if isinstance(error, commands.BadArgument):
+    		await ctx.send(f'Sorry {ctx.author.mention} i could not find that user.')
+
     @commands.command(help="Advice from world.")
     async def advice(self, ctx):
         async with aiohttp.ClientSession() as cs:
