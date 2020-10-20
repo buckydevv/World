@@ -349,6 +349,56 @@ class EconomyCog(commands.Cog):
         win_embed = Embed(title="Congrats!", color=0x2F3136, description=f"Hey {ctx.author.mention} You have won `{amount}` coins.")
         await ctx.send(embed=win_embed)
 
+    @commands.command(name="roulette")
+    async def roulette(self, ctx: commands.Context, amount: UnsignedIntegerConverter, choice: UnsignedIntegerConverter) -> None:
+        """
+        Roulette.
+
+        If you win, you get triple the money, Otherwise, if you loose
+        Then the money that you rouletted will be removed.
+        """
+        if choice > 100:
+        	return await ctx.send(f"Sorry {ctx.author.mention} you can only pick a number between 1 and 100.")
+
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
+
+        user = await self._get_user(ctx.author.id)
+        if user.coins < amount:
+            raise NotEnoughCoins(f"Sorry {ctx.author.mention} The amount of money to roulette is larger than your current balance.")
+
+        await self._database_collection.update_one(
+            {
+                "_id": ctx.author.id
+            },
+            {
+                "$set": {
+                    "coins": user.coins - amount
+                }
+            }
+        )
+
+        random.seed(datetime.now().timestamp())
+        percentage = random.randint(1, 100)
+        if percentage is not choice:
+            embed_lost = Embed(title="Roulette", color=0x2F3136, description=f"Hey {ctx.author.mention} You have lost {amount} coin{'s' if amount > 1 else ''}.\nYou chose `{choice}`\nWorld chose: `{percentage}`")
+            await ctx.send(embed=embed_lost)
+            return
+
+        user = await self._get_user(ctx.author.id)
+        await self._database_collection.update_one(
+            {
+                "_id": user._id
+            },
+            {
+                "$set": {
+                    "coins": user.coins + (amount * 3)
+                }
+            }
+        )
+        embed_win = Embed(title="Roulette!", color=0x2F3136, description=f"Hey {ctx.author.mention} You have won `{amount * 3}` coins.\nYou chose `{choice}`\nWorld chose `{percentage}`")
+        await ctx.send(embed=embed_win)
+
     @commands.command(name="beg")
     @commands.cooldown(1, 45, BucketType.member)
     async def beg(self, ctx: commands.Context) -> None:
@@ -375,6 +425,15 @@ class EconomyCog(commands.Cog):
             description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins}` Coins"
         )
         await ctx.send(embed=beg_embed)
+
+    @roulette.error
+    async def roulette_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+        """Handles errors when running the gamble command."""
+        error = getattr(error, "original", error)
+        if isinstance(error, NotEnoughCoins):
+            await ctx.send(error)
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} You ran that command wrong, here's how you should run it: `w/roulette <amount> <choice>`")
 
     @beg.error
     async def beg_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
