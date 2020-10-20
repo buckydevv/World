@@ -131,7 +131,7 @@ class HelpCog(commands.Cog):
         inline=False
         ).add_field(
         name=":thumbsup: | Fun commands",
-        value="`w/daily` | `w/weekly` | `w/gamble`",
+        value="`w/daily` | `w/weekly` | `w/gamble` | `w/roulette`",
         inline=False
         )
       await ctx.send(embed=em)
