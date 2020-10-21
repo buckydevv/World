@@ -422,7 +422,7 @@ class EconomyCog(commands.Cog):
         beg_embed = Embed(
             title="You have begged.",
             color=0x2F3136,
-            description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins}` Coins"
+            description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins:.2f}` Coins"
         )
         await ctx.send(embed=beg_embed)
 
