@@ -173,6 +173,36 @@ class EconomyCog(commands.Cog):
         inventory_embed.set_thumbnail(url=ctx.author.avatar_url)
         await ctx.send(embed=inventory_embed)
 
+    @commands.command(name="profile", aliases=("account",))
+    async def profile(self, ctx: commands.Context, user: Member=None) -> None:
+        """Returns the profile of the users items, status and coins."""
+        user = user or ctx.author
+        if not (await self._has_account(user.id)):
+            await self._create_account(user.id)
+
+        stat = await self._get_user(user.id)
+        status_embed = Embed(
+        	title=f"{ctx.author}'s Profile",
+        	color=0x2F3136
+        	).add_field(
+        	name="<:memberlogo:765649915031846912> | Account",
+        	value=f"Account Type: `World Account`\nCoins: `{stat.coins:.2f}`\nStatus: `{stat.afk}`"
+        	).set_thumbnail(
+        	url=user.avatar_url
+        	)
+        await ctx.send(embed=status_embed)
+
+    @profile.error
+    async def profile_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+        """Handles errors when showing users profile something."""
+        error = getattr(error, "original", error)
+        if isinstance(error, NotEnoughCoins):
+            await ctx.send(error)
+        elif isinstance(error, commands.errors.BadArgument):
+            await ctx.send(error)
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please mention a valid user.")
+
     @commands.command(name="balance", aliases=("bal",))
     async def balance(self, ctx: commands.Context) -> None:
         """Returns the current balance of the user."""
@@ -665,7 +695,7 @@ class EconomyCog(commands.Cog):
             "choc": 0,
             "poop": 0,
             "apple": 0,
-            "afk": "No status set, run `w/status` to set a status"
+            "afk": "No status set, run w/status to set a status"
         })
 
     async def _has_account(self, user_id: int) -> None:
