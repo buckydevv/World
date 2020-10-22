@@ -182,7 +182,7 @@ class EconomyCog(commands.Cog):
 
         stat = await self._get_user(user.id)
         status_embed = Embed(
-        	title=f"{ctx.author}'s Profile",
+        	title=f"{user}'s Profile",
         	color=0x2F3136
         	).add_field(
         	name="<:memberlogo:765649915031846912> | Account",
