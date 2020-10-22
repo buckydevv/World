@@ -112,7 +112,7 @@ class HelpCog(commands.Cog):
         color=0x2F3136,
         ).add_field(
         name="<:fun:765647000208801803> | Fun Commands",
-        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme`| \n`w/tweet` | `w/quote`| `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/asktrump` | `w/gif` | `w/rr` | `w/kill` | `w/qr`"
+        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme`| \n`w/tweet` | `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/asktrump` | `w/gif` | `w/rr` | `w/kill` | `w/qr`"
         )
       await ctx.send(embed=em)
 
@@ -124,7 +124,7 @@ class HelpCog(commands.Cog):
         color=0x2F3136,
         ).add_field(
         name="<:account:765642079920980009> | Account Commands",
-        value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer`"
+        value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer` | `w/profile`"
         ).add_field(
         name=":shopping_bags: | Market Commands",
         value="`w/shop` | `w/buy` | `w/sell` | `w/beg`",
