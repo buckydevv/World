@@ -124,14 +124,14 @@ class HelpCog(commands.Cog):
         color=0x2F3136,
         ).add_field(
         name="<:account:765642079920980009> | Account Commands",
-        value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer` | `w/profile`"
+        value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer`"
         ).add_field(
         name=":shopping_bags: | Market Commands",
         value="`w/shop` | `w/buy` | `w/sell` | `w/beg`",
         inline=False
         ).add_field(
         name=":thumbsup: | Fun commands",
-        value="`w/daily` | `w/weekly` | `w/gamble` | `w/roulette`",
+        value="`w/daily` | `w/weekly` | `w/gamble` | `w/rep` | `w/repinfo`",
         inline=False
         )
       await ctx.send(embed=em)
