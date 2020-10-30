@@ -73,28 +73,21 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="Info on your last given rep point.")
     async def repinfo(self, ctx):
     	if not collection.find_one({"_id": ctx.author.id}):
-    		rep_account = {
-    		"_id": ctx.author.id,
-    		"Reputation": 0,
-    		"LastUsed": "Isnotset",
-    		"TargetMember": 0,
-    		}
-    		await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
-    	else:
-    		if collection.find_one({"_id": ctx.author.id})["LastUsed"] == "Isnotset":
-    			return await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
-    			query = {"_id": ctx.author.id}
-    			rep_ = collection.find(query)
-    			post = {"Reputation": ctx.author.id}
-    			for result in rep_:
-    				last_used = result["LastUsed"]
-    				target_user = result["TargetMember"]
-    				embed = discord.Embed(
-    					title="Last Reputation",
-    					description=f"{ctx.author.mention} You gave <@{target_user}> `1` Reputation point\nDate: `{last_used}`",
-    					color=0x2F3136
-    					)
-    				await ctx.send(embed=embed)
+    		return await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
+    	if collection.find_one({"_id": ctx.author.id})["LastUsed"] == "Isnotset":
+    		return await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
+    	query = {"_id": ctx.author.id}
+    	rep_ = collection.find(query)
+    	post = {"Reputation": ctx.author.id}
+    	for result in rep_:
+    		last_used = result["LastUsed"]
+    		target_user = result["TargetMember"]
+    		embed = discord.Embed(
+    			title="Last Reputation",
+    			description=f"{ctx.author.mention} You gave <@{target_user}> `1` Reputation point\nDate: `{last_used}`",
+    			color=0x2F3136
+    			)
+    		await ctx.send(embed=embed)
 
 
 
