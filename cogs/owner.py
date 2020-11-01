@@ -93,14 +93,55 @@ class OwnerCog(commands.Cog):
     @commands.is_owner()
     async def selfpurge(self, ctx, amount: int):
     	def world(m):
-    		return m.author == self.bot.user
-    	await ctx.message.channel.purge(limit=amount, check=world)
+    		return self.bot.user.id == m.author.id
+    	await ctx.message.channel.purge(limit=amount, check=world, bulk=False)
     	embed = discord.Embed(title="Purged", description=f"{ctx.author.mention} i have successfully purged `{amount}` of messages in <#{ctx.message.channel.id}>", color=ctx.author.color)
     	yes = await ctx.send(embed=embed)
     	await asyncio.sleep(3)
     	await yes.delete()
     	await ctx.message.delete()
 
+    @commands.command()
+    @commands.is_owner()
+    async def shutdown(self, ctx):
+    	page1 = discord.Embed(
+    		title="Shutdown World",
+    		description="Would you like to shutdown World?",
+    		)
+
+    	page2 = discord.Embed(
+    		title="Shudown Failed",
+    		description="You Chose not to shutdown World."
+    		)
+
+    	page3 = discord.Embed(
+    		title="Shutting Down",
+    		description="I Have shut myself down."
+    		)
+
+    	message = await ctx.send(embed=page1)
+
+    	await message.add_reaction('✅')
+    	await message.add_reaction('❎')
+
+    	emoji = ''
+
+    	while True:
+    		if emoji=='✅':
+    			await message.edit(embed=page3)
+    			await self.bot.close()
+    		if emoji=='❎':
+    			await message.edit(embed=page2)
+    			break
+
+    		res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=15)
+    		if res==None:
+    			break
+    		if str(res[1])!='World#4520':
+    			emoji=str(res[0].emoji)
+    			await message.remove_reaction(res[0].emoji,res[1])
+
+    	await message.clear_reactions()
 
 
 def setup(bot):
