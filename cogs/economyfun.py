@@ -336,7 +336,6 @@ class EconomyFunCog(commands.Cog):
                     break
             if str(res[1])!='World#4520':
                 emoji=str(res[0].emoji)
-                await msg.remove_reaction(res[0].emoji,res[1])
             if emoji == "☑":
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedTo": str(user)}})
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedDate": str(m_date)}})
