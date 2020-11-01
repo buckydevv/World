@@ -152,7 +152,7 @@ class InfoCog(commands.Cog):
             name=":computer: | Owners and developers",
             value=textwrap.dedent("""
                 Owner: `seañ#1718`
-                Developers: `Atie#5173` | `catnowblue#5904` | `fxcilities#4728`
+                Developers: `Atie#5173` | `fxcilities#4728`
             """),
             inline=False
         )
@@ -227,7 +227,8 @@ class InfoCog(commands.Cog):
         """Gives a World invite link to the user."""
         embed = Embed(
             title="Invite world",
-            description=f"[Invite - Admin perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)\n[Invite - No perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=0&scope=bot)\n[Support server](https://discord.gg/3dYmZra)"
+            description=f"[Invite - Admin perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)\n[Invite - No perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=0&scope=bot)\n[Support server](https://discord.gg/AyWjtRncHA)",
+            color=0x2F3136
             )
         await ctx.send(embed=embed)
 
