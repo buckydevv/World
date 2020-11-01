@@ -1,5 +1,6 @@
 import os
 import random
+import datetime
 import textwrap
 from dataclasses import dataclass
 from datetime import datetime
@@ -11,6 +12,7 @@ import aiohttp
 from discord import Embed, Member
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
+from datetime import datetime
 
 from dotenv import load_dotenv
 
@@ -28,6 +30,22 @@ class User:
     poop: int
     apple: int
     afk: str
+    AccountCreated: str
+    Reputation: int
+    #Premium: str
+    #Bank: int
+    #Wallet: int
+    #Tickets: int
+    #TicketReason: str
+    #WorldFriends: int
+    #IsBlacklisted: str
+    #CurrentJob: str
+    #LastWithdraw: str
+    LastTransfer: str
+    #beans: int
+    #pizza: int
+    #waffles: int
+    #Fish: int
 
 
 class Item(type):
@@ -173,35 +191,17 @@ class EconomyCog(commands.Cog):
         inventory_embed.set_thumbnail(url=ctx.author.avatar_url)
         await ctx.send(embed=inventory_embed)
 
-    @commands.command(name="profile", aliases=("account",))
-    async def profile(self, ctx: commands.Context, user: Member=None) -> None:
-        """Returns the profile of the users items, status and coins."""
-        user = user or ctx.author
-        if not (await self._has_account(user.id)):
-            await self._create_account(user.id)
 
-        stat = await self._get_user(user.id)
-        status_embed = Embed(
-        	title=f"{user}'s Profile",
-        	color=0x2F3136
-        	).add_field(
-        	name="<:memberlogo:765649915031846912> | Account",
-        	value=f"Account Type: `World Account`\nCoins: `{stat.coins:.2f}`\nStatus: `{stat.afk}`"
-        	).set_thumbnail(
-        	url=user.avatar_url
-        	)
-        await ctx.send(embed=status_embed)
-
-    @profile.error
-    async def profile_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
-        """Handles errors when showing users profile something."""
-        error = getattr(error, "original", error)
-        if isinstance(error, NotEnoughCoins):
-            await ctx.send(error)
-        elif isinstance(error, commands.errors.BadArgument):
-            await ctx.send(error)
-        elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please mention a valid user.")
+    #@profile.error
+   # async def profile_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+        #"""Handles errors when showing users profile something."""
+       # error = getattr(error, "original", error)
+        #if isinstance(error, NotEnoughCoins):
+        #    await ctx.send(error)
+       # elif isinstance(error, commands.errors.BadArgument):
+        #    await ctx.send(error)
+        #elif isinstance(error, commands.errors.MissingRequiredArgument):
+         #   await ctx.send(f"Sorry {ctx.author.mention} Please mention a valid user.")
 
     @commands.command(name="balance", aliases=("bal",))
     async def balance(self, ctx: commands.Context) -> None:
@@ -541,6 +541,7 @@ class EconomyCog(commands.Cog):
 
         The target is a member from your Discord server.
         """
+        now = datetime.now()
         if not (await self._has_account(ctx.author.id)):
             await self._create_account(ctx.author.id)
 
@@ -556,7 +557,8 @@ class EconomyCog(commands.Cog):
             },
             {
                 "$set": {
-                    "coins": user.coins - amount
+                    "coins": user.coins - amount,
+                    "LastTransfer": str(now.strftime("%m/%d/%Y at %H:%M:%S"))
                 }
             }
         )
@@ -573,7 +575,7 @@ class EconomyCog(commands.Cog):
         daily_embed = Embed(
             title="Transfer",
             color=0x2F3136,
-            description=f"Hey {ctx.author.mention} You have successfully transfered `{amount}` coin{'s' if amount > 1 else ''} to {target.mention}."
+            description=f"Hey {ctx.author.mention} You have successfully transfered `{amount}` coin{'s' if amount > 1 else ''} to {target.mention}.\nYour Last Transfer: `{user.LastTransfer}`"
         )
         await ctx.send(embed=daily_embed)
 
@@ -616,7 +618,8 @@ class EconomyCog(commands.Cog):
 
         user_object = User(
             user_id, user_data["coins"], user_data["cookie"], user_data["choc"],
-            user_data["poop"], user_data["apple"], user_data["afk"]
+            user_data["poop"], user_data["apple"], user_data["afk"], user_data["AccountCreated"], user_data["Reputation"],
+            user_data["LastTransfer"]
         )
         return user_object
 
@@ -688,14 +691,40 @@ class EconomyCog(commands.Cog):
 
     async def _create_account(self, user_id: int) -> None:
         """Creates a record, setting the record's author as user_id."""
+        now = datetime.now()
+        _created_at = str(now.strftime("%m/%d/%Y at %H:%M:%S"))
         await self._database_collection.insert_one({
             "_id": user_id,
             "coins": 100,
             "cookie": 0,
             "choc": 0,
             "poop": 0,
+            "beans": 0,
+            "pizza": 0,
+            "waffles": 0,
+            "Fish": 0,
             "apple": 0,
-            "afk": "No status set, run w/status to set a status"
+            "afk": "No status set, run w/status to set a status",
+            "Reputation": 0,
+            "LastUsed": "Isnotset",
+            "TargetMember": 0,
+            "BadgeSlot1": "Doesn't Have Noob",
+            "BadgeSlot2": "Doesn't Have Beginner",
+            "BadgeSlot3": "Doesn't Have Leader",
+            "AccountCreated": _created_at,
+            "Premium": "No",
+            "Developer": "No",
+            "Bank": 0,
+            "Wallet": 0,
+            "Tickets": 0,
+            "TicketReason": "No reason",
+            "WorldFriends": 0,
+            "IsBlacklisted": "No",
+            "CurrentJob": "No job",
+            "LastWithdraw": "No date",
+            "LastTransfer": "No date",
+            "MarriedTo": "Nobody",
+            "MarriedDate": "No date",
         })
 
     async def _has_account(self, user_id: int) -> None:
