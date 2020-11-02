@@ -30,10 +30,8 @@ class User:
     poop: int
     apple: int
     afk: str
-    AccountCreated: str
-    Reputation: int
+    Bank: int
     #Premium: str
-    #Bank: int
     #Wallet: int
     #Tickets: int
     #TicketReason: str
@@ -41,7 +39,6 @@ class User:
     #IsBlacklisted: str
     #CurrentJob: str
     #LastWithdraw: str
-    LastTransfer: str
     #beans: int
     #pizza: int
     #waffles: int
@@ -191,18 +188,6 @@ class EconomyCog(commands.Cog):
         inventory_embed.set_thumbnail(url=ctx.author.avatar_url)
         await ctx.send(embed=inventory_embed)
 
-
-    #@profile.error
-   # async def profile_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
-        #"""Handles errors when showing users profile something."""
-       # error = getattr(error, "original", error)
-        #if isinstance(error, NotEnoughCoins):
-        #    await ctx.send(error)
-       # elif isinstance(error, commands.errors.BadArgument):
-        #    await ctx.send(error)
-        #elif isinstance(error, commands.errors.MissingRequiredArgument):
-         #   await ctx.send(f"Sorry {ctx.author.mention} Please mention a valid user.")
-
     @commands.command(name="balance", aliases=("bal",))
     async def balance(self, ctx: commands.Context) -> None:
         """Returns the current balance of the user."""
@@ -213,7 +198,7 @@ class EconomyCog(commands.Cog):
         bal_embed = Embed(
             title=f"{ctx.author}'s balance",
             color=0x2F3136,
-            description=f"`{author.coins:.2f}` Coins"
+            description=f"Coins: `{author.coins:.2f}`\nBank: `{author.Bank}`"
         )
         await ctx.send(embed=bal_embed)
 
@@ -620,8 +605,7 @@ class EconomyCog(commands.Cog):
 
         user_object = User(
             user_id, user_data["coins"], user_data["cookie"], user_data["choc"],
-            user_data["poop"], user_data["apple"], user_data["afk"], user_data["AccountCreated"], user_data["Reputation"],
-            user_data["LastTransfer"]
+            user_data["poop"], user_data["apple"], user_data["afk"], user_data["Bank"]
         )
         return user_object
 
