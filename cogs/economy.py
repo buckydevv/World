@@ -541,6 +541,8 @@ class EconomyCog(commands.Cog):
 
         The target is a member from your Discord server.
         """
+        if target.id == ctx.author.id:
+        	return await ctx.send(f"Sorry {ctx.author.mention} but you cant transfer money to yourself dummy?")
         now = datetime.now()
         if not (await self._has_account(ctx.author.id)):
             await self._create_account(ctx.author.id)
@@ -586,7 +588,7 @@ class EconomyCog(commands.Cog):
         if isinstance(error, NotEnoughCoins):
             await ctx.send(error)
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} You forgot to mention the member.")
+            await ctx.send(f"Sorry {ctx.author.mention} Invalid argument please type `world transfer <@user? <amount>")
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
         elif isinstance(error, UserNotFound):
