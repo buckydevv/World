@@ -124,14 +124,14 @@ class HelpCog(commands.Cog):
         color=0x2F3136,
         ).add_field(
         name="<:account:765642079920980009> | Account Commands",
-        value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer`"
+        value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer` | `w/profile` | \n`w/deposit` | `w/withdraw`"
         ).add_field(
         name=":shopping_bags: | Market Commands",
-        value="`w/shop` | `w/buy` | `w/sell` | `w/beg`",
+        value="`w/shop` | `w/buy` | `w/sell` | `w/beg` | `w/badgeshop` | `w/buybadge`",
         inline=False
         ).add_field(
         name=":thumbsup: | Fun commands",
-        value="`w/daily` | `w/weekly` | `w/gamble` | `w/rep` | `w/repinfo`",
+        value="`w/daily` | `w/weekly` | `w/gamble` | `w/rep` | `w/repinfo` | `w/marry` | `w/divorce`",
         inline=False
         )
       await ctx.send(embed=em)
@@ -142,7 +142,7 @@ class HelpCog(commands.Cog):
       em = discord.Embed(
         title="New commands!", 
         color=0x2F3136,
-        description="Whole rewrite - `w/economy`\nMore logs! - `w/logs`\nSuggest a bug! - `w/suggest`\nSnipe commands! - `w/mod`\nMore information - `w/other`"
+        description="New economy commands: `w/economy`"
         )
       await ctx.send(embed=em)
 
