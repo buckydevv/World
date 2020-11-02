@@ -4,12 +4,14 @@ import os
 import textwrap
 import datetime
 import asyncio
+import typing
 
 from discord.ext.commands import command
 from discord.ext import commands
 from discord.ext.commands import Cog
 from pymongo import MongoClient
 from datetime import datetime
+from typing import Optional
 from asyncio import TimeoutError
 
 
@@ -146,13 +148,14 @@ class EconomyFunCog(commands.Cog):
             beginner_b = result["BadgeSlot2"]
             leader_b = result["BadgeSlot3"]
             marry = result["MarriedTo"]
+            bank_ = result["Bank"]
             page1 = discord.Embed(
                 title='Page 1/3',
                 description=f"{user}'s Profile",
                 colour=0x2F3136
                 ).add_field(
                 name="<:memberlogo:765649915031846912> | Account",
-                value=f"Account Type: `World Account`\nCoins: `{coins:.2f}`\nReputation: `{rep}`\nStatus: `{afk}`"
+                value=f"Account Type: `World Account`\nCoins: `{coins:.2f}`\nBank: `{bank_}`\nReputation: `{rep}`\nStatus: `{afk}`"
                 )
 
             page2 = discord.Embed(
@@ -336,6 +339,7 @@ class EconomyFunCog(commands.Cog):
                     break
             if str(res[1])!='World#4520':
                 emoji=str(res[0].emoji)
+                await msg.remove_reaction(res[0].emoji,res[1])
             if emoji == "☑":
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedTo": str(user)}})
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedDate": str(m_date)}})
@@ -394,7 +398,59 @@ class EconomyFunCog(commands.Cog):
             a = round(a)
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
 
-## Divorce end
+## Divorce end ##
 
+## Bank start ##
+
+    @commands.command(help="Deposit money into your World bank account", aliases=["dep"])
+    async def deposit(self, ctx, amount: int):
+        if amount < 0:
+            return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
+        query = {"_id": ctx.author.id}
+        dep_ = collection.find(query)
+        for result in dep_:
+            bank_ = result["Bank"]
+            coins_ = result["coins"]
+            remove_coins = coins_ - amount
+            total_coins = bank_ + amount
+            if collection.find_one({"_id": ctx.author.id})["coins"] < amount:
+                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money.")
+                return await ctx.send(embed=embed)
+            collection.update_one({"_id": ctx.author.id}, {"$set": {"Bank": total_coins}})
+            collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": remove_coins}})
+            embed = discord.Embed(title="Deposit", description=f"{ctx.author.mention} you have just deposited `{amount}` coins.", color=0x2F3136)
+            await ctx.send(embed=embed)
+
+    @commands.command(help="Withdraw money from your World bank account.", aliases=["with"])
+    async def withdraw(self, ctx, amount: int):
+        if amount < 0:
+            return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
+        query = {"_id": ctx.author.id}
+        with_ = collection.find(query)
+        for result in with_:
+            bank_ = result["Bank"]
+            coins_ = result["coins"]
+            total_coins = coins_ + amount
+            remove_coins = bank_ - amount
+            if collection.find_one({"_id": ctx.author.id})["Bank"] < amount:
+                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't withdraw because you don't have that much money in the bank.")
+                return await ctx.send(embed=embed)
+            collection.update_one({"_id": ctx.author.id}, {"$set": {"Bank": remove_coins}})
+            collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": total_coins}})
+            embed = discord.Embed(title="Withdraw", description=f"{ctx.author.mention} you have just withdrawn `{amount}` coins.", color=0x2F3136)
+            await ctx.send(embed=embed)
+
+    @deposit.error
+    async def deposit_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/deposit <amount>`")
+
+
+    @withdraw.error
+    async def withdraw_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/withdraw <amount>`")
+
+## Bank end ##
 def setup(bot):
     bot.add_cog(EconomyFunCog(bot))
