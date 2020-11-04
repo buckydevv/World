@@ -184,19 +184,56 @@ class ModCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-    @commands.command(help="Nuke a channel.")
+    @commands.command(help="Nuke a specified channel.")
     @commands.has_permissions(manage_messages=True)
     async def nuke(self, ctx, channel=None):
-        channel = channel or ctx.channel
-        await channel.delete()
-        nuked_channel = await channel.clone()
-        message_ = self.bot.get_channel(nuked_channel.id)
-        await message_.send(f"{ctx.author.mention} <#{nuked_channel.id}> was nuked.\nhttps://tenor.com/view/explosion-explode-clouds-of-smoke-gif-17216934")
+    	channel = channel or ctx.channel
+    	nuke_ = discord.Embed(
+    		title="Nuke",
+    		description=f"Would you like to nuke `{channel}`?\nThis will delete the channel and remake it.",
+    		color=0x2F3136
+    		)
+
+    	nuke_fail = discord.Embed(
+    		title="Nuke Failed",
+    		description=f"You Chose not to nuke `{channel}`",
+    		color=0x2F3136
+    		)
+
+    	message = await ctx.send(embed=nuke_)
+
+    	await message.add_reaction('✅')
+    	await message.add_reaction('❎')
+
+    	emoji = ''
+
+    	while True:
+    		if emoji=='✅':
+    			try:
+    				await channel.delete()
+    				nuked_channel = await channel.clone()
+    				message_ = self.bot.get_channel(nuked_channel.id)
+    				await message_.send(f"{ctx.author.mention} <#{nuked_channel.id}> was nuked.\nhttps://tenor.com/view/explosion-explode-clouds-of-smoke-gif-17216934")
+    				break
+    			except Exception as e:
+    				embed = discord.Embed(title="Error:", description=e, color=0x2F3136)
+    				return await ctx.send(embed=embed)
+    		if emoji=='❎':
+    			await message.edit(embed=nuke_fail)
+    			break
+
+    		res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=15)
+    		if res==None:
+    			break
+    		if str(res[1])!='World#4520':
+    			emoji=str(res[0].emoji)
+
+    	await message.clear_reactions()
         
     @nuke.error
     async def nuke_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f':regional_indicator_x: Sorry {ctx.author.mention} You Do Not Have The Role Perm: `manage messages`!')
+            await ctx.send(f':regional_indicator_x: Sorry {ctx.author.mention} You Do Not Have The Role Permission: `manage messages`!')
 
  
     @commands.command(help="Unlock the current channel.")
