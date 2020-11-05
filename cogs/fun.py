@@ -12,6 +12,7 @@ import json
 from discord.ext import commands, tasks
 from urllib.parse import urlparse, quote
 from akinator.async_aki import Akinator
+from discord import Spotify
 from googletrans import Translator
 
 akiObj = akinator.async_aki.Akinator()
@@ -118,6 +119,22 @@ class FunCog(commands.Cog):
         em.color = 0x2F3136
         em.set_footer(text=f"👍Ups:{ups} 👎Downs:{downs}")
         await ctx.send(embed=em)
+
+    @commands.command(help="Enlarge a discord emoji!")
+    async def enlarge(self, ctx, emoji: discord.Emoji):
+    	if emoji.animated:
+    		embed = discord.Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=0x2F3136)
+    		embed.set_image(url=emoji.url)
+    		await ctx.send(embed=embed)
+    	if not emoji.animated:
+    		embed = discord.Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=0x2F3136)
+    		embed.set_image(url=emoji.url)
+    		await ctx.send(embed=embed)
+
+    @enlarge.error
+    async def enlarge_error(self, ctx, error):
+        if isinstance(error, commands.EmojiNotFound):
+        	await ctx.send(f"Sorry {ctx.author.mention} that emoji is not valid!")
 
     @meme.error
     async def meme_error(self, ctx, error):
@@ -371,7 +388,7 @@ class FunCog(commands.Cog):
         "they stole money from your bank",
         "they ate your cookies",
         "they tried to steal your phone",
-        "they smelt like poop",
+        "they smelled like poop",
         "they didn't like you",
         "they lied to you",
         "they didnt trust you"
