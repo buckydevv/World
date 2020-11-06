@@ -149,6 +149,10 @@ class EconomyFunCog(commands.Cog):
             leader_b = result["BadgeSlot3"]
             marry = result["MarriedTo"]
             bank_ = result["Bank"]
+            beans = result["beans"]
+            pizzas = result["pizza"]
+            waffles = result["waffles"]
+            fish = result["Fish"]
             page1 = discord.Embed(
                 title='Page 1/3',
                 description=f"{user}'s Profile",
@@ -164,7 +168,7 @@ class EconomyFunCog(commands.Cog):
                 colour=0x2F3136
                 ).add_field(
                 name=":handbag: | Inventory",
-                value=f":cookie: Cookies: `{cookie}`\n:chocolate_bar: Chocbars: `{chocolate}`\n:apple: Apples: `{apple}`\n:poop: Poop: `{poop}`"
+                value=f":cookie: Cookies: `{cookie}`\n:chocolate_bar: Chocbars: `{chocolate}`\n:apple: Apples: `{apple}`\n:poop: Poop: `{poop}`\n<:beanworld:774371828629635132> Beans: `{beans}`\n:pizza: Pizza: `{pizzas}`\n:waffle: Waffles `{waffles}`\n:fish: Fish: `{fish}`"
                 )
 
             page3 = discord.Embed(
