@@ -31,6 +31,10 @@ class User:
     apple: int
     afk: str
     Bank: int
+    beans: int
+    pizza: int
+    waffles: int
+    Fish: int
     #Premium: str
     #Wallet: int
     #Tickets: int
@@ -39,10 +43,6 @@ class User:
     #IsBlacklisted: str
     #CurrentJob: str
     #LastWithdraw: str
-    #beans: int
-    #pizza: int
-    #waffles: int
-    #Fish: int
 
 
 class Item(type):
@@ -76,6 +76,30 @@ class Apple(metaclass=Item):
     name = "apple"
     price = 10
 
+class Beans(metaclass=Item):
+    """Represents a World item."""
+
+    name = "beans"
+    price = 10
+
+class Pizza(metaclass=Item):
+    """Represents a World item."""
+
+    name = "pizza"
+    price = 15
+
+class Waffles(metaclass=Item):
+    """Represents a World item."""
+
+    name = "waffles"
+    price = 20
+
+class Fish(metaclass=Item):
+    """Represents a World item."""
+
+    name = "Fish"
+    price = 30
+
 
 class ItemConverter(commands.Converter):
     """Converts a string into a World item."""
@@ -90,6 +114,14 @@ class ItemConverter(commands.Converter):
             return Poop
         elif argument.lower() in ("apple", "apples"):
             return Apple
+        elif argument.lower() in ("beans", "bean"):
+            return Beans
+        elif argument.lower() in ("pizza", "pizzas"):
+            return Pizza
+        elif argument.lower() in ("waffle", "waffles"):
+            return Waffles
+        elif argument.lower() in ("fish", "fishes"):
+            return Fish
         else:
             raise commands.errors.BadArgument("Invalid item provided.")
 
@@ -145,6 +177,14 @@ class EconomyCog(commands.Cog):
                 `6 coins per poop.`
                 - Apples
                 `10 coins per apple.`
+                - Beans
+                `10 coins per bean.`
+                - Waffles
+                `15 coins per waffle.`
+                - Pizzas
+                `20 coins per pizza.`
+                - Fish
+                `30 coins per Fish.`
             """),
             color=0x2F3136
         )
@@ -182,8 +222,20 @@ class EconomyCog(commands.Cog):
             value=f":poop: {author.poop}"
         )
         inventory_embed.add_field(
-            name="Status",
-            value=author.afk
+            name="Beans",
+            value=f"<:beanworld:774371828629635132> {author.beans}"
+        )
+        inventory_embed.add_field(
+            name="Pizza",
+            value=f":pizza: {author.pizza}"
+        )
+        inventory_embed.add_field(
+            name="Waffles",
+            value=f":waffle: {author.waffles}"
+        )
+        inventory_embed.add_field(
+            name="Fish",
+            value=f":fish: {author.Fish}"
         )
         inventory_embed.set_thumbnail(url=ctx.author.avatar_url)
         await ctx.send(embed=inventory_embed)
@@ -605,7 +657,8 @@ class EconomyCog(commands.Cog):
 
         user_object = User(
             user_id, user_data["coins"], user_data["cookie"], user_data["choc"],
-            user_data["poop"], user_data["apple"], user_data["afk"], user_data["Bank"]
+            user_data["poop"], user_data["apple"], user_data["afk"], user_data["Bank"],
+            user_data["beans"], user_data["pizza"], user_data["waffles"], user_data["Fish"]
         )
         return user_object
 
