@@ -217,7 +217,6 @@ class EconomyFunCog(commands.Cog):
                     break
                 if str(res[1])!='World#4520':
                     emoji=str(res[0].emoji)
-                    await message.remove_reaction(res[0].emoji,res[1])
 
             await message.clear_reactions()
 
@@ -339,7 +338,6 @@ class EconomyFunCog(commands.Cog):
                     break
             if str(res[1])!='World#4520':
                 emoji=str(res[0].emoji)
-                await msg.remove_reaction(res[0].emoji,res[1])
             if emoji == "☑":
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedTo": str(user)}})
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedDate": str(m_date)}})
@@ -452,5 +450,42 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/withdraw <amount>`")
 
 ## Bank end ##
+
+## Owner section ##
+
+    @commands.command(help="Sorry Buddy only owner.")
+    @commands.is_owner()
+    async def givecoin(self, ctx, users: discord.Member, *, coin):
+        query = {"_id": users.id}
+        user = collection.find(query)
+        for result in user:
+            user_coin = result["coins"]
+            total_coins = user_coins + coin
+            collection.update_one({"_id": users.id}, {"$set": {"coins": total_coins}})
+            embed1 = discord.Embed(
+                title="Success!"
+                ).add_field(
+                name=f"Complete", 
+                value=f"{ctx.author.mention} I Have Added `{coin}` Coins To {users.mention}'s Balance"
+                )
+            await ctx.send(embed=embed1)
+
+    @commands.command(help="Only owner buddy.")
+    @commands.is_owner()
+    async def removecoin(self, ctx, users: discord.Member, *, coin):
+        query = {"_id": users.id}
+        user = collection.find(query)
+        for result in user:
+            user_coin = result["coins"]
+            collection.update_one({"_id": users.id}, {"$set": {"coins":coins}})
+            embed1 = discord.Embed(
+                title="Success"
+                ).add_field(
+                name=f"Complete",
+                value=f"{ctx.author.mention} I Have Removed `{coin}` Coins From {users.mention}'s Balance"
+                )
+            await ctx.send(embed=embed1)
+
+## end of owner section
 def setup(bot):
     bot.add_cog(EconomyFunCog(bot))
