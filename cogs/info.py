@@ -39,7 +39,7 @@ class InfoCog(commands.Cog):
             value=textwrap.dedent(f"""
                 Name: `{user.name}`
                 ID: `{user.id}`
-                Created at: `{user.created_at}`
+                Created at: `{user.created_at.strftime('%m/%d/%Y')}`
                 Bot: `{user.bot}`
                 Status: `{user.status}`
                 Activity: `{user.activity}`
@@ -50,7 +50,7 @@ class InfoCog(commands.Cog):
             name="Server related information",
             value=textwrap.dedent(f"""
                 Nick: `{user.nick if user.nick else 'None'}`
-                Joined at: `{user.joined_at}`
+                Joined at: `{user.joined_at.strftime('%m/%d/%Y')}`
                 Join position: `{sorted(ctx.guild.members, key=lambda m: m.joined_at).index(user) + 1}`
                 Booster since: `{user.premium_since}`
                 System user: `{user.system}`
@@ -227,8 +227,7 @@ class InfoCog(commands.Cog):
         """Gives a World invite link to the user."""
         embed = Embed(
             title="Invite world",
-            description=f"[Invite - Admin perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)\n[Invite - No perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=0&scope=bot)\n[Support server](https://discord.gg/AyWjtRncHA)",
-            color=0x2F3136
+            description=f"[Invite - Admin perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)\n[Invite - No perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=0&scope=bot)\n[Support server](https://discord.gg/AyWjtRncHA)"
             )
         await ctx.send(embed=embed)
 
