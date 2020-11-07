@@ -1,5 +1,6 @@
 import textwrap
 import discord
+import psutil
 from time import time
 from typing import Optional
 
@@ -42,7 +43,7 @@ class InfoCog(commands.Cog):
                 Created at: `{user.created_at.strftime('%m/%d/%Y')}`
                 Bot: `{user.bot}`
                 Status: `{user.status}`
-                Activity: `{user.activity}`
+                Activity: `{user.activity.name}`
             """),
             inline=False
         )
@@ -145,6 +146,7 @@ class InfoCog(commands.Cog):
                 Version: discord.py {discord_version}
                 Servers: {len(self.bot.guilds)}
                 Users: {len(set(self.bot.get_all_members()))}
+                CPU Usage: {psutil.cpu_percent()}%
             """),
             inline=False
         )
