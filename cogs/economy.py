@@ -317,7 +317,7 @@ class EconomyCog(commands.Cog):
     	if target.coins == 0:
     		return await ctx.send(f"Sorry {ctx.author.mention} That user has no coins, try again next time!")
     	else:
-    		robbed_amount = random.randint(1, target.coins)
+    		robbed_amount = random.randint(1, round(target.coins))
     		total_robbed = target.coins - robbed_amount
     		robber_total = robbed_amount + robber.coins
     		await self._database_collection.update_one({"_id": user.id}, {"$set": {"coins": total_robbed}})
