@@ -35,6 +35,7 @@ class User:
     pizza: int
     waffles: int
     Fish: int
+    LastTransfer: str
     #Premium: str
     #Wallet: int
     #Tickets: int
@@ -42,7 +43,6 @@ class User:
     #WorldFriends: int
     #IsBlacklisted: str
     #CurrentJob: str
-    #LastWithdraw: str
 
 
 class Item(type):
@@ -303,6 +303,47 @@ class EconomyCog(commands.Cog):
         else:
             sold_embed = Embed(title="Congrats!", color=0x2F3136, description=f"Hey {ctx.author.mention} You sold your items successfully! You earned **{coins_earned}** coins.")
             await ctx.send(embed=sold_embed)
+
+    @commands.command(name="rob")
+    @commands.cooldown(1, 1800, BucketType.member)
+    async def rob(self, ctx: commands.Context, user: Member) -> None:
+    	"""Rob a user!"""
+    	if user.id == ctx.author.id:
+    		return await ctx.send(f"Sorry {ctx.author.mention} you can't rob yourself silly <:Worldkek:768145777926078474>")
+    	if not (await self._has_account(ctx.author.id)):
+    		await self._create_account(ctx.author.id)
+    	robber = await self._get_user(ctx.author.id)
+    	target = await self._get_user(user.id)
+    	if target.coins == 0:
+    		return await ctx.send(f"Sorry {ctx.author.mention} That user has no coins, try again next time!")
+    	else:
+    		robbed_amount = random.randint(1, target.coins)
+    		total_robbed = target.coins - robbed_amount
+    		robber_total = robbed_amount + robber.coins
+    		await self._database_collection.update_one({"_id": user.id}, {"$set": {"coins": total_robbed}})
+    		await self._database_collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": robber_total}})
+
+    		embed = Embed(
+    			title="Rob",
+    			description=f"{ctx.author.mention} you haved robbed `{robbed_amount}` coins from {user.mention}",
+    			color=0x2F3136
+    			)
+    		await ctx.send(embed=embed)
+
+    @rob.error
+    async def rob_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+        """Handles errors when running the rob command."""
+        error = getattr(error, "original", error)
+        if isinstance(error, NotEnoughCoins):
+            await ctx.send(error)
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Invalid argument please type `world rob <@user>")
+        elif isinstance(error, commands.errors.BadArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
+        elif isinstance(error, commands.errors.CommandOnCooldown):
+            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:.2f} seconds.")
+        elif isinstance(error, UserNotFound):
+            await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
 
     @sell.error
     async def sell_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
@@ -658,7 +699,8 @@ class EconomyCog(commands.Cog):
         user_object = User(
             user_id, user_data["coins"], user_data["cookie"], user_data["choc"],
             user_data["poop"], user_data["apple"], user_data["afk"], user_data["Bank"],
-            user_data["beans"], user_data["pizza"], user_data["waffles"], user_data["Fish"]
+            user_data["beans"], user_data["pizza"], user_data["waffles"], user_data["Fish"],
+            user_data["LastTransfer"]
         )
         return user_object
 
