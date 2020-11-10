@@ -184,6 +184,8 @@ class ModCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
+
+
     @commands.command(help="Nuke a specified channel.")
     @commands.has_permissions(manage_messages=True)
     async def nuke(self, ctx, channel=None):
@@ -225,7 +227,7 @@ class ModCog(commands.Cog):
     		res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=15)
     		if res==None:
     			break
-    		if str(res[1])!='World#4520':
+    		if str(res[1])!='Luffy#0728':
     			emoji=str(res[0].emoji)
 
     	await message.clear_reactions()
@@ -323,28 +325,28 @@ class ModCog(commands.Cog):
 
     @commands.command(help="Snipe a deleted message.")
     async def snipe(self, ctx):
-    	if not self.snipeCache:
-    		return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to Snipe.")
-    	else:
+    	try:
     		embed = discord.Embed(title="Snipe", color=0x2F3136, timestamp=datetime.datetime.utcnow())
     		embed.add_field(name="User", value=self.snipeCache[ctx.channel.id]["user"])
     		embed.add_field(name="Content", value=self.snipeCache[ctx.channel.id]["content"])
     		embed.add_field(name="Channel", value=f"<#{self.snipeCache[ctx.channel.id]['channel']}>")
     		await ctx.send(embed=embed)
     		del self.snipeCache[ctx.channel.id]
+    	except Exception as e:
+    		return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to snipe!")
 
 
     @commands.command(help="Snipe a edited message.")
     async def editsnipe(self, ctx):
-    	if not self.editSnipeCache:
-    		return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to EditSnipe.")
-    	else:
+    	try:
     		embed = discord.Embed(title="Edit Snipe", colour=0x2F3136, timestamp=datetime.datetime.utcnow())
     		embed.add_field(name="User", value=self.editSnipeCache[ctx.channel.id]["user"])
     		embed.add_field(name="Content", value=self.editSnipeCache[ctx.channel.id]["bcontent"])
     		embed.add_field(name="Channel", value=f"<#{self.editSnipeCache[ctx.channel.id]['channel']}>")
     		await ctx.send(embed=embed)
     		del self.editSnipeCache[ctx.channel.id]
+    	except Exception as e:
+    		return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to editsnipe!")
 
 
     @commands.Cog.listener()
