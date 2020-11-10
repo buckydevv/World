@@ -4,6 +4,7 @@ import os
 import textwrap
 import datetime
 import asyncio
+import motor.motor_asyncio
 import typing
 
 from discord.ext.commands import command
@@ -34,41 +35,8 @@ class EconomyFunCog(commands.Cog):
         now = datetime.now()
         if user.id == ctx.author.id:
             return await ctx.send(f"Sorry {ctx.author.mention} You cant give yourself a reputation point.")
-        if not collection.find_one({"_id": user.id}):
-            rep_account = {
-            "_id": user.id,
-            "coins": 100,
-            "cookie": 0,
-            "choc": 0,
-            "poop": 0,
-            "beans": 0,
-            "pizza": 0,
-            "waffles": 0,
-            "Fish": 0,
-            "apple": 0,
-            "afk": "No status set, run w/status to set a status",
-            "Reputation": 0,
-            "LastUsed": "Isnotset",
-            "TargetMember": 0,
-            "BadgeSlot1": "Doesn't Have Noob",
-            "BadgeSlot2": "Doesn't Have Beginner",
-            "BadgeSlot3": "Doesn't Have Leader",
-            "AccountCreated": _created_at,
-            "Premium": "No",
-            "Developer": "No",
-            "Bank": 0,
-            "Wallet": 0,
-            "Tickets": 0,
-            "TicketReason": "No reason",
-            "WorldFriends": 0,
-            "IsBlacklisted": "No",
-            "CurrentJob": "No job",
-            "LastWithdraw": "No date",
-            "LastTransfer": "No date",
-            "MarriedTo": "Nobody",
-            "MarriedDate": "No date",
-            }
-            collection.insert_one(rep_account)
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
             query = {"_id": user.id}
             rep_ = collection.find(query)
             post = {"Reputation": user.id}
@@ -107,6 +75,8 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command(help="Info on your last given rep point.")
     async def repinfo(self, ctx):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         now = datetime.now()
         if not collection.find_one({"_id": ctx.author.id}):
             return await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
@@ -131,6 +101,8 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command()
     async def profile(self, ctx, user: discord.Member=None):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         user = user or ctx.author
         query = {"_id": user.id}
         prof = collection.find(query)
@@ -246,6 +218,8 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command(help="Buy a World Badge.")
     async def buybadge(self, ctx, item: str):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         query = {"_id": ctx.author.id}
         a_ = collection.find(query)
         for result in a_:
@@ -319,6 +293,8 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="Marry a specified user!")
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     async def marry(self, ctx, user: discord.Member):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         now = datetime.now()
         m_date = str(now.strftime("%m/%d/%Y"))
         if user == ctx.author:
@@ -371,6 +347,8 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="Divorce a specified user!")
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     async def divorce(self, ctx, user: discord.Member):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         if user == ctx.author:
             return await ctx.send(f"Sorry {ctx.author.mention} but you can't divorce yourself!")
         query = {"_id": ctx.author.id}
@@ -406,6 +384,8 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command(help="Deposit money into your World bank account", aliases=["dep"])
     async def deposit(self, ctx, amount: int):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         if amount < 0:
             return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
         query = {"_id": ctx.author.id}
@@ -425,6 +405,8 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command(help="Withdraw money from your World bank account.", aliases=["with"])
     async def withdraw(self, ctx, amount: int):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         if amount < 0:
             return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
         query = {"_id": ctx.author.id}
@@ -491,5 +473,54 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(embed=embed1)
 
 ## end of owner section
+
+## define section
+
+    async def _create_account(self, user_id: int) -> None:
+        """Create a World account."""
+        now = datetime.now()
+        _created_at = str(now.strftime("%m/%d/%Y at %H:%M:%S"))
+        collection.insert_one({
+            "_id": user_id,
+            "coins": 100,
+            "cookie": 0,
+            "choc": 0,
+            "poop": 0,
+            "beans": 0,
+            "pizza": 0,
+            "waffles": 0,
+            "Fish": 0,
+            "apple": 0,
+            "afk": "No status set, run w/status to set a status",
+            "Reputation": 0,
+            "LastUsed": "Isnotset",
+            "TargetMember": 0,
+            "BadgeSlot1": "Doesn't Have Noob",
+            "BadgeSlot2": "Doesn't Have Beginner",
+            "BadgeSlot3": "Doesn't Have Leader",
+            "AccountCreated": _created_at,
+            "Premium": "No",
+            "Developer": "No",
+            "Bank": 0,
+            "Wallet": 0,
+            "Tickets": 0,
+            "TicketReason": "No reason",
+            "WorldFriends": 0,
+            "IsBlacklisted": "No",
+            "CurrentJob": "No job",
+            "LastWithdraw": "No date",
+            "LastTransfer": "No date",
+            "MarriedTo": "Nobody",
+            "MarriedDate": "No date",
+        })
+
+    async def _has_account(self, user_id: int) -> None:
+        """Returns True if the user_id has an account. Otherwise False."""
+        return bool(collection.find_one(
+            {"_id": user_id}
+        ))
+
+## end of define section
+
 def setup(bot):
     bot.add_cog(EconomyFunCog(bot))
