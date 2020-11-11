@@ -6,6 +6,7 @@ import datetime
 import asyncio
 import motor.motor_asyncio
 import typing
+import random
 
 from discord.ext.commands import command
 from discord.ext import commands
@@ -474,7 +475,91 @@ class EconomyFunCog(commands.Cog):
 
 ## end of owner section
 
+## Shootout start ##
+
+    @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
+    @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
+    async def shootout(self, ctx):
+    	await self._shootout_game(ctx)
+
+    @shootout.error
+    async def shootout_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            a = error.retry_after
+            a = round(a)
+            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
+
+## shootout end ##
+
 ## define section
+
+    async def _shootout_game(self, ctx: commands.Context):
+    	shooter_world = "https://im-a-dev.xyz/QqoZ2M6m.png"
+    	normal_world = "https://im-a-dev.xyz/BvdekLII.png"
+    	nothing_world = "https://im-a-dev.xyz/MfSnYYAa.png"
+
+    	all_worlds = [shooter_world, normal_world, nothing_world]
+
+    	random_choice = random.choice(all_worlds)
+
+    	embed = discord.Embed(title="Shootout", description="Is World a shooter?", color=0x2F3136)
+    	embed.set_image(url=random_choice)
+    	embed.set_footer(text="|✅ - shooter|❎ - innocent|🚫 - nothing")
+    	message = await ctx.send(embed=embed)
+
+    	await message.add_reaction('✅')
+    	await message.add_reaction('❎')
+    	await message.add_reaction('🚫')
+
+    	emoji = ''
+
+    	while True:
+    		if emoji == '✅':
+    			if random_choice == "https://im-a-dev.xyz/QqoZ2M6m.png":
+    				query = {"_id": ctx.author.id}
+    				user = collection.find(query)
+    				for result in user:
+    					user_coin = result["coins"]
+    					amount_won = user_coin + 250
+    					collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": amount_won}})
+    					await message.delete()
+    					return await ctx.send(f"Hey {ctx.author.mention} you caught World in the act! and have earned a total of `250` coins. Well done!")
+    			else:
+    				await message.delete()
+    				return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
+    		if emoji == '❎':
+    			if random_choice == "https://im-a-dev.xyz/BvdekLII.png":
+    				query = {"_id": ctx.author.id}
+    				user = collection.find(query)
+    				for result in user:
+    					user_coin = result["coins"]
+    					amount_won = user_coin + 100
+    					collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": amount_won}})
+    					await message.delete()
+    					return await ctx.send(f"Hey {ctx.author.mention} you have found innocent World! and have earned a total of `100` coins. Well done!")
+    			else:
+    				await message.delete()
+    				return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
+    		if emoji == '🚫':
+    			if random_choice == "https://im-a-dev.xyz/MfSnYYAa.png":
+    				await message.delete()
+    				return await ctx.send(f"Hey {ctx.author.mention} you found nothing...")
+    			else:
+    				await message.delete()
+    				return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
+    		try:
+    			res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=4)
+    			if res==None:
+    				break
+    			if str(res[1])!='Luffy#0728':
+    				emoji=str(res[0].emoji)
+    		except TimeoutError:
+    			await message.delete()
+    			return await ctx.send(f"Sorry {ctx.author.mention} you werent fast enough and World got away...")
+
+    	await message.clear_reactions()
+
+
 
     async def _create_account(self, user_id: int) -> None:
         """Create a World account."""
