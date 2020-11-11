@@ -480,8 +480,6 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
     @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
     async def shootout(self, ctx):
-    	if not (await self._has_account(ctx.author.id)):
-    		await self._create_account(ctx.author.id)
     	await self._shootout_game(ctx)
 
     @shootout.error
@@ -493,7 +491,87 @@ class EconomyFunCog(commands.Cog):
 
 ## shootout end ##
 
+## Fishing start ##
+
+    @commands.command(help="Fish for things in the lake", aliases=["fish", "worldfishing"])
+    @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
+    async def fishing(self, ctx):
+    	await self._fishing_world(ctx)
+
+    @fishing.error
+    async def fishing_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            a = error.retry_after
+            a = round(a)
+            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
+
+## Fishing end ##
+
 ## define section
+
+    async def _fishing_world(self, ctx: commands.Context):
+    	fishing_idle = "https://im-a-dev.xyz/1kKJXQSr.png"
+    	caught_fish = "https://im-a-dev.xyz/ImWqkaSy.png"
+    	caught_cookies = "https://im-a-dev.xyz/sqPSfhJJ.png"
+    	caught_coins = "https://im-a-dev.xyz/syTQUdrV.png"
+
+    	randomize = [fishing_idle, caught_fish, caught_cookies, caught_coins]
+    	random_choice = random.choice(randomize)
+
+    	if random_choice == "https://im-a-dev.xyz/1kKJXQSr.png":
+    		embed = discord.Embed(
+    			title="Fishing",
+    			description="There are no fish in the lake right now, come again soon!",
+    			color=0x2F3136
+    			)
+    		embed.set_image(url="https://im-a-dev.xyz/1kKJXQSr.png")
+    		return await ctx.send(embed=embed)
+
+    	if random_choice == "https://im-a-dev.xyz/ImWqkaSy.png":
+    		query = {"_id": ctx.author.id}
+    		user = collection.find(query)
+    		for result in user:
+    			user_fish = result["Fish"]
+    			new_amount = user_fish + int(1)
+    			collection.update_one({"_id": ctx.author.id}, {"$set": {"Fish": new_amount}})
+    			embed = discord.Embed(
+    				title="Fishing",
+    				description=f"Great, looks like you have caught a fish! you now have a total of `{new_amount}` Fish!",
+    				color=0x2F3136
+    				)
+    			embed.set_image(url="https://im-a-dev.xyz/ImWqkaSy.png")
+    			return await ctx.send(embed=embed)
+
+    	if random_choice == "https://im-a-dev.xyz/sqPSfhJJ.png":
+    		query = {"_id": ctx.author.id}
+    		user = collection.find(query)
+    		for result in user:
+    			user_cookie = result["cookie"]
+    			box_cookies = user_cookie + int(5)
+    			collection.update_one({"_id": ctx.author.id}, {"$set": {"cookie": box_cookies}})
+    			embed = discord.Embed(
+    				title="Fishing",
+    				description=f"Wow, you caught a box of cookies while fishing?! you now have a total of `{box_cookies}` Cookies!",
+    				color=0x2F3136
+    				)
+    			embed.set_image(url="https://im-a-dev.xyz/sqPSfhJJ.png")
+    			return await ctx.send(embed=embed)
+
+    	if random_choice == "https://im-a-dev.xyz/syTQUdrV.png":
+    		query = {"_id": ctx.author.id}
+    		user = collection.find(query)
+    		for result in user:
+    			user_coin = result["coins"]
+    			random_coins = random.randint(1, 50)
+    			bagof_coins = user_coin + random_coins
+    			collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": bagof_coins}})
+    			embed = discord.Embed(
+    				title="Fishing",
+    				description=f"Wow, you caught a bag of coins while fishing?!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{bagof_coins}` Coins!",
+    				color=0x2F3136
+    				)
+    			embed.set_image(url="https://im-a-dev.xyz/syTQUdrV.png")
+    			return await ctx.send(embed=embed)
 
     async def _shootout_game(self, ctx: commands.Context):
     	shooter_world = "https://im-a-dev.xyz/QqoZ2M6m.png"
