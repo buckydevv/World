@@ -8,6 +8,7 @@ import io
 import datetime
 import aiohttp
 import googletrans
+import os
 import json
 from discord.ext import commands, tasks
 from urllib.parse import urlparse, quote
@@ -68,6 +69,30 @@ class FunCog(commands.Cog):
             embed.set_image(url=f'https://api.alexflipnote.dev/pornhub?text={quote(text1)}{line}text2={quote(text)}')
             await ctx.send(embed=embed)
 
+    @commands.command(help="Make a user the impostor")
+    async def impostor(self, ctx, user: discord.Member=None):
+        user = user.name or ctx.author.name
+        IMAGE_WIDTH = 600
+        IMAGE_HEIGHT = 300
+
+        response = urllib.request.urlopen("https://im-a-dev.xyz/vHkANH4W.png")
+        image = Image.open(response)
+        draw = ImageDraw.Draw(image)
+        draw.rectangle([50, 50, IMAGE_WIDTH-50, IMAGE_HEIGHT-50], fill=(0,0,0), outline=(0,0,0))
+        text = f'{user} was the impostor'
+        font = ImageFont.truetype('Arial', 30)
+
+        text_width, text_height = draw.textsize(text, font=font)
+        x = (IMAGE_WIDTH - text_width)//2
+        y = (IMAGE_HEIGHT - text_height)//2
+
+        draw.text( (x, y), text, fill=(0,0,255), font=font)
+        buffer = io.BytesIO()
+
+        image.save(buffer, format='PNG')    
+        buffer.seek(0) 
+        await ctx.send(file=File(buffer, 'impostor.png'))
+
     @phtext.error
     async def phtext_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -121,20 +146,22 @@ class FunCog(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.command(help="Enlarge a discord emoji!")
-    async def enlarge(self, ctx, emoji: discord.Emoji):
-    	if emoji.animated:
-    		embed = discord.Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=0x2F3136)
-    		embed.set_image(url=emoji.url)
-    		await ctx.send(embed=embed)
-    	if not emoji.animated:
-    		embed = discord.Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=0x2F3136)
-    		embed.set_image(url=emoji.url)
-    		await ctx.send(embed=embed)
+    async def enlarge(self, ctx, emoji: discord.PartialEmoji):
+        if emoji.animated:
+            embed = discord.Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=0x2F3136)
+            embed.set_image(url=emoji.url)
+            await ctx.send(embed=embed)
+        if not emoji.animated:
+            embed = discord.Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=0x2F3136)
+            embed.set_image(url=emoji.url)
+            await ctx.send(embed=embed)
 
     @enlarge.error
     async def enlarge_error(self, ctx, error):
-        if isinstance(error, commands.EmojiNotFound):
-        	await ctx.send(f"Sorry {ctx.author.mention} that emoji is not valid!")
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/enlarge <emoji>`")
+        if isinstance(error, commands.PartialEmojiConversionFailure):
+            await ctx.send(f"Sorry {ctx.author.mention} that emoji was not found!")
 
     @meme.error
     async def meme_error(self, ctx, error):
@@ -326,6 +353,8 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Turn text into emojis!.")
     async def emojify(self, ctx, *, stuff):
+        if len(stuff) > 20:
+            return await ctx.send(f"Sorry {ctx.author.mention} a limit of 20 chars please!")
         emj = ("".join([":regional_indicator_"+l+":"  if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in f"{stuff}"]))
         embed = discord.Embed(title='Emojify', description=f'Requested By {ctx.author.mention}', color=0x2F3136)
         embed.add_field(name='Your Message Was Emojifyed', value=f'{emj}')
@@ -435,19 +464,19 @@ class FunCog(commands.Cog):
     async def _activity(self, ctx: commands.Context, *, user: discord.Member = None):
         user = user or ctx.author
         if user.bot == True:
-        	embed = discord.Embed(
-        		title="Activity",
-        		color=0x2F3136,
-        		description=f"Sorry {ctx.author.mention} that's a bot, please mention a user!"
-        		)
-        	return await ctx.send(embed=embed)
+            embed = discord.Embed(
+                title="Activity",
+                color=0x2F3136,
+                description=f"Sorry {ctx.author.mention} that's a bot, please mention a user!"
+                )
+            return await ctx.send(embed=embed)
         if user.activity == None:
-        	embed = discord.Embed(
-        		title="Activity",
-        		color=0x2F3136,
-        		description=f"Sorry {ctx.author.mention} that user does not have a status!"
-        		)
-        	return await ctx.send(embed=embed)
+            embed = discord.Embed(
+                title="Activity",
+                color=0x2F3136,
+                description=f"Sorry {ctx.author.mention} that user does not have a status!"
+                )
+            return await ctx.send(embed=embed)
         for activity in user.activities:
             if activity.type is discord.ActivityType.playing:
                 embed = discord.Embed(
@@ -470,24 +499,24 @@ class FunCog(commands.Cog):
                     )
                 await ctx.send(embed=embed)
             elif activity.type is discord.ActivityType.streaming:
-            	embed = discord.Embed(
-            		title=f"Activity",
-            		color=0x2F3136,
-            		description=f"Streaming {user.activity.name}\n[`Watch`]({user.activity.url})"
-            		)
-            	await ctx.send(embed=embed)
+                embed = discord.Embed(
+                    title=f"Activity",
+                    color=0x2F3136,
+                    description=f"Streaming {user.activity.name}\n[`Watch`]({user.activity.url})"
+                    )
+                await ctx.send(embed=embed)
             elif isinstance(activity, discord.CustomActivity):
-            	embed = discord.Embed(
-            		title="Activity",
-            		color=0x2F3136,
-            		description=f"{user.activity.emoji} {user.activity.name}"
-            		)
-            	await ctx.send(embed=embed)
+                embed = discord.Embed(
+                    title="Activity",
+                    color=0x2F3136,
+                    description=f"{user.activity.emoji} {user.activity.name}"
+                    )
+                await ctx.send(embed=embed)
 
     @_activity.error
     async def _activity_error(self, ctx, error):
-    	if isinstance(error, commands.BadArgument):
-    		await ctx.send(f'Sorry {ctx.author.mention} i could not find that user.')
+        if isinstance(error, commands.BadArgument):
+            await ctx.send(f'Sorry {ctx.author.mention} i could not find that user.')
 
     @commands.command(help="Advice from world.")
     async def advice(self, ctx):
