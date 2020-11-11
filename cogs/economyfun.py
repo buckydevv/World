@@ -480,6 +480,8 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
     @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
     async def shootout(self, ctx):
+    	if not (await self._has_account(ctx.author.id)):
+    		await self._create_account(ctx.author.id)
     	await self._shootout_game(ctx)
 
     @shootout.error
