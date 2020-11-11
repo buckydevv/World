@@ -496,6 +496,8 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="Fish for things in the lake", aliases=["fish", "worldfishing"])
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     async def fishing(self, ctx):
+    	if not (await self._has_account(ctx.author.id)):
+    		await self._create_account(ctx.author.id)
     	await self._fishing_world(ctx)
 
     @fishing.error
