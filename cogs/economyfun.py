@@ -389,20 +389,9 @@ class EconomyFunCog(commands.Cog):
             await self._create_account(ctx.author.id)
         if amount < 0:
             return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
-        query = {"_id": ctx.author.id}
-        dep_ = collection.find(query)
-        for result in dep_:
-            bank_ = result["Bank"]
-            coins_ = result["coins"]
-            remove_coins = coins_ - amount
-            total_coins = bank_ + amount
-            if collection.find_one({"_id": ctx.author.id})["coins"] < amount:
-                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money.")
-                return await ctx.send(embed=embed)
-            collection.update_one({"_id": ctx.author.id}, {"$set": {"Bank": total_coins}})
-            collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": remove_coins}})
-            embed = discord.Embed(title="Deposit", description=f"{ctx.author.mention} you have just deposited `{amount}` coins.", color=0x2F3136)
-            await ctx.send(embed=embed)
+        await self._deposit_coins(ctx, amount)
+
+
 
     @commands.command(help="Withdraw money from your World bank account.", aliases=["with"])
     async def withdraw(self, ctx, amount: int):
@@ -641,7 +630,21 @@ class EconomyFunCog(commands.Cog):
 
     	await message.clear_reactions()
 
-
+    async def _deposit_coins(self, ctx: commands.Context, amount: int):
+    	query = {"_id": ctx.author.id}
+    	dep_ = collection.find(query)
+    	for result in dep_:
+    		bank_ = result["Bank"]
+    		coins_ = result["coins"]
+    		remove_coins = coins_ - amount
+    		total_coins = bank_ + amount
+    		if collection.find_one({"_id": ctx.author.id})["coins"] < amount:
+    			embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money.")
+    			return await ctx.send(embed=embed)
+    		collection.update_one({"_id": ctx.author.id}, {"$set": {"Bank": total_coins}})
+    		collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": remove_coins}})
+    		embed = discord.Embed(title="Deposit", description=f"{ctx.author.mention} you have just deposited `{amount}` coins.", color=0x2F3136)
+    		await ctx.send(embed=embed)
 
     async def _create_account(self, user_id: int) -> None:
         """Create a World account."""
