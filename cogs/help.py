@@ -72,7 +72,7 @@ class HelpCog(commands.Cog):
         color=0x2F3136,
         ).add_field(
         name="<:shufflelogo:765652804387471430> | Random Commands",
-        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban`\n|`w/vote` | `w/uptime` | `w/translate` | `w/advice`| `w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity`"
+        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban`\n|`w/vote` | `w/uptime` | `w/translate` | `w/advice`| `w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` | `w/emotes`"
         )
       await ctx.send(embed=em)
 
@@ -142,7 +142,7 @@ class HelpCog(commands.Cog):
       em = discord.Embed(
         title="New commands!", 
         color=0x2F3136,
-        description="New economy commands: `w/economy`"
+        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout`"
         )
       await ctx.send(embed=em)
 
