@@ -43,7 +43,7 @@ class InfoCog(commands.Cog):
                 Created at: `{user.created_at.strftime('%m/%d/%Y')}`
                 Bot: `{user.bot}`
                 Status: `{user.status}`
-                Activity: `{user.activity.name}`
+                Activity: `{user.activity}`
             """),
             inline=False
         )
@@ -233,6 +233,93 @@ class InfoCog(commands.Cog):
             )
         await ctx.send(embed=embed)
 
+    @commands.command(help="How to get World emotes!", aliases=["worldemotes", "worldemote", "emojis", "emoji"])
+    async def emotes(self, ctx, allemote: Optional[str]) -> None:
+        allemotes = ["--all", "all", "allemotes"]
+        if allemote == None:
+            embed = Embed(
+                title="World emotes",
+                description="`Support server:` [<:Worldhappy:768145777985454131> Join](https://discord.gg/gQSHvKCV)\n`World Emotes1:` [<:Worldhappy:768145777985454131> Join](https://discord.gg/TEfM7hEBpz)",
+                color=0x2F3136
+                )
+            embed.set_footer(text="To see all emotes run `w/emotes --all`")
+            return await ctx.send(embed=embed)
+
+        if allemote in allemotes:
+
+            server1 = self.bot.get_guild(738392767637487713)
+            world1 = [f"`{emoji.name}` - {emoji}" for emoji in server1.emojis]
+            server2 = self.bot.get_guild(774294150748831814)
+            world2 = [f"`{emoji.name}` - {emoji}" for emoji in server2.emojis]
+
+            emote1 = Embed(
+                title=f"`Page 1` - World Emotes",
+                description = "\n".join(world1[0:18]),
+                color=0x2F3136
+                )
+
+            emote2 = Embed(
+                title="`Page 2` - World Emotes",
+                description="\n".join(world1[19:34]),
+                color=0x2F3136
+                )
+
+            emote3 = Embed(
+                title="`Page 3` - World Emotes",
+                description="\n".join(world1[35:51]),
+                color=0x2F3136
+                )
+
+            emote4 = Embed(
+                title="`Page 4` - World Emotes",
+                description="\n".join(world2[0:14]),
+                color=0x2F3136
+                )
+
+
+            pages = [emote1, emote2, emote3, emote4]
+
+            message = await ctx.send(embed=emote1)
+
+            await message.add_reaction('\u23ee')
+            await message.add_reaction('\u25c0')
+            await message.add_reaction('\u25b6')
+            await message.add_reaction('\u23ed')
+            await message.add_reaction('\u23F9')
+
+            operator = 0
+            emoji = ''
+
+            while True:
+                if emoji == '\u23ee':
+                    operator=0
+                    await message.edit(embed=pages[operator])
+                if emoji == '\u25c0':
+                    if operator>0:
+                        operator-=1
+                        await message.edit(embed=pages[operator])
+                if emoji == '\u25b6':
+                    if operator<3:
+                        operator+=1
+                        await message.edit(embed=pages[operator])
+                if emoji=='\u23ed':
+                    operator=3
+                    await message.edit(embed=pages[operator])
+                if emoji == '\u23F9':
+                    await message.clear_reactions()
+                    break
+
+                try:
+                    res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=10)
+                except TimeoutError:
+                    await message.clear_reactions()
+                    break
+                if res == None:
+                    break
+                if str(res[1])!='World#4520':
+                    emoji = str(res[0].emoji)
+
+            await message.clear_reactions()
 
 def setup(bot: commands.Bot) -> None:
     """Adds the cog into the bot."""
