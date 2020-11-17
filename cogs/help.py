@@ -45,7 +45,7 @@ class HelpCog(commands.Cog):
         embed.add_field(name="Shows multiple categories.", value="w/categories", inline=True)
         embed.add_field(name="Invite", value="[Invite World](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)", inline=True)
         embed.add_field(name="Vote", value="[Vote For World](https://top.gg/bot/700292147311542282/vote)", inline=True)
-        embed.add_field(name="> World is a discord bot made for all", value="> World is a discord bot made a while after juice wrld's death(Jarad Higgins).\n> My owner was very upset that juice wrld passed away so she decided to make me.", inline=False)
+        embed.set_image(url="https://im-a-dev.xyz/Yr0rRrcP.png")
         embed.set_footer(text="Use \"w/help <command>\" For more info")
         await ctx.send(embed=embed)
 
@@ -112,7 +112,7 @@ class HelpCog(commands.Cog):
         color=0x2F3136,
         ).add_field(
         name="<:fun:765647000208801803> | Fun Commands",
-        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme`| \n`w/tweet` | `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/asktrump` | `w/gif` | `w/rr` | `w/kill` | `w/qr`"
+        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme`| \n`w/tweet` | `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/asktrump` | `w/gif` | `w/rr` | `w/kill` | `w/qr` | `w/duck`"
         )
       await ctx.send(embed=em)
 
