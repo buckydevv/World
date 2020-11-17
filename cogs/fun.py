@@ -543,5 +543,19 @@ class FunCog(commands.Cog):
             )
         await ctx.send(embed=embed)
 
+    @commands.command(help="This command will show you a cute duck", aliases=['quack', 'duk'])
+    async def duck(self, ctx):
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get('https://random-d.uk/api/v2/random') as r:
+                res = await r.json()
+                duckimg = res['url']
+        embed = discord.Embed(
+        	title='Quack!',
+        	 color=0x2F3136
+        	 ).set_image(
+        	 url=duckimg
+        	 )
+        await ctx.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(FunCog(bot))
