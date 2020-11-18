@@ -337,7 +337,7 @@ class EconomyCog(commands.Cog):
         if isinstance(error, NotEnoughCoins):
             await ctx.send(error)
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Invalid argument please type `world rob <@user>")
+            await ctx.send(f"Sorry {ctx.author.mention} Invalid argument please type `world rob <@user>`")
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
         elif isinstance(error, commands.errors.CommandOnCooldown):
