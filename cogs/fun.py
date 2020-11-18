@@ -389,7 +389,7 @@ class FunCog(commands.Cog):
     @urban.error
     async def urban_error(self, ctx, error):
         if isinstance(error, commands.errors.NSFWChannelRequired):
-            embed = Embed(title="NSFW", description=f"Sorry {ctx.author.mention} but this command is nsfw and this is not a nsfw channel.")
+            embed = Embed(title="NSFW", description=f"Sorry {ctx.author.mention} but this command is nsfw and this is not a nsfw channel.", color=self.color)
             embed.set_image(url="https://media.discordapp.net/attachments/265156286406983680/728328135942340699/nsfw.gif")
             return await ctx.send(embed=embed)
 
