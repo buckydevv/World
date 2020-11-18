@@ -180,9 +180,10 @@ class InfoCog(commands.Cog):
         await ctx.send(
             embed=Embed(
                 title="Done!",
+                description=f"I have sent the following to World developers: `{suggestion}`",
                 color=0x2F3136
             ).set_footer(
-                text=f"I have sent the following to World developers: `{suggestion}`\n\nWARNING: Bad usage of this command may lead to a bot ban."
+                text=f"WARNING: Bad usage of this command may lead to a bot ban."
             )
         )
         suggestion_channel = await self.bot.fetch_channel(763110868791459860)
