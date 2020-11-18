@@ -27,11 +27,12 @@ def syntax(command):
 class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.color = 0x2F3136
 
     async def cmd_help(self, ctx, command):
       embed = Embed(title=f"{command} - Help",
             description=syntax(command),
-            color=0x2F3136)
+            color=self.color)
       embed.add_field(name="Command info", value=command.help)
       await ctx.send(embed=embed)
 
@@ -40,7 +41,7 @@ class HelpCog(commands.Cog):
     async def show_help(self, ctx, cmd: Optional[str]):
       """Shows this message."""
       if cmd is None:
-        embed = discord.Embed(color=0x2F3136)
+        embed = discord.Embed(color=self.color)
         embed.set_author(name='World - Help', icon_url=world_pfp)
         embed.add_field(name="Shows multiple categories.", value="w/categories", inline=True)
         embed.add_field(name="Invite", value="[Invite World](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)", inline=True)
@@ -59,7 +60,7 @@ class HelpCog(commands.Cog):
 
     @commands.command(help="Shows categories")
     async def categories(self, ctx):
-      em = discord.Embed(color=0x2F3136)
+      em = discord.Embed(color=self.color)
       em.add_field(name="‎‎World", value=f"New\n`w/new`\nFun\n`w/fun`\nOther\n`w/other`")
       em.add_field(name=f"Categories", value=f"Logging\n`w/logs`\nEconomy\n`w/economy`\nModeration\n`w/mod`")
       await ctx.send(embed=em)
@@ -69,10 +70,10 @@ class HelpCog(commands.Cog):
     async def other(self, ctx):
       em = discord.Embed(
         title="Other commands", 
-        color=0x2F3136,
+        color=self.color,
         ).add_field(
         name="<:shufflelogo:765652804387471430> | Random Commands",
-        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban`\n|`w/vote` | `w/uptime` | `w/translate` | `w/advice`| `w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` | `w/emotes`"
+        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban` |\n`w/vote` | `w/uptime` | `w/translate` | `w/advice` |\n`w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` |\n`w/emotes`"
         )
       await ctx.send(embed=em)
 
@@ -82,7 +83,7 @@ class HelpCog(commands.Cog):
     async def mod(self, ctx):
       em = discord.Embed(
         title="Moderation commands", 
-        color=0x2F3136,
+        color=self.color,
         ).add_field(
         name="<:memberlogo:765649915031846912> | Member Commands",
         value="`w/ban` | `w/kick` | `w/unban` | `w/mute` | `w/unmute` | `w/bans`"
@@ -97,10 +98,10 @@ class HelpCog(commands.Cog):
     async def logs(self, ctx):
       em = discord.Embed(
         title="Logging commands", 
-        color=0x2F3136,
+        color=self.color,
         ).add_field(
         name="<:discordlogo:765648661039677481> | Guild Commands",
-        value="`w/logging create` | `w/logging shutdown`\n| `w/logging <option> <channel>` | `w/logging options`"
+        value="`w/logging create` | `w/logging shutdown` |\n`w/logging <option> <channel>` | `w/logging options`"
         )
       await ctx.send(embed=em)
 
@@ -109,10 +110,10 @@ class HelpCog(commands.Cog):
     async def fun(self, ctx):
       em = discord.Embed(
         title="Fun commands", 
-        color=0x2F3136,
+        color=self.color,
         ).add_field(
         name="<:fun:765647000208801803> | Fun Commands",
-        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme`| \n`w/tweet` | `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/asktrump` | `w/gif` | `w/rr` | `w/kill` | `w/qr` | `w/duck`"
+        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme` |\n`w/tweet` | `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/rr` | `w/kill` | `w/qr`"
         )
       await ctx.send(embed=em)
 
@@ -121,7 +122,7 @@ class HelpCog(commands.Cog):
     async def economy(self, ctx):
       em = discord.Embed(
         title="Economy commands", 
-        color=0x2F3136,
+        color=self.color,
         ).add_field(
         name="<:account:765642079920980009> | Account Commands",
         value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer` | `w/profile` | \n`w/deposit` | `w/withdraw`"
@@ -141,8 +142,8 @@ class HelpCog(commands.Cog):
     async def new(self, ctx):
       em = discord.Embed(
         title="New commands!", 
-        color=0x2F3136,
-        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout`"
+        color=self.color,
+        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout` | `w/duck`"
         )
       await ctx.send(embed=em)
 
