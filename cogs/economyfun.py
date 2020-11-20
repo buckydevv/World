@@ -502,6 +502,8 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command(help="What badges do you have?", aliases=["mybadges", "showbadges", "badge"])
     async def badges(self, ctx):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         query = {"_id": ctx.author.id}
         user = collection.find(query)
         for result in user:
@@ -518,6 +520,8 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command(help="Show your reputation", aliases=["myrep", "myreputation", "reputationcount"])
     async def repcount(self, ctx):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         query = {"_id": ctx.author.id}
         user = collection.find(query)
         for result in user:
@@ -531,6 +535,8 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command(help="Show your World status", aliases=["mystat", "worldstatus"])
     async def mystatus(self, ctx):
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
         query = {"_id": ctx.author.id}
         user = collection.find(query)
         for result in user:
