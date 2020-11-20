@@ -469,7 +469,7 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
     @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
     async def shootout(self, ctx):
-    	await self._shootout_game(ctx)
+        await self._shootout_game(ctx)
 
     @shootout.error
     async def shootout_error(self, ctx, error):
@@ -485,9 +485,9 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="Fish for things in the lake", aliases=["fish", "worldfishing"])
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     async def fishing(self, ctx):
-    	if not (await self._has_account(ctx.author.id)):
-    		await self._create_account(ctx.author.id)
-    	await self._fishing_world(ctx)
+        if not (await self._has_account(ctx.author.id)):
+            await self._create_account(ctx.author.id)
+        await self._fishing_world(ctx)
 
     @fishing.error
     async def fishing_error(self, ctx, error):
@@ -498,153 +498,200 @@ class EconomyFunCog(commands.Cog):
 
 ## Fishing end ##
 
+## User stuff ##
+
+    @commands.command(help="What badges do you have?", aliases=["mybadges", "showbadges", "badge"])
+    async def badges(self, ctx):
+        query = {"_id": ctx.author.id}
+        user = collection.find(query)
+        for result in user:
+            noob = result["BadgeSlot1"]
+            beginner = result["BadgeSlot2"]
+            leader = result["BadgeSlot3"]
+        embed = discord.Embed(
+            title="Your badges",
+            description=f"Noob: {noob}\nBeginner: {beginner}\nLeader: {leader}\n\n[`Noob`](https://cdn.discordapp.com/emojis/779192872402026516.png?v=1) | [`Beginner`](https://cdn.discordapp.com/emojis/779192938617241600.png?v=1) | [`Leader`](https://cdn.discordapp.com/emojis/779193003024973835.png?v=1)",
+            color=0x2F3136
+            )
+        await ctx.send(embed=embed)
+
+
+    @commands.command(help="Show your reputation", aliases=["myrep", "myreputation", "reputationcount"])
+    async def repcount(self, ctx):
+        query = {"_id": ctx.author.id}
+        user = collection.find(query)
+        for result in user:
+            rep = result["Reputation"]
+        embed = discord.Embed(
+            title="Your Reputation",
+            description=f"Reputation Points: `{rep}`",
+            color=0x2F3136
+            )
+        await ctx.send(embed=embed)
+
+    @commands.command(help="Show your World status", aliases=["mystat", "worldstatus"])
+    async def mystatus(self, ctx):
+        query = {"_id": ctx.author.id}
+        user = collection.find(query)
+        for result in user:
+            status = result["afk"]
+        embed = discord.Embed(
+            title="Your Status",
+            description=f"World status: `{status}`",
+            color=0x2F3136
+            )
+        await ctx.send(embed=embed)
+
+
+## End of User Stuff ##
+
 ## define section
 
     async def _fishing_world(self, ctx: commands.Context):
-    	fishing_idle = "https://im-a-dev.xyz/1kKJXQSr.png"
-    	caught_fish = "https://im-a-dev.xyz/ImWqkaSy.png"
-    	caught_cookies = "https://im-a-dev.xyz/sqPSfhJJ.png"
-    	caught_coins = "https://im-a-dev.xyz/syTQUdrV.png"
+        fishing_idle = "https://im-a-dev.xyz/1kKJXQSr.png"
+        caught_fish = "https://im-a-dev.xyz/ImWqkaSy.png"
+        caught_cookies = "https://im-a-dev.xyz/sqPSfhJJ.png"
+        caught_coins = "https://im-a-dev.xyz/syTQUdrV.png"
 
-    	randomize = [fishing_idle, caught_fish, caught_cookies, caught_coins]
-    	random_choice = random.choice(randomize)
+        randomize = [fishing_idle, caught_fish, caught_cookies, caught_coins]
+        random_choice = random.choice(randomize)
 
-    	if random_choice == "https://im-a-dev.xyz/1kKJXQSr.png":
-    		embed = discord.Embed(
-    			title="Fishing",
-    			description="There are no fish in the lake right now, come again soon!",
-    			color=0x2F3136
-    			)
-    		embed.set_image(url="https://im-a-dev.xyz/1kKJXQSr.png")
-    		return await ctx.send(embed=embed)
+        if random_choice == "https://im-a-dev.xyz/1kKJXQSr.png":
+            embed = discord.Embed(
+                title="Fishing",
+                description="There are no fish in the lake right now, come again soon!",
+                color=0x2F3136
+                )
+            embed.set_image(url="https://im-a-dev.xyz/1kKJXQSr.png")
+            return await ctx.send(embed=embed)
 
-    	if random_choice == "https://im-a-dev.xyz/ImWqkaSy.png":
-    		query = {"_id": ctx.author.id}
-    		user = collection.find(query)
-    		for result in user:
-    			user_fish = result["Fish"]
-    			new_amount = user_fish + int(1)
-    			collection.update_one({"_id": ctx.author.id}, {"$set": {"Fish": new_amount}})
-    			embed = discord.Embed(
-    				title="Fishing",
-    				description=f"Great, looks like you have caught a fish! you now have a total of `{new_amount}` Fish!",
-    				color=0x2F3136
-    				)
-    			embed.set_image(url="https://im-a-dev.xyz/ImWqkaSy.png")
-    			return await ctx.send(embed=embed)
+        if random_choice == "https://im-a-dev.xyz/ImWqkaSy.png":
+            query = {"_id": ctx.author.id}
+            user = collection.find(query)
+            for result in user:
+                user_fish = result["Fish"]
+                new_amount = user_fish + int(1)
+                collection.update_one({"_id": ctx.author.id}, {"$set": {"Fish": new_amount}})
+                embed = discord.Embed(
+                    title="Fishing",
+                    description=f"Great, looks like you have caught a fish! you now have a total of `{new_amount}` Fish!",
+                    color=0x2F3136
+                    )
+                embed.set_image(url="https://im-a-dev.xyz/ImWqkaSy.png")
+                return await ctx.send(embed=embed)
 
-    	if random_choice == "https://im-a-dev.xyz/sqPSfhJJ.png":
-    		query = {"_id": ctx.author.id}
-    		user = collection.find(query)
-    		for result in user:
-    			user_cookie = result["cookie"]
-    			box_cookies = user_cookie + int(5)
-    			collection.update_one({"_id": ctx.author.id}, {"$set": {"cookie": box_cookies}})
-    			embed = discord.Embed(
-    				title="Fishing",
-    				description=f"Wow, you caught a box of cookies while fishing?! you now have a total of `{box_cookies}` Cookies!",
-    				color=0x2F3136
-    				)
-    			embed.set_image(url="https://im-a-dev.xyz/sqPSfhJJ.png")
-    			return await ctx.send(embed=embed)
+        if random_choice == "https://im-a-dev.xyz/sqPSfhJJ.png":
+            query = {"_id": ctx.author.id}
+            user = collection.find(query)
+            for result in user:
+                user_cookie = result["cookie"]
+                box_cookies = user_cookie + int(5)
+                collection.update_one({"_id": ctx.author.id}, {"$set": {"cookie": box_cookies}})
+                embed = discord.Embed(
+                    title="Fishing",
+                    description=f"Wow, you caught a box of cookies while fishing?! you now have a total of `{box_cookies}` Cookies!",
+                    color=0x2F3136
+                    )
+                embed.set_image(url="https://im-a-dev.xyz/sqPSfhJJ.png")
+                return await ctx.send(embed=embed)
 
-    	if random_choice == "https://im-a-dev.xyz/syTQUdrV.png":
-    		query = {"_id": ctx.author.id}
-    		user = collection.find(query)
-    		for result in user:
-    			user_coin = result["coins"]
-    			random_coins = random.randint(1, 50)
-    			bagof_coins = user_coin + random_coins
-    			collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": bagof_coins}})
-    			embed = discord.Embed(
-    				title="Fishing",
-    				description=f"Wow, you caught a bag of coins while fishing?!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{bagof_coins}` Coins!",
-    				color=0x2F3136
-    				)
-    			embed.set_image(url="https://im-a-dev.xyz/syTQUdrV.png")
-    			return await ctx.send(embed=embed)
+        if random_choice == "https://im-a-dev.xyz/syTQUdrV.png":
+            query = {"_id": ctx.author.id}
+            user = collection.find(query)
+            for result in user:
+                user_coin = result["coins"]
+                random_coins = random.randint(1, 50)
+                bagof_coins = user_coin + random_coins
+                collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": bagof_coins}})
+                embed = discord.Embed(
+                    title="Fishing",
+                    description=f"Wow, you caught a bag of coins while fishing?!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{bagof_coins}` Coins!",
+                    color=0x2F3136
+                    )
+                embed.set_image(url="https://im-a-dev.xyz/syTQUdrV.png")
+                return await ctx.send(embed=embed)
 
     async def _shootout_game(self, ctx: commands.Context):
-    	shooter_world = "https://im-a-dev.xyz/QqoZ2M6m.png"
-    	normal_world = "https://im-a-dev.xyz/BvdekLII.png"
-    	nothing_world = "https://im-a-dev.xyz/MfSnYYAa.png"
+        shooter_world = "https://im-a-dev.xyz/QqoZ2M6m.png"
+        normal_world = "https://im-a-dev.xyz/BvdekLII.png"
+        nothing_world = "https://im-a-dev.xyz/MfSnYYAa.png"
 
-    	all_worlds = [shooter_world, normal_world, nothing_world]
+        all_worlds = [shooter_world, normal_world, nothing_world]
 
-    	random_choice = random.choice(all_worlds)
+        random_choice = random.choice(all_worlds)
 
-    	embed = discord.Embed(title="Shootout", description="Is World a shooter?", color=0x2F3136)
-    	embed.set_image(url=random_choice)
-    	embed.set_footer(text="|✅ - shooter|❎ - innocent|🚫 - nothing")
-    	message = await ctx.send(embed=embed)
+        embed = discord.Embed(title="Shootout", description="Is World a shooter?", color=0x2F3136)
+        embed.set_image(url=random_choice)
+        embed.set_footer(text="|✅ - shooter|❎ - innocent|🚫 - nothing")
+        message = await ctx.send(embed=embed)
 
-    	await message.add_reaction('✅')
-    	await message.add_reaction('❎')
-    	await message.add_reaction('🚫')
+        await message.add_reaction('✅')
+        await message.add_reaction('❎')
+        await message.add_reaction('🚫')
 
-    	emoji = ''
+        emoji = ''
 
-    	while True:
-    		if emoji == '✅':
-    			if random_choice == "https://im-a-dev.xyz/QqoZ2M6m.png":
-    				query = {"_id": ctx.author.id}
-    				user = collection.find(query)
-    				for result in user:
-    					user_coin = result["coins"]
-    					amount_won = user_coin + 250
-    					collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": amount_won}})
-    					await message.delete()
-    					return await ctx.send(f"Hey {ctx.author.mention} you caught World in the act! and have earned a total of `250` coins. Well done!")
-    			else:
-    				await message.delete()
-    				return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
-    		if emoji == '❎':
-    			if random_choice == "https://im-a-dev.xyz/BvdekLII.png":
-    				query = {"_id": ctx.author.id}
-    				user = collection.find(query)
-    				for result in user:
-    					user_coin = result["coins"]
-    					amount_won = user_coin + 100
-    					collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": amount_won}})
-    					await message.delete()
-    					return await ctx.send(f"Hey {ctx.author.mention} you have found innocent World! and have earned a total of `100` coins. Well done!")
-    			else:
-    				await message.delete()
-    				return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
-    		if emoji == '🚫':
-    			if random_choice == "https://im-a-dev.xyz/MfSnYYAa.png":
-    				await message.delete()
-    				return await ctx.send(f"Hey {ctx.author.mention} you found nothing...")
-    			else:
-    				await message.delete()
-    				return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
-    		try:
-    			res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=4)
-    			if res==None:
-    				break
-    			if str(res[1])!='Luffy#0728':
-    				emoji=str(res[0].emoji)
-    		except TimeoutError:
-    			await message.delete()
-    			return await ctx.send(f"Sorry {ctx.author.mention} you werent fast enough and World got away...")
+        while True:
+            if emoji == '✅':
+                if random_choice == "https://im-a-dev.xyz/QqoZ2M6m.png":
+                    query = {"_id": ctx.author.id}
+                    user = collection.find(query)
+                    for result in user:
+                        user_coin = result["coins"]
+                        amount_won = user_coin + 250
+                        collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": amount_won}})
+                        await message.delete()
+                        return await ctx.send(f"Hey {ctx.author.mention} you caught World in the act! and have earned a total of `250` coins. Well done!")
+                else:
+                    await message.delete()
+                    return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
+            if emoji == '❎':
+                if random_choice == "https://im-a-dev.xyz/BvdekLII.png":
+                    query = {"_id": ctx.author.id}
+                    user = collection.find(query)
+                    for result in user:
+                        user_coin = result["coins"]
+                        amount_won = user_coin + 100
+                        collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": amount_won}})
+                        await message.delete()
+                        return await ctx.send(f"Hey {ctx.author.mention} you have found innocent World! and have earned a total of `100` coins. Well done!")
+                else:
+                    await message.delete()
+                    return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
+            if emoji == '🚫':
+                if random_choice == "https://im-a-dev.xyz/MfSnYYAa.png":
+                    await message.delete()
+                    return await ctx.send(f"Hey {ctx.author.mention} you found nothing...")
+                else:
+                    await message.delete()
+                    return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
+            try:
+                res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=4)
+                if res==None:
+                    break
+                if str(res[1])!='Luffy#0728':
+                    emoji=str(res[0].emoji)
+            except TimeoutError:
+                await message.delete()
+                return await ctx.send(f"Sorry {ctx.author.mention} you werent fast enough and World got away...")
 
-    	await message.clear_reactions()
+        await message.clear_reactions()
 
     async def _deposit_coins(self, ctx: commands.Context, amount: int):
-    	query = {"_id": ctx.author.id}
-    	dep_ = collection.find(query)
-    	for result in dep_:
-    		bank_ = result["Bank"]
-    		coins_ = result["coins"]
-    		remove_coins = coins_ - amount
-    		total_coins = bank_ + amount
-    		if collection.find_one({"_id": ctx.author.id})["coins"] < amount:
-    			embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money.")
-    			return await ctx.send(embed=embed)
-    		collection.update_one({"_id": ctx.author.id}, {"$set": {"Bank": total_coins}})
-    		collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": remove_coins}})
-    		embed = discord.Embed(title="Deposit", description=f"{ctx.author.mention} you have just deposited `{amount}` coins.", color=0x2F3136)
-    		await ctx.send(embed=embed)
+        query = {"_id": ctx.author.id}
+        dep_ = collection.find(query)
+        for result in dep_:
+            bank_ = result["Bank"]
+            coins_ = result["coins"]
+            remove_coins = coins_ - amount
+            total_coins = bank_ + amount
+            if collection.find_one({"_id": ctx.author.id})["coins"] < amount:
+                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money.")
+                return await ctx.send(embed=embed)
+            collection.update_one({"_id": ctx.author.id}, {"$set": {"Bank": total_coins}})
+            collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": remove_coins}})
+            embed = discord.Embed(title="Deposit", description=f"{ctx.author.mention} you have just deposited `{amount}` coins.", color=0x2F3136)
+            await ctx.send(embed=embed)
 
     async def _create_account(self, user_id: int) -> None:
         """Create a World account."""
