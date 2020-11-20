@@ -113,7 +113,7 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:fun:765647000208801803> | Fun Commands",
-        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme` |\n`w/tweet` | `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/rr` | `w/kill` | `w/qr`"
+        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme` |\n`w/tweet` | `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/rr` | `w/kill` | `w/qr` | `w/flip` | `w/blur`"
         )
       await ctx.send(embed=em)
 
@@ -143,7 +143,7 @@ class HelpCog(commands.Cog):
       em = discord.Embed(
         title="New commands!", 
         color=self.color,
-        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout` | `w/duck`"
+        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur`"
         )
       await ctx.send(embed=em)
 
