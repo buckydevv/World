@@ -10,10 +10,15 @@ import aiohttp
 import googletrans
 import os
 import json
+import PIL
 
 from discord.ext import commands, tasks
 from discord import Spotify
 from discord import Embed
+from discord import File
+
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+
 from urllib.parse import urlparse, quote
 from akinator.async_aki import Akinator
 from googletrans import Translator
@@ -357,15 +362,11 @@ class FunCog(commands.Cog):
 
     @commands.command()
     async def translate(self, ctx, *, translation):
-        try:
-            translator = Translator()
-            result = translator.translate(translation)
-            embed = Embed(title=f"Translator", description=f"`{result.origin}`", color=self.color)
-            embed.add_field(name=f"Translation", value=f"`{result.text}`", inline=False)
-            await ctx.send(embed=embed)
-        except Exception as e:
-            embed = Embed(title=f"Error: `{e}`", color=self.color)
-            await ctx.send(embed=embed)
+        translator = Translator()
+        result = translator.translate(translation)
+        embed = Embed(title=f"Translator", description=f"`{result.origin}`", color=self.color)
+        embed.add_field(name=f"Translation", value=f"`{result.text}`", inline=False)
+        await ctx.send(embed=embed)
 
     @commands.command(help="Urban Dictionary")
     @commands.is_nsfw()
@@ -488,6 +489,54 @@ class FunCog(commands.Cog):
              url=duckimg
              )
         await ctx.send(embed=embed)
+
+    @commands.command(help="Flip a users avatar!", aliases=["flipav", "avflip"])
+    async def flip(self, ctx, user: discord.Member=None):
+        user = user or ctx.author
+
+        pfp = user.avatar_url_as(format='png')
+
+        buffer_avatar = io.BytesIO()
+        await pfp.save(buffer_avatar)
+        buffer_avatar.seek(0)
+
+        av_img = Image.open(buffer_avatar)
+
+        done = av_img.rotate(180)
+
+        buffer = io.BytesIO()
+
+        done.save(buffer, format='PNG')
+
+        buffer.seek(0)
+
+        file = discord.File(buffer, "flippedimg.png")
+        embed = discord.Embed(title="Flip!", description=f"{user}'s avatar flipped", color=0x2F3136)
+        embed.set_image(url="attachment://flippedimg.png")
+        await ctx.send(embed=embed, file=file)
+
+
+    @commands.command(help="Blur a users avatar!")
+    async def blur(self, ctx, user: discord.Member=None):
+        user = user or ctx.author
+        pfp = user.avatar_url_as(format='png')
+        buffer_avatar = io.BytesIO()
+
+        await pfp.save(buffer_avatar)
+
+        buffer_avatar.seek(0)
+
+        av_img = Image.open(buffer_avatar)
+        done = av_img.filter(PIL.ImageFilter.GaussianBlur(radius=8))
+
+        buffer = io.BytesIO()
+        done.save(buffer, format='PNG')
+        buffer.seek(0)
+
+        file = discord.File(buffer, "blurimg.png")
+        embed = discord.Embed(title="blur!", description=f"{user}'s avatar blurred", color=0x2F3136)
+        embed.set_image(url="attachment://blurimg.png")
+        await ctx.send(embed=embed, file=file)
 
 def setup(bot):
     bot.add_cog(FunCog(bot))
