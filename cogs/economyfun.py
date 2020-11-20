@@ -232,14 +232,14 @@ class EconomyFunCog(commands.Cog):
                 if collection.find_one({"_id": ctx.author.id})["coins"] < 900:
                     embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World Noob Badge`")
                     return await ctx.send(embed=embed)
-                if collection.find_one({"_id": ctx.author.id})["BadgeSlot1"] == "<:WorldBadge1:772220840007565362>":
+                if collection.find_one({"_id": ctx.author.id})["BadgeSlot1"] == "<:WorldBadge1:779192872402026516>":
                     embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World Noob Badge`.")
                     return await ctx.send(embed=embed)
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": total_cost}})
-                collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot1": "<:WorldBadge1:772220840007565362>"}})
+                collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot1": "<:WorldBadge1:779192872402026516>"}})
                 embed = discord.Embed(
                     title="World Badge",
-                    description="You have bought `World Noob Badge` for `900` Coins. <:WorldBadge1:772220840007565362>",
+                    description="You have bought `World Noob Badge` for `900` Coins. <:WorldBadge1:779192872402026516>",
                     color=0x2F3136
                     )
                 await ctx.send(embed=embed)
@@ -251,14 +251,14 @@ class EconomyFunCog(commands.Cog):
                 if collection.find_one({"_id": ctx.author.id})["coins"] < 3500:
                     embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World Beginner Badge`")
                     return await ctx.send(embed=embed)
-                if collection.find_one({"_id": ctx.author.id})["BadgeSlot2"] == "<:WorldBadge2:772227094125477910>":
+                if collection.find_one({"_id": ctx.author.id})["BadgeSlot2"] == "<:WorldBadge2:779192938617241600>":
                     embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World Beginner Badge`.")
                     return await ctx.send(embed=embed)
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": total_cost2}})
-                collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot2": "<:WorldBadge2:772227094125477910>"}})
+                collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot2": "<:WorldBadge2:779192938617241600>"}})
                 embed = discord.Embed(
                     title="World Badge",
-                    description="You have bought `World Beginner Badge` for `3,500` Coins. <:WorldBadge2:772227094125477910>",
+                    description="You have bought `World Beginner Badge` for `3,500` Coins. <:WorldBadge2:779192938617241600>",
                     color=0x2F3136
                     )
                 await ctx.send(embed=embed)
@@ -270,14 +270,14 @@ class EconomyFunCog(commands.Cog):
                 if collection.find_one({"_id": ctx.author.id})["coins"] < 9500:
                     embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World Leader Badge`")
                     return await ctx.send(embed=embed)
-                if collection.find_one({"_id": ctx.author.id})["BadgeSlot2"] == "<:WorldBadge3:772228285488168980>":
+                if collection.find_one({"_id": ctx.author.id})["BadgeSlot2"] == "<:WorldBadge3:779193003024973835>":
                     embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World Leader Badge`.")
                     return await ctx.send(embed=embed)
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": total_cost3}})
-                collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot3": "<:WorldBadge3:772228285488168980>"}})
+                collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot3": "<:WorldBadge3:779193003024973835>"}})
                 embed = discord.Embed(
                     title="World Badge",
-                    description="You have bought `World Leader Badge` for `9,500` Coins. <:WorldBadge3:772228285488168980>",
+                    description="You have bought `World Leader Badge` for `9,500` Coins. <:WorldBadge3:779193003024973835>",
                     color=0x2F3136
                     )
                 await ctx.send(embed=embed)
