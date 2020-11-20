@@ -125,10 +125,10 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:account:765642079920980009> | Account Commands",
-        value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer` | `w/profile` | \n`w/deposit` | `w/withdraw`"
+        value="`w/create` | `w/delete` | `w/balance` | `w/inventory` | `w/transfer` | `w/profile` | \n`w/mybadges` | `w/mystatus` `w/repcount`"
         ).add_field(
         name=":shopping_bags: | Market Commands",
-        value="`w/shop` | `w/buy` | `w/sell` | `w/beg` | `w/badgeshop` | `w/buybadge`",
+        value="`w/shop` | `w/buy` | `w/sell` | `w/beg` | `w/badgeshop` | `w/buybadge` | `w/deposit` | `w/withdraw`",
         inline=False
         ).add_field(
         name=":thumbsup: | Fun commands",
