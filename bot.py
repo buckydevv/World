@@ -24,9 +24,11 @@ load_dotenv()
 
 defaultprefixes = ["World", "w/", "world "]
 
+ownerprefix = ["w/", "world ", "World "]
+
 async def get_prefix(world, message):
 	if await world.is_owner(message.author):
-		return commands.when_mentioned_or("")(world, message)
+		return commands.when_mentioned_or(*ownerprefix)(world, message)
 	with open('prefixes.json', 'r') as f:
 		prefixes = json.load(f)
 		if not str(message.guild.id) in prefixes:
@@ -50,7 +52,7 @@ world.remove_command("help")
 # -------
 # Command area 
 
-@world.command()
+@world.command(help="Change the prefix for your discord guild")
 @has_permissions(administrator=True)
 async def changeprefix(ctx, prefix):
 	if len(prefix) >7:
@@ -65,11 +67,26 @@ async def changeprefix(ctx, prefix):
 
 	embed = Embed(
 		title="Custom prefix",
-		description=f"Prefix for {ctx.guild} is now `{prefix}`.\nTry using the help command: `{prefix}help`",
-		color=0x2F3136
+		description=f"Prefix for {ctx.guild} is now `{prefix}`.\nTry using the help command: `{prefix}help`"
 		)
 	await ctx.send(embed=embed)
 
+
+@world.command()
+async def enablenoprefix(ctx):
+	if await world.is_owner(ctx.author):
+		ownerprefix.append("")
+		await ctx.send(f"Hey {ctx.author.mention} i have enabled `No Prefix mode`.")
+	else:
+		return
+
+@world.command()
+async def disablenoprefix(ctx):
+	if await world.is_owner(ctx.author):
+		ownerprefix.remove("")
+		await ctx.send(f"Hey {ctx.author.mention} i have disabled `No Prefix mode`.")
+	else:
+		return
 
 @changeprefix.error
 async def changeprefix_error(ctx, error):
@@ -112,7 +129,7 @@ async def on_message(message: Message) -> None:
             f"<https://discord.com/oauth2/authorize?client_id={world.user.id}&permissions=8&scope=bot>"
         ))
 
-    if message.author.id in blacklisted_people:
+    if str(message.author.id) in blacklisted_people:
         return
     
     await world.process_commands(message)
