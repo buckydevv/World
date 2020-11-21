@@ -1,6 +1,7 @@
 import textwrap
 import discord
 import psutil
+import json
 from time import time
 from typing import Optional
 
@@ -136,6 +137,13 @@ class InfoCog(commands.Cog):
     @commands.command(name="botinfo", aliases=("bot", "about"))
     async def botinfo(self, ctx: commands.Context) -> None:
         """Shows info about World."""
+        with open('prefixes.json', 'r') as f:
+        	prefixes = json.load(f)
+        if str(ctx.guild.id) in prefixes:
+        	guild_prefix = prefixes[str(ctx.guild.id)]
+        else:
+        	yes = ""
+        	guild_prefix = yes.join("w/, world")
         world_information = Embed(
             title="World's info!",
             color=0x2F3136
@@ -143,10 +151,11 @@ class InfoCog(commands.Cog):
         world_information.add_field(
             name=":robot: | Stats",
             value=textwrap.dedent(f"""
-                Version: discord.py {discord_version}
-                Servers: {len(self.bot.guilds)}
-                Users: {len(set(self.bot.get_all_members()))}
-                CPU Usage: {psutil.cpu_percent()}%
+                Version: `discord.py {discord_version}`
+                Servers: `{len(self.bot.guilds)}`
+                Users: `{len(set(self.bot.get_all_members()))}`
+                CPU Usage: `{psutil.cpu_percent()}%`
+                Prefix: `{guild_prefix}`
             """),
             inline=False
         )
