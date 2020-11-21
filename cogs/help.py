@@ -73,7 +73,7 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:shufflelogo:765652804387471430> | Random Commands",
-        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban` |\n`w/vote` | `w/uptime` | `w/translate` | `w/advice` |\n`w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` |\n`w/emotes`"
+        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban` |\n`w/vote` | `w/uptime` | `w/translate` | `w/advice` |\n`w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` |\n`w/emotes` | `w/changeprefix`"
         )
       await ctx.send(embed=em)
 
@@ -143,7 +143,7 @@ class HelpCog(commands.Cog):
       em = discord.Embed(
         title="New commands!", 
         color=self.color,
-        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur`"
+        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur` | `w/changeprefix`"
         )
       await ctx.send(embed=em)
 
