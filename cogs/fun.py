@@ -137,8 +137,9 @@ class FunCog(commands.Cog):
             await ctx.send(file=discord.File(file, f"Avatar.{format}"))
 
     @commands.command(help="Fake tweet text.")
-    @commands.guild_only()
     async def tweet(self, ctx, username: str, *, message: str):
+        if len(message) >50:
+            return await ctx.send(f"Sorry {ctx.author.mention} a limit of `50` chars please.")
         async with aiohttp.ClientSession() as cs:
             async with cs.get(
                 f"https://nekobot.xyz/api/imagegen?type=tweet&username={username}&text={message}"
