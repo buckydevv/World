@@ -73,7 +73,7 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:shufflelogo:765652804387471430> | Random Commands",
-        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban` |\n`w/vote` | `w/uptime` | `w/translate` | `w/advice` |\n`w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` |\n`w/emotes` | `w/changeprefix`"
+        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban` |\n`w/vote` | `w/uptime` | `w/translate` | `w/advice` |\n`w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` |\n`w/emotes` | `w/snipe` | `w/editsnipe`"
         )
       await ctx.send(embed=em)
 
@@ -89,7 +89,7 @@ class HelpCog(commands.Cog):
         value="`w/ban` | `w/kick` | `w/unban` | `w/mute` | `w/unmute` | `w/bans`"
         ).add_field(
         name="<:channellogo:765650652797468682> | Channel Commands",
-        value="`w/slowmode` | `w/lock` | `w/unlock` | `w/nuke` | `w/purge` | `w/snipe` | `w/editsnipe` | `w/poll` | `w/polln`",
+        value="`w/slowmode` | `w/lock` | `w/unlock` | `w/nuke` | `w/purge` | `w/poll` | `w/polln`",
         inline=False
         )
       await ctx.send(embed=em)
@@ -113,7 +113,7 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:fun:765647000208801803> | Fun Commands",
-        value="`w/wasted` | `w/gay` | `w/askali` | `w/pp` | `w/supreme` |\n`w/tweet` | `w/8ball` | `w/phtext` | `w/f` | `w/joke` | `w/ship` | `w/meme` | `w/avatar` | `w/akinator` | `w/emojify` | `w/rr` | `w/kill` | `w/qr` | `w/flip` | `w/blur`"
+        value="`w/gay` | `w/askali` | `w/pp` | `w/tweet` | `w/8ball` | `w/f` | `w/joke` | `w/meme` | `w/avatar` |\n`w/akinator` | `w/emojify` | `w/kill` | `w/qr` | `w/flip` | `w/blur`"
         )
       await ctx.send(embed=em)
 
@@ -143,7 +143,7 @@ class HelpCog(commands.Cog):
       em = discord.Embed(
         title="New commands!", 
         color=self.color,
-        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur` | `w/changeprefix`"
+        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur`"
         )
       await ctx.send(embed=em)
 
