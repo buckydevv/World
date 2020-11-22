@@ -86,10 +86,10 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:memberlogo:765649915031846912> | Member Commands",
-        value="`w/ban` | `w/kick` | `w/unban` | `w/mute` | `w/unmute` | `w/bans`"
+        value="`w/ban` | `w/kick` | `w/unban` | `w/mute` | `w/unmute`"
         ).add_field(
         name="<:channellogo:765650652797468682> | Channel Commands",
-        value="`w/slowmode` | `w/lock` | `w/unlock` | `w/nuke` | `w/purge` | `w/poll` | `w/polln`",
+        value="`w/slowmode` | `w/lock` | `w/unlock` | `w/nuke` | `w/purge`",
         inline=False
         )
       await ctx.send(embed=em)
