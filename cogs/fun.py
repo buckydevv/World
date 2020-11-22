@@ -281,7 +281,7 @@ class FunCog(commands.Cog):
     @commands.command(help="Turn text into emojis!.")
     async def emojify(self, ctx, *, stuff):
         if len(stuff) > 20:
-            return await ctx.send(f"Sorry {ctx.author.mention} a limit of 20 chars please!")
+            return await ctx.send(f"Sorry {ctx.author.mention} a limit of `20` chars please!")
         emj = ("".join([":regional_indicator_"+l+":"  if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in f"{stuff}"]))
         embed = Embed(title='Emojify', description=f'{emj}', color=self.color)
         await ctx.send(embed=embed)
