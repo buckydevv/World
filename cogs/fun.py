@@ -46,14 +46,6 @@ class FunCog(commands.Cog):
             )
         await ctx.send(embed=embed)
 
-    @commands.command(help="World will transform your avatar into the GTA world, and you become wasted.")
-    async def wasted(self, ctx, user: discord.Member=None):
-        if user == None:
-            user = ctx.author
-        embed = Embed(title=f"Wasted Machine", color=self.color)
-        embed.set_image(url=f'https://some-random-api.ml/canvas/wasted?avatar={user.avatar_url_as(format="png")}')
-        await ctx.send(embed=embed)
-
     @commands.command(help="Ask Alister-A a question!")
     async def askali(self, ctx, *, question):
         responses = [
@@ -72,38 +64,6 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/askali <question>`")
 
-    @commands.command(help="Generate some P*rn Hub text.")
-    async def phtext(self, ctx, text1, line, text):
-        if line == '&':
-            embed = Embed(title='P*rn Hub Text', description=f'Requested By {ctx.author.mention}', color=self.color)
-            embed.set_image(url=f'https://api.alexflipnote.dev/pornhub?text={quote(text1)}{line}text2={quote(text)}')
-            await ctx.send(embed=embed)
-
-    @phtext.error
-    async def phtext_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/phtext text & text`")
-
-    @commands.command(help="Show love between users.")
-    async def ship(self, ctx, text1: discord.Member, line, text: discord.Member):
-        if line == '&':
-            embed = Embed(title='Cuties', description=f'Requested By {ctx.author.mention}', color=self.color)
-            embed.set_image(url=f'https://api.alexflipnote.dev/ship?user={text1.avatar_url}{line}user2={text.avatar_url}')
-            await ctx.send(embed=embed)
-
-    @ship.error
-    async def ship_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/ship <@user> <&> <@user>`")
-
-    @commands.command(help="Generate supreme text.")
-    async def supreme(self, ctx,*,message=None):
-        if message == None:
-            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/supreme <text>`")
-        sent = message.lower()
-        embed = Embed(title='Supreme', description=f'Your text was generated.', color=self.color)
-        embed.set_image(url=f'https://api.alexflipnote.dev/supreme?text={urllib.parse.quote(sent)}')
-        await ctx.send(embed=embed)
 
     @commands.command(name="f", help="Give respects.")
     async def f(self, ctx, *, text: commands.clean_content = None):
@@ -330,17 +290,6 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/emojify <text>`")
 
-    @commands.command(aliases=["russianrulette"], help="Play a game of Russian rulette.")
-    async def rr(self, ctx):
-        responses = [
-            "🔫Pow Your Dead!, Try again?",
-            "🎉You lived!!!",
-            "🔫SPLAT!, You died. Try again?",
-            "🎉You were lucky enough to survive!!",
-        ]
-        embed = Embed(title=":gun: Russian roulette :gun:", description=f"{random.choice(responses)}", color=self.color)
-        await ctx.send(embed=embed)
-
     @commands.command(help="Kill a user")
     async def kill(self, ctx, user: discord.Member):
         user = user or (ctx.author)
@@ -475,6 +424,11 @@ class FunCog(commands.Cog):
             url=f"http://api.qrserver.com/v1/create-qr-code/?data={quote(text)}&margin=25"
             )
         await ctx.send(embed=embed)
+
+    @qr.error
+    async def qr_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/qr <text>`")
 
     @commands.command(help="This command will show you a cute duck", aliases=['quack', 'duk'])
     async def duck(self, ctx):
