@@ -233,7 +233,7 @@ class EconomyFunCog(commands.Cog):
                     embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World Noob Badge`")
                     return await ctx.send(embed=embed)
                 if collection.find_one({"_id": ctx.author.id})["BadgeSlot1"] == "<:WorldBadge1:779192872402026516>":
-                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World Noob Badge`.")
+                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World Noob Badge`.", color=0x2F3136)
                     return await ctx.send(embed=embed)
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": total_cost}})
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot1": "<:WorldBadge1:779192872402026516>"}})
@@ -252,7 +252,7 @@ class EconomyFunCog(commands.Cog):
                     embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World Beginner Badge`")
                     return await ctx.send(embed=embed)
                 if collection.find_one({"_id": ctx.author.id})["BadgeSlot2"] == "<:WorldBadge2:779192938617241600>":
-                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World Beginner Badge`.")
+                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World Beginner Badge`.", color=0x2F3136)
                     return await ctx.send(embed=embed)
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": total_cost2}})
                 collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot2": "<:WorldBadge2:779192938617241600>"}})
@@ -306,7 +306,7 @@ class EconomyFunCog(commands.Cog):
             Marriedto_ = result["MarriedTo"]
             MarriedDate = result["MarriedDate"]
             if collection.find_one({"_id": ctx.author.id})["MarriedTo"] == str(user):
-                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're already married to `{user}`.")
+                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're already married to `{user}`.", color=0x2F3136)
                 return await ctx.send(embed=embed)
             msg = await ctx.send(f"Hey {user.mention} {ctx.author.mention} wants to marry you.\nPlease react.")
             emoji = ''
@@ -358,10 +358,10 @@ class EconomyFunCog(commands.Cog):
             Marriedto_ = result["MarriedTo"]
             MarriedDate = result["MarriedDate"]
             if collection.find_one({"_id": ctx.author.id})["MarriedTo"] == "Nobody":
-                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You are not married yet!.")
+                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You are not married yet!.", color=0x2F3136)
                 return await ctx.send(embed=embed)
             if not collection.find_one({"_id": ctx.author.id})["MarriedTo"] == str(user):
-                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're not married to {user}.")
+                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're not married to {user}.", color=0x2F3136)
                 return await ctx.send(embed=embed)
             collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedTo": "Nobody"}})
             collection.update_one({"_id": user.id}, {"$set": {"MarriedTo": "Nobody"}})
@@ -407,7 +407,7 @@ class EconomyFunCog(commands.Cog):
             total_coins = coins_ + amount
             remove_coins = bank_ - amount
             if collection.find_one({"_id": ctx.author.id})["Bank"] < amount:
-                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't withdraw because you don't have that much money in the bank.")
+                embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't withdraw because you don't have that much money in the bank.", color=0x2F3136)
                 return await ctx.send(embed=embed)
             collection.update_one({"_id": ctx.author.id}, {"$set": {"Bank": remove_coins}})
             collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": total_coins}})
@@ -427,49 +427,14 @@ class EconomyFunCog(commands.Cog):
 
 ## Bank end ##
 
-## Owner section ##
-
-    @commands.command(help="Sorry Buddy only owner.")
-    @commands.is_owner()
-    async def givecoin(self, ctx, users: discord.Member, *, coin):
-        query = {"_id": users.id}
-        user = collection.find(query)
-        for result in user:
-            user_coin = result["coins"]
-            total_coins = user_coins + coin
-            collection.update_one({"_id": users.id}, {"$set": {"coins": total_coins}})
-            embed1 = discord.Embed(
-                title="Success!"
-                ).add_field(
-                name=f"Complete", 
-                value=f"{ctx.author.mention} I Have Added `{coin}` Coins To {users.mention}'s Balance"
-                )
-            await ctx.send(embed=embed1)
-
-    @commands.command(help="Only owner buddy.")
-    @commands.is_owner()
-    async def removecoin(self, ctx, users: discord.Member, *, coin):
-        query = {"_id": users.id}
-        user = collection.find(query)
-        for result in user:
-            user_coin = result["coins"]
-            collection.update_one({"_id": users.id}, {"$set": {"coins":coins}})
-            embed1 = discord.Embed(
-                title="Success"
-                ).add_field(
-                name=f"Complete",
-                value=f"{ctx.author.mention} I Have Removed `{coin}` Coins From {users.mention}'s Balance"
-                )
-            await ctx.send(embed=embed1)
-
-## end of owner section
-
 ## Shootout start ##
 
     @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
     @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
     async def shootout(self, ctx):
-        await self._shootout_game(ctx)
+    	if not (await self._has_account(ctx.author.id)):
+    		await self._create_account(ctx.author.id)
+    	await self._shootout_game(ctx)
 
     @shootout.error
     async def shootout_error(self, ctx, error):
