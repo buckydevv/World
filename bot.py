@@ -22,7 +22,7 @@ load_dotenv()
 # -------
 # prefix area
 
-defaultprefixes = ["World", "w/", "world "]
+defaultprefixes = ["World ", "w/", "world "]
 
 ownerprefix = ["w/", "world ", "World "]
 
