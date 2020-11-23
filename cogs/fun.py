@@ -25,7 +25,7 @@ from googletrans import Translator
 
 akiObj = akinator.async_aki.Akinator()
 
-world_pfp = ("https://cdn.discordapp.com/attachments/727241613901824563/764885646162395156/world.png")
+world_pfp = ("https://im-a-dev.xyz/EL35H6QC.png")
 
 class FunCog(commands.Cog):
     def __init__(self, bot):
