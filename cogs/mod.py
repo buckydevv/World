@@ -6,7 +6,7 @@ from discord.ext import commands
 from discord import Embed
 from discord.utils import get
 
-world_pfp = ("https://cdn.discordapp.com/attachments/727241613901824563/764885646162395156/world.png")
+world_pfp = ("https://im-a-dev.xyz/EL35H6QC.png")
 
 class ModCog(commands.Cog):
     def __init__(self, bot):
