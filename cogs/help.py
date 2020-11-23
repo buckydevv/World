@@ -8,7 +8,7 @@ from discord.ext.commands import command
 from discord.utils import get
 from discord.ext import commands
 
-world_pfp = ("https://cdn.discordapp.com/attachments/727241613901824563/764885646162395156/world.png")
+world_pfp = ("https://im-a-dev.xyz/EL35H6QC.png")
 
 
 def syntax(command):
