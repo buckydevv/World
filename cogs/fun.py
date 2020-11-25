@@ -7,7 +7,6 @@ import requests
 import io
 import datetime
 import aiohttp
-import googletrans
 import os
 import json
 import PIL
@@ -21,8 +20,6 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 from urllib.parse import urlparse, quote
 from akinator.async_aki import Akinator
-from googletrans import Translator
-
 akiObj = akinator.async_aki.Akinator()
 
 world_pfp = ("https://im-a-dev.xyz/EL35H6QC.png")
@@ -308,14 +305,6 @@ class FunCog(commands.Cog):
             description=f"{ctx.author.mention} you killed {user.mention} because {random.choice(kills)}",
             color=self.color
             )
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    async def translate(self, ctx, *, translation):
-        translator = Translator()
-        result = translator.translate(translation)
-        embed = Embed(title=f"Translator", description=f"`{result.origin}`", color=self.color)
-        embed.add_field(name=f"Translation", value=f"`{result.text}`", inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(help="Urban Dictionary")
