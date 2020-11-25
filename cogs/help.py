@@ -73,7 +73,7 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:shufflelogo:765652804387471430> | Random Commands",
-        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban` |\n`w/vote` | `w/uptime` | `w/translate` | `w/advice` |\n`w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` |\n`w/emotes` | `w/snipe` | `w/editsnipe`"
+        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban` |\n`w/vote` | `w/uptime` | `w/advice` |\n`w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` |\n`w/emotes` | `w/snipe` | `w/editsnipe`"
         )
       await ctx.send(embed=em)
 
