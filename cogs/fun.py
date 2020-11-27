@@ -3,6 +3,7 @@ import asyncio
 import urllib
 import akinator
 import random
+import twemoji_parser
 import requests
 import typing
 import io
@@ -20,6 +21,7 @@ from datetime import datetime
 from typing import Optional
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
+from twemoji_parser import TwemojiParser
 
 from urllib.parse import urlparse, quote
 from akinator.async_aki import Akinator
@@ -497,19 +499,18 @@ class FunCog(commands.Cog):
         await pfp.save(buffer_avatar)
 
         buffer_avatar.seek(0)
-        font = ImageFont.truetype("Whitney-Medium.ttf", 23, encoding="unic")
-        fontsmall = ImageFont.truetype("Whitney-Medium.ttf", 11, encoding="unic")
-        fontnormal = ImageFont.truetype("Whitney-Medium.ttf", 20, encoding="unic")
+        font = ImageFont.truetype("fonts/Whitney-Medium.ttf", 23, encoding="unic")
+        fontsmall = ImageFont.truetype("fonts/Whitney-Medium.ttf", 16, encoding="unic")
+        fontnormal = ImageFont.truetype("fonts/Whitney-Medium.ttf", 20, encoding="unic")
 
         userchar = font.getsize(user.name)[0]
 
         av_img = Image.open(buffer_avatar)
-        image = Image.open("fake.png")
-        img_draw = ImageDraw.Draw(image)
-        avdraw = ImageDraw.Draw(image)
-        avdraw.text((73, 65), user.name, fill='white', font=font)
-        avdraw.text((73 + userchar + 8, 75), str(now.strftime("Today at %H:%M")), fill='grey', font=fontsmall)
-        avdraw.text((74, 95), message, fill='white', font=fontnormal)
+        image = Image.open("images/fake.png")
+        parser = TwemojiParser(image)
+        parser.draw_text((73, 65), user.name, fill='white', font=font)
+        parser.draw_text((73 + userchar + 8, 69), str(now.strftime("Today at %H:%M")), fill='grey', font=fontsmall)
+        parser.draw_text((74, 95), message, fill='white', font=fontnormal)
 
         resized = av_img.resize((45, 45));
         bigger = (resized.size[0] * 3, resized.size[1] * 3)
@@ -531,30 +532,37 @@ class FunCog(commands.Cog):
         embed.set_image(url="attachment://fakequote.png")
         await ctx.send(embed=embed, file=file)
 
+    @fakequote.error
+    async def fakequote_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/fakequote <user> <text>`")
+
     @commands.command(help="Write a top.gg Review", aliases=["tgg", "topggreview", "topggbotreview", "botreview"])
-    async def topgg(self, ctx, user: Optional[discord.Member], *, message) -> None:
+    async def topgg(self, ctx, user: Optional[discord.Member], *, message):
         user = user or ctx.author
         if len(message) > 30:
             return await ctx.send(f"Sorry {ctx.author.mention} there is a limit of `30` chars.")
 
+        ran_days = random.randint(2, 30)
         picture = user.avatar_url_as(format='png')
         buf_avatar = io.BytesIO()
 
         await picture.save(buf_avatar)
         buf_avatar.seek(0)
 
-        font = ImageFont.truetype("karla1.ttf", 19, encoding="unic")
-        fontsmall = ImageFont.truetype("karla1.ttf", 15, encoding="unic")
-        fontnormal = ImageFont.truetype("karla1.ttf", 18, encoding="unic")
+        font = ImageFont.truetype("fonts/karla1.ttf", 19, encoding="unic")
+        fontsmall = ImageFont.truetype("fonts/karla1.ttf", 15, encoding="unic")
+        fontnormal = ImageFont.truetype("fonts/karla1.ttf", 18, encoding="unic")
 
         userchars = font.getsize(user.name)[0]
 
-        mainimage = Image.open("tgg.png")
+        mainimage = Image.open("images/tgg.png")
+        parser = TwemojiParser(mainimage)
+        parser.draw_text((126, 43), user.name, fill='black', font=font)
+        parser.draw_text((132 + userchars + 2, 47.8), f"{ran_days} days ago", fill='grey', font=fontsmall)
+        parser.draw_text((129, 84), message, fill='black', font=font)
+
         user_picture = Image.open(buf_avatar)
-        draw_main = ImageDraw.Draw(mainimage)
-        draw_main.text((126, 43), user.name, fill='black', font=font)
-        draw_main.text((132 + userchars + 3, 47), "2 days ago", fill='grey', font=fontsmall)
-        draw_main.text((125, 84), message, fill='black', font=font)
 
         resize = user_picture.resize((41, 41));
         size_bigger = (resize.size[0] * 3, resize.size[1] * 3)
@@ -566,7 +574,7 @@ class FunCog(commands.Cog):
 
         output = ImageOps.fit(resize, maskimage.size, centering=(0.5, 0.5))
         output.putalpha(maskimage)
-        mainimage.paste(resize, (62, 66), resize)
+        mainimage.paste(resize, (62, 46), resize)
 
         buffer = io.BytesIO()
         mainimage.save(buffer, format='PNG')
@@ -576,6 +584,11 @@ class FunCog(commands.Cog):
         embed = discord.Embed(color=0x2F3136)
         embed.set_image(url="attachment://topggreview.png")
         await ctx.send(embed=embed, file=file)
+
+    @topgg.error
+    async def topgg_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/topgg <user> <text>`")
 
 def setup(bot):
     bot.add_cog(FunCog(bot))
