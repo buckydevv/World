@@ -4,6 +4,7 @@ import urllib
 import akinator
 import random
 import requests
+import typing
 import io
 import datetime
 import aiohttp
@@ -15,8 +16,10 @@ from discord.ext import commands, tasks
 from discord import Spotify
 from discord import Embed
 from discord import File
+from datetime import datetime
+from typing import Optional
 
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 
 from urllib.parse import urlparse, quote
 from akinator.async_aki import Akinator
@@ -480,6 +483,52 @@ class FunCog(commands.Cog):
         file = discord.File(buffer, "blurimg.png")
         embed = discord.Embed(title="blur!", description=f"{user}'s avatar blurred", color=0x2F3136)
         embed.set_image(url="attachment://blurimg.png")
+        await ctx.send(embed=embed, file=file)
+
+    @commands.command(hlep="Generate a fake discord message!", aliases=["fq", "fakeq", "fakemessage", "fakemsg"])
+    async def fakequote(self, ctx, user: Optional[discord.Member], *, message) -> None:
+        if len(message) > 50:
+            return await ctx.send(f"Sorry {ctx.author.mention} there is a limit of `50` chars.")
+        now = datetime.now()
+        user = user or ctx.author
+        pfp = user.avatar_url_as(format='png')
+        buffer_avatar = io.BytesIO()
+
+        await pfp.save(buffer_avatar)
+
+        buffer_avatar.seek(0)
+        font = ImageFont.truetype("Whitney-Medium.ttf", 23, encoding="unic")
+        fontsmall = ImageFont.truetype("Whitney-Medium.ttf", 11, encoding="unic")
+        fontnormal = ImageFont.truetype("Whitney-Medium.ttf", 20, encoding="unic")
+
+        userchar = font.getsize(user.name)[0]
+
+        av_img = Image.open(buffer_avatar)
+        image = Image.open("fake.png")
+        img_draw = ImageDraw.Draw(image)
+        avdraw = ImageDraw.Draw(image)
+        avdraw.text((73, 65), user.name, fill='white', font=font)
+        avdraw.text((73 + userchar + 8, 75), str(now.strftime("Today at %H:%M")), fill='grey', font=fontsmall)
+        avdraw.text((74, 95), message, fill='white', font=fontnormal)
+
+        resized = av_img.resize((45, 45));
+        bigger = (resized.size[0] * 3, resized.size[1] * 3)
+        maskimage = Image.new('L', bigger, 0)
+        draw = ImageDraw.Draw(maskimage)
+        draw.ellipse((0, 0) + bigger, fill=255)
+        maskimage = maskimage.resize(resized.size, Image.ANTIALIAS)
+        resized.putalpha(maskimage)
+
+        output = ImageOps.fit(resized, maskimage.size, centering=(0.5, 0.5))
+        output.putalpha(maskimage)
+        image.paste(resized, (19, 69), resized)
+        buffer = io.BytesIO()
+        image.save(buffer, format='PNG')
+        buffer.seek(0)
+
+        file = discord.File(buffer, "fakequote.png")
+        embed = discord.Embed(color=0x2F3136)
+        embed.set_image(url="attachment://fakequote.png")
         await ctx.send(embed=embed, file=file)
 
 def setup(bot):
