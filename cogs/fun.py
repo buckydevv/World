@@ -590,5 +590,30 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/topgg <user> <text>`")
 
+    @commands.command(help="Widen a discord avatar!", aliases=["widen", "putin", "wideputin"])
+    async def wide(self, ctx, user: discord.Member=None):
+        user = user or ctx.author
+
+        pfp = user.avatar_url_as(format='png')
+
+        buffer_avatar = io.BytesIO()
+        await pfp.save(buffer_avatar)
+        buffer_avatar.seek(0)
+
+        av_img = Image.open(buffer_avatar)
+
+        done = av_img.resize((350, 180))
+
+        buffer = io.BytesIO()
+
+        done.save(buffer, format='PNG')
+
+        buffer.seek(0)
+
+        file = discord.File(buffer, "stretch.png")
+        embed = discord.Embed(title="Wide!", description=f"{user}'s avatar widened", color=0x2F3136)
+        embed.set_image(url="attachment://stretch.png")
+        await ctx.send(embed=embed, file=file)
+
 def setup(bot):
     bot.add_cog(FunCog(bot))
