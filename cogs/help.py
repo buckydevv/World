@@ -113,7 +113,7 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:fun:765647000208801803> | Fun Commands",
-        value="`w/gay` | `w/askali` | `w/pp` | `w/tweet` | `w/8ball` | `w/f` | `w/joke` | `w/meme` | `w/avatar` |\n`w/akinator` | `w/emojify` | `w/kill` | `w/qr` | `w/flip` | `w/blur`"
+        value="`w/gay` | `w/askali` | `w/pp` | `w/tweet` | `w/8ball` | `w/f` | `w/joke` | `w/meme` | `w/avatar` |\n`w/akinator` | `w/emojify` | `w/kill` | `w/qr` | `w/flip` | `w/blur` | `w/fakequote`"
         )
       await ctx.send(embed=em)
 
