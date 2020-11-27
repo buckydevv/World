@@ -531,5 +531,51 @@ class FunCog(commands.Cog):
         embed.set_image(url="attachment://fakequote.png")
         await ctx.send(embed=embed, file=file)
 
+    @commands.command(help="Write a top.gg Review", aliases=["tgg", "topggreview", "topggbotreview", "botreview"])
+    async def topgg(self, ctx, user: Optional[discord.Member], *, message) -> None:
+        user = user or ctx.author
+        if len(message) > 30:
+            return await ctx.send(f"Sorry {ctx.author.mention} there is a limit of `30` chars.")
+
+        picture = user.avatar_url_as(format='png')
+        buf_avatar = io.BytesIO()
+
+        await picture.save(buf_avatar)
+        buf_avatar.seek(0)
+
+        font = ImageFont.truetype("karla1.ttf", 19, encoding="unic")
+        fontsmall = ImageFont.truetype("karla1.ttf", 15, encoding="unic")
+        fontnormal = ImageFont.truetype("karla1.ttf", 18, encoding="unic")
+
+        userchars = font.getsize(user.name)[0]
+
+        mainimage = Image.open("tgg.png")
+        user_picture = Image.open(buf_avatar)
+        draw_main = ImageDraw.Draw(mainimage)
+        draw_main.text((126, 43), user.name, fill='black', font=font)
+        draw_main.text((132 + userchars + 3, 47), "2 days ago", fill='grey', font=fontsmall)
+        draw_main.text((125, 84), message, fill='black', font=font)
+
+        resize = user_picture.resize((41, 41));
+        size_bigger = (resize.size[0] * 3, resize.size[1] * 3)
+        maskimage = Image.new('L', size_bigger, 0)
+        draw = ImageDraw.Draw(maskimage)
+        draw.ellipse((0, 0) + size_bigger, fill=255)
+        maskimage = maskimage.resize(resize.size, Image.ANTIALIAS)
+        resize.putalpha(maskimage)
+
+        output = ImageOps.fit(resize, maskimage.size, centering=(0.5, 0.5))
+        output.putalpha(maskimage)
+        mainimage.paste(resize, (62, 66), resize)
+
+        buffer = io.BytesIO()
+        mainimage.save(buffer, format='PNG')
+        buffer.seek(0)
+
+        file = discord.File(buffer, "topggreview.png")
+        embed = discord.Embed(color=0x2F3136)
+        embed.set_image(url="attachment://topggreview.png")
+        await ctx.send(embed=embed, file=file)
+
 def setup(bot):
     bot.add_cog(FunCog(bot))
