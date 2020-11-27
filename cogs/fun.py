@@ -499,7 +499,7 @@ class FunCog(commands.Cog):
         await pfp.save(buffer_avatar)
 
         buffer_avatar.seek(0)
-        font = ImageFont.truetype("fonts/Whitney-Medium.ttf", 23, encoding="unic")
+        font = ImageFont.truetype("fonts/Whitney-Medium.ttf", 22, encoding="unic")
         fontsmall = ImageFont.truetype("fonts/Whitney-Medium.ttf", 16, encoding="unic")
         fontnormal = ImageFont.truetype("fonts/Whitney-Medium.ttf", 20, encoding="unic")
 
