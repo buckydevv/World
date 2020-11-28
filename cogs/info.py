@@ -1,14 +1,19 @@
 import textwrap
 import discord
 import psutil
+import asyncio
 import json
-from time import time
+import aiohttp
+import statcord
+import time
+
+
 from typing import Optional
+from time import time
 
 from discord import Embed, Member
 from discord import __version__ as discord_version
 from discord.ext import commands
-
 
 init_time = time()
 
@@ -137,37 +142,58 @@ class InfoCog(commands.Cog):
     @commands.command(name="botinfo", aliases=("bot", "about"))
     async def botinfo(self, ctx: commands.Context) -> None:
         """Shows info about World."""
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.statcord.com/v3/700292147311542282") as req:
+                if req.status != 200:
+                    return await ctx.send(f"Sorry {ctx.author.mention} a error has occured and will be fixed soon!")
+                r = await req.json()
+                p = json.dumps(r)
+                y = json.loads(p)
         with open('prefixes.json', 'r') as f:
-        	prefixes = json.load(f)
+            prefixes = json.load(f)
         if str(ctx.guild.id) in prefixes:
-        	guild_prefix = prefixes[str(ctx.guild.id)]
+            guild_prefix = prefixes[str(ctx.guild.id)]
         else:
-        	yes = ""
-        	guild_prefix = yes.join("w/, world")
+            yes = ""
+            guild_prefix = yes.join("w/, world")
+        start = time()
+        loading = Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=0x2F3136)
+        message = await ctx.send(embed=loading)
+        end = time()
         world_information = Embed(
             title="World's info!",
-            color=0x2F3136
-        )
-        world_information.add_field(
-            name=":robot: | Stats",
-            value=textwrap.dedent(f"""
+            color=0x2F3136,
+            description=textwrap.dedent(f"""
+                > <:Worldhappy:768145777985454131> Bot Information
                 Version: `discord.py {discord_version}`
+                CPU Load: `{psutil.cpu_percent()}%`
+                Cores: `{psutil.cpu_count()}`
+                Memory: `{psutil.virtual_memory().percent}%`
                 Servers: `{len(self.bot.guilds)}`
                 Users: `{len(set(self.bot.get_all_members()))}`
-                CPU Usage: `{psutil.cpu_percent()}%`
+
+                > <:Worldsmile:768145778493227058> Guild info
                 Prefix: `{guild_prefix}`
-            """),
-            inline=False
+                Latency: `{round(self.bot.latency * 1000)}ms`
+                Response Time: `{(end-start)*1000:,.0f}ms`
+
+                > <:Worldsipjuice:768201555811631134> Command info
+                Total commands: `{len(self.bot.commands)}`
+                Commands used today: `{y['data'][0]['commands']}`
+                Popular commands: `w/{y['data'][0]['popular'][0]['name']}`, `w/{y['data'][0]['popular'][1]['name']}`, `w/{y['data'][0]['popular'][2]['name']}`,\n`w/{y['data'][0]['popular'][3]['name']}`, `w/{y['data'][0]['popular'][4]['name']}`
+
+            """)
         )
         world_information.add_field(
             name=":computer: | Owners and developers",
             value=textwrap.dedent("""
                 Owner: `seañ#1718`
-                Developers: `Atie#5173` | `fxcilities#4728`
+                Developers: `Atie#5173` | `fxcilities#4728` | `antemortem#0110`
             """),
             inline=False
         )
-        await ctx.send(embed=world_information)
+        await asyncio.sleep(1)
+        await message.edit(embed=world_information)
 
     @commands.command(name="vote")
     async def vote(self, ctx: commands.Context) -> None:
