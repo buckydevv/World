@@ -15,3 +15,7 @@ flake8-string-format
 flake8-tidy-imports
 flake8-todo
 pep8-naming
+colorthief
+humanfriendly
+pykakasi
+twemoji_parser
