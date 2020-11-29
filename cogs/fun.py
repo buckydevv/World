@@ -8,8 +8,10 @@ import requests
 import typing
 import io
 import datetime
+import aggdraw
 import aiohttp
 import os
+import pykakasi
 import json
 import PIL
 
@@ -19,15 +21,56 @@ from discord import Embed
 from discord import File
 from datetime import datetime
 from typing import Optional
+from humanfriendly import format_timespan
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 from twemoji_parser import TwemojiParser
+from colorthief import ColorThief
 
 from urllib.parse import urlparse, quote
 from akinator.async_aki import Akinator
+
 akiObj = akinator.async_aki.Akinator()
 
+kks = pykakasi.kakasi()
+
 world_pfp = ("https://im-a-dev.xyz/EL35H6QC.png")
+
+def add_corners(im, rad): # Thanks to Stackoverflow: https://stackoverflow.com/questions/11287402/how-to-round-corner-a-logo-without-white-backgroundtransparent-on-it-using-pi/11291419#11291419
+    circle = Image.new('L', (rad * 2, rad * 2), 0)
+    draw = ImageDraw.Draw(circle)
+    draw.ellipse((0, 0, rad * 2, rad * 2), fill=255)
+    alpha = Image.new('L', im.size, 255)
+    w, h = im.size
+    alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))
+    alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
+    alpha.paste(circle.crop((rad, 0, rad * 2, rad)), (w - rad, 0))
+    alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)), (w - rad, h - rad))
+    im.putalpha(alpha)
+    return im
+
+def round_corner_jpg(image, radius): # # Thanks to Stackoverflow: https://stackoverflow.com/questions/11287402/how-to-round-corner-a-logo-without-white-backgroundtransparent-on-it-using-pi/11291419#11291419
+    mask = Image.new('L', image.size)
+    draw = aggdraw.Draw(mask)
+    brush = aggdraw.Brush('white')
+    width, height = mask.size
+    draw.pieslice((0,0,radius*2, radius*2), 90, 180, None, brush)
+    draw.pieslice((width - radius*2, 0, width, radius*2), 0, 90, None, brush)
+    draw.pieslice((0, height - radius * 2, radius*2, height),180, 270, None, brush)
+    draw.pieslice((width - radius * 2, height - radius * 2, width, height), 270, 360, None, brush)
+    draw.rectangle((radius, radius, width - radius, height - radius), brush)
+    draw.rectangle((radius, 0, width - radius, radius), brush)
+    draw.rectangle((0, radius, radius, height-radius), brush)
+    draw.rectangle((radius, height-radius, width-radius, height), brush)
+    draw.rectangle((width-radius, radius, width, height-radius), brush)
+    draw.flush()
+    image = image.convert('RGBA')
+    image.putalpha(mask)
+    return image
+
+def relative_luminance(rgb_triplet):
+    r, g, b = tuple(x / 255 for x in rgb_triplet)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
 class FunCog(commands.Cog):
     def __init__(self, bot):
@@ -258,7 +301,7 @@ class FunCog(commands.Cog):
             "As I see it, yes.",
             "Most likely.",
             "Outlook good.",
-            "Sean Says Yes.",
+            "World Says Yes.",
             "Signs point to yes.",
             "Reply hazy, try again.",
             "Ask again later.",
@@ -269,7 +312,7 @@ class FunCog(commands.Cog):
             "My reply is no.",
             "My sources say no.",
             "Outlook not so good.",
-            "Sean Thinks Its Very doubtful.",
+            "World Thinks Its Very doubtful.",
         ]
         embed = Embed(title=":8ball: The Almighty 8ball :8ball:", description=f"Question = `{question}`\n **Answer**: :8ball: {random.choice(responses)} :8ball:", color=self.color)
         embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/717038947846455406/717784205249085470/aaaaaaaaaaaaaaaaaaa.png')
@@ -614,6 +657,70 @@ class FunCog(commands.Cog):
         embed = discord.Embed(title="Wide!", description=f"{user}'s avatar widened", color=0x2F3136)
         embed.set_image(url="attachment://stretch.png")
         await ctx.send(embed=embed, file=file)
+
+    @commands.command(help="Get spotify information on a discord user!", aliases=["sp"])
+    async def spotify(self, ctx, user: Optional[discord.Member]):
+        user = user or ctx.author
+        spotify_activity = next(
+            (activity for activity in user.activities if isinstance(activity, Spotify)),
+            None
+            )
+        if spotify_activity is None:
+            return await ctx.send(f"Sorry {ctx.author.mention} {user.name} is not currently listening to Spotify.")
+
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(str(spotify_activity.album_cover_url)) as r:
+                res = io.BytesIO(await r.read())
+
+            color_thief = ColorThief(res)
+            dominant_color = color_thief.get_color(quality=40)
+
+            font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
+            fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
+
+            title = kks.convert(spotify_activity.title)
+            album = kks.convert(spotify_activity.album)
+            artists = kks.convert(spotify_activity.artists)
+
+            title_new = ''.join(item['hepburn'] for item in title)
+            album_new = ''.join(item['hepburn'] for item in album)
+            transliterated_artists = [kks.convert(artist) for artist in spotify_activity.artists]
+            artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
+
+            abridged = album_new if len(album_new) <= 20 else f'{album_new[0:17]}...'
+
+            cbridged = title_new if len(title_new) <= 30 else f'{title_new[0:27]}...'
+
+            dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[0:27]}...'
+
+            duration = format_timespan(spotify_activity.duration)
+
+            luminance = relative_luminance(dominant_color)
+
+            text_colour = 'black' if luminance > 0.5 else 'white'
+
+            img = Image.new('RGB', (999, 395), color=dominant_color)
+
+            album = Image.open(res)
+            resized_album = album.resize((245, 245))
+            img.paste(resized_album, (41, 76))
+
+            parser = TwemojiParser(img)
+
+            parser.draw_text((300, 90), abridged, fill=text_colour, font=fontbold)
+            parser.draw_text((303, 170), cbridged, fill=text_colour, font=font)
+            parser.draw_text((303, 228), dbridged, fill=text_colour, font=font)
+
+            final = add_corners(img, 55)
+
+            buffer = io.BytesIO()
+            final.save(buffer, format='PNG')
+            buffer.seek(0)
+
+            file = discord.File(buffer, "spotify.png")
+            embed = discord.Embed(color=0x2F3136)
+            embed.set_image(url="attachment://spotify.png")
+            await ctx.send(embed=embed, file=file)
 
 def setup(bot):
     bot.add_cog(FunCog(bot))
