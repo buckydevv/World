@@ -658,7 +658,8 @@ class FunCog(commands.Cog):
         embed.set_image(url="attachment://stretch.png")
         await ctx.send(embed=embed, file=file)
 
-    @commands.command(help="Get spotify information on a discord user!", aliases=["sp"])
+
+    @commands.command(help="Get spotify information", aliases=["sp"])
     async def spotify(self, ctx, user: Optional[discord.Member]):
         user = user or ctx.author
         spotify_activity = next(
@@ -718,9 +719,7 @@ class FunCog(commands.Cog):
             buffer.seek(0)
 
             file = discord.File(buffer, "spotify.png")
-            embed = discord.Embed(color=0x2F3136)
-            embed.set_image(url="attachment://spotify.png")
-            await ctx.send(embed=embed, file=file)
+            await ctx.send(file=file)
 
 def setup(bot):
     bot.add_cog(FunCog(bot))
