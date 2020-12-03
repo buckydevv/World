@@ -187,7 +187,7 @@ class InfoCog(commands.Cog):
         world_information.add_field(
             name=":computer: | Owners and developers",
             value=textwrap.dedent("""
-                Owner: `seañ#1718`
+                Owner: `wrld of jaffa#1718`
                 Developers: `Atie#5173` | `fxcilities#4728` | `antemortem#0110`
             """),
             inline=False
