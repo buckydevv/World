@@ -73,7 +73,12 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:shufflelogo:765652804387471430> | Random Commands",
-        value="`w/botinfo` | `w/invite` | `w/servers` | `w/vote` | `w/urban` |\n`w/vote` | `w/uptime` | `w/advice` |\n`w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` |\n`w/emotes` | `w/snipe` | `w/editsnipe`"
+        value="`w/urban` | `w/advice` | `w/userinfo` | `w/serverinfo` | `w/roleinfo` | `w/categoryinfo` | `w/activity` | `w/snipe` | `w/editsnipe`",
+        inline=False
+        ).add_field(
+        name="<:Worldhappy:768145777985454131> | World commands",
+        value="`w/botinfo` | `w/invite` | `w/vote` | `w/uptime` | `w/emotes`",
+        inline=False
         )
       await ctx.send(embed=em)
 
@@ -106,16 +111,20 @@ class HelpCog(commands.Cog):
       await ctx.send(embed=em)
 
 
-    @commands.command(help="Shows Fun category.")
+    @commands.command(hlep="Shows Fun category.")
     async def fun(self, ctx):
-      em = discord.Embed(
+      embed = discord.Embed(
         title="Fun commands", 
         color=self.color,
         ).add_field(
-        name="<:fun:765647000208801803> | Fun Commands",
-        value="`w/gay` | `w/askali` | `w/pp` | `w/tweet` | `w/8ball` | `w/f` | `w/joke` | `w/meme` | `w/avatar` |\n`w/akinator` | `w/emojify` | `w/kill` | `w/qr` | `w/flip` | `w/blur` |\n `w/fakequote` | `w/topgg` | `w/wude`"
+        name="<:Worldcool:768201555492864030> | Normal fun",
+        value="`w/gay` | `w/askali` | `w/pp` | `w/8ball` | `w/f` | `w/joke` | `w/emojify` | `w/akinator` | `w/kill`"
+        ).add_field(
+        name=":frame_photo: | Image fun",
+        value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/tweet` | `w/blur` | `w/buybadge` | `w/deposit` | `w/avatar` | `w/qr` | `w/flip` | `w/wide`",
+        inline=False
         )
-      await ctx.send(embed=em)
+      await ctx.send(embed=embed)
 
 
     @commands.command(help="Shows economy category.")
@@ -143,7 +152,7 @@ class HelpCog(commands.Cog):
       em = discord.Embed(
         title="New commands!", 
         color=self.color,
-        description="`w/emotes` | `w/economy` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur`"
+        description="`w/emotes` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur`\n\nTo see patches Join the support server! `w/invite`"
         )
       await ctx.send(embed=em)
 
