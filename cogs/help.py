@@ -126,7 +126,7 @@ class HelpCog(commands.Cog):
         value="`w/gay` | `w/askali` | `w/pp` | `w/8ball` | `w/f` | `w/joke` | `w/emojify` | `w/akinator` | `w/kill`"
         ).add_field(
         name=":frame_photo: | Image fun",
-        value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/tweet` | `w/blur` | `w/buybadge` | `w/deposit` | `w/avatar` | `w/qr` | `w/flip` | `w/wide`",
+        value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/tweet` | `w/blur` | `w/avatar` | `w/qr` | `w/flip` | `w/wide`",
         inline=False
         )
       await ctx.send(embed=embed)
