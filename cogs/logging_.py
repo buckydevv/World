@@ -2,20 +2,25 @@ import discord
 import pymongo
 import typing
 import io
-import datetime
 import os
+import datetime
 import requests
 import PIL
 import urllib
-from PIL import Image
+import twemoji_parser
+
+
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 from io import BytesIO
 from typing import Optional
+from twemoji_parser import TwemojiParser
 from discord import TextChannel
 from pymongo import MongoClient
 from discord.ext import commands
 from urllib.parse import urlparse, quote
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
+from discord import Embed
 
 load_dotenv()
 
@@ -28,195 +33,190 @@ collection = db["Guilds"]
 class LoggingCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.color = 0x2F3136
 
-    @commands.command(help="World - Logging")
+
+    @commands.group(name="logging")
+    async def logging(self, ctx):
+        if ctx.invoked_subcommand is None:
+            return await ctx.send(f"Sorry {ctx.author.mention} please type `w/logging <command>`")
+
+    @logging.command(name="create")
     @commands.has_permissions(administrator=True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def logging(self, ctx, options, channel: Optional[discord.TextChannel]):
+    async def create(self, ctx):
+        try:
+            await self._create_guild_account(ctx.guild.id)
 
-        if options == "create":
-            try:
-                post = {
-                "_id": ctx.guild.id,
-                "Bans": 0,
-                "Kicks": 0,
-                "Mutes": 0,
-                "LockedChannel": 0,
-                "UnLockedChannel": 0,
-                "Unmute": 0,
-                "Slowmode": 0,
-                "DeletedMessage": 0,
-                "EditedMessage": 0,
-                "JoinedServer": 0,
-                "LeftServer": 0,
-                "Unbanned": 0,
-                "Poll": 0,
-                "Eval": 0,
-                "Extraslot": 0
-                }
-                collection.insert_one(post)
-                embed1 = discord.Embed(title="Logging Created.")
-                embed1.add_field(
-                    name=f"**Success**",
-                    value=f"{ctx.author.mention} I Have Succsesfully Set up `{ctx.guild.name}'s` Logging\nTo see logging options: `world logging help`\nTo remove logging: `world logging shutdown`.",
-                    inline=True,
-                    )
-                await ctx.channel.send(embed=embed1)
-            except pymongo.errors.DuplicateKeyError:
-                embed1 = discord.Embed(
-                    title="Error!",
-                    description=f"Sorry {ctx.author.mention} your guild is already registered.",
-                    )
-                await ctx.send(embed=embed1)
-
-        if options == "shutdown":
-            collection.remove({"_id": ctx.guild.id})
-            embed = discord.Embed(title="Logging Shutdown.", description=f"{ctx.author.mention} I have succsesfully shutdown `{ctx.guild.name}'s` Logging.")
+            embed = Embed(title="Logging", description=f"I have succsesfully setup logging for `{ctx.guild.name}`.", color=self.color)
             await ctx.send(embed=embed)
+        except pymongo.errors.DuplicateKeyError:
+            embed = Embed(title="Logging", description=f"Sorry {ctx.author.mention} your guild already has a logging system setup!", color=self.color)
+            return await ctx.send(embed=embed)
 
-        if options == "help":
-            embed = discord.Embed()
-            embed.set_author(name='World - Logging help')
-            embed.add_field(name="Register your guild.", value="w/logging create", inline=True)
-            embed.add_field(name="Remove your guild.", value="w/logging shutdown", inline=True)
-            embed.add_field(name="Set Logging.", value="w/logging <option>", inline=True)
-            embed.set_footer(text="Use \"w/logging options>\" For logging info.")
-            await ctx.send(embed=embed)
-
-        if options == "options":
-            embed = discord.Embed()
-            embed.set_author(name='World - Logging Options')
-            embed.add_field(name="Set ban log.", value="w/logging bans <channel>", inline=False)
-            embed.add_field(name="Set unban log.", value="w/logging unbans <channel>", inline=False)
-            embed.add_field(name="Set deleted messages log.", value="w/logging deleted <channel>", inline=False)
-            embed.add_field(name="Set Welcome messages.", value="w/logging welcome <channel>", inline=False)
-            embed.add_field(name="Set Goodybe messages.", value="w/logging goodbye <channel>", inline=False)
-            embed.add_field(name="Set all.", value="w/logging all <channel>", inline=False)
-            embed.set_footer(text="More logging coming soon.")
-            await ctx.send(embed=embed)
-
-
-
-        if options == "bans":
-            query = {"_id": ctx.guild.id}
-            banlog = collection.find(query)
-            post = {"Bans": channel.id}
-            for result in banlog:
-                if collection.find_one({"_id": ctx.guild.id})["Bans"] == channel.id:
-                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Ban Log`.")
-                    return await ctx.send(embed=embed)
-                ban = result["Bans"]
-                banresult = int(channel.id)
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"Bans": banresult}})
-                embed = discord.Embed(title="Logging - set", description=f"{ctx.author.mention} I have succsesfully updated your `Ban Log` to the channel: <#{channel.id}>")
-                await ctx.send(embed=embed)
-
-        if options == "unbans":
-            query = {"_id": ctx.guild.id}
-            unbanlog = collection.find(query)
-            post = {"Unbanned": channel.id}
-            for result in unbanlog:
-                if collection.find_one({"_id": ctx.guild.id})["Unbanned"] == channel.id:
-                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Unbanned Log`.")
-                    return await ctx.send(embed=embed)
-                unban = result["Unbanned"]
-                unbanresult = int(channel.id)
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"Unbanned": unbanresult}})
-                embed = discord.Embed(title="Logging - set", description=f"{ctx.author.mention} I have succsesfully updated your `Unban Log` to the channel: <#{channel.id}>")
-                await ctx.send(embed=embed)
-
-        if options == "deleted":
-            query = {"_id": ctx.guild.id}
-            deletedlog = collection.find(query)
-            post = {"DeletedMessage": channel.id}
-            for result in deletedlog:
-                if collection.find_one({"_id": ctx.guild.id})["DeletedMessage"] == channel.id:
-                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Deleted message Log`.")
-                    return await ctx.send(embed=embed)
-                deleted = result["DeletedMessage"]
-                deletedresult = int(channel.id)
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"DeletedMessage": deletedresult}})
-                embed = discord.Embed(title="Logging - set", description=f"{ctx.author.mention} I have succsesfully updated your `Deleted messages Log` to the channel: <#{channel.id}>")
-                await ctx.send(embed=embed)
-
-        if options == "edited":
-            query = {"_id": ctx.guild.id}
-            editedlog = collection.find(query)
-            post = {"EditedMessage": channel.id}
-            for result in editedlog:
-                if collection.find_one({"_id": ctx.guild.id})["EditedMessage"] == channel.id:
-                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Edited message Log`.")
-                    return await ctx.send(embed=embed)
-                edited = result["EditedMessage"]
-                editedresult = int(channel.id)
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"EditedMessage": editedresult}})
-                embed = discord.Embed(title="Logging - set", description=f"{ctx.author.mention} I have succsesfully updated your `Edited messages Log` to the channel: <#{channel.id}>")
-                await ctx.send(embed=embed)
-
-
-        if options == "welcome":
-            query = {"_id": ctx.guild.id}
-            joinlog = collection.find(query)
-            post = {"JoinedServer": channel.id}
-            for result in joinlog:
-                if collection.find_one({"_id": ctx.guild.id})["JoinedServer"] == channel.id:
-                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Welcome Message log`.")
-                    return await ctx.send(embed=embed)
-                joined = result["JoinedServer"]
-                joinedresult = int(channel.id)
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"JoinedServer": joinedresult}})
-                embed = discord.Embed(title="Logging - set", description=f"{ctx.author.mention} I have succsesfully updated your `Welcome Messages` to the channel: <#{channel.id}>")
-                await ctx.send(embed=embed)
-
-        if options == "goodbye":
-            query = {"_id": ctx.guild.id}
-            leftlog = collection.find(query)
-            post = {"LeftServer": channel.id}
-            for result in leftlog:
-                if collection.find_one({"_id": ctx.guild.id})["LeftServer"] == channel.id:
-                    embed = discord.Embed(title="Error!", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Goodbye Message log`.")
-                    return await ctx.send(embed=embed)
-                leave = result["LeftServer"]
-                leaveresult = int(channel.id)
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"LeftServer": leaveresult}})
-                embed = discord.Embed(title="Logging - set", description=f"{ctx.author.mention} I have succsesfully updated your `Goodbye Messages` to the channel: <#{channel.id}>")
-                await ctx.send(embed=embed)
-
-
-        if options == "all":
-            query = {"_id": ctx.guild.id}
-            allc = collection.find(query)
-            post = {"_id": channel.id}
-            for result in allc:
-                edited = result["EditedMessage"]
-                deleted = result["DeletedMessage"]
-                joined = result["JoinedServer"]
-                left = result["LeftServer"]
-                unban = result["Unbanned"]
-                ban = result["Bans"]
-                allresult = int(channel.id)
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"EditedMessage": allresult}})
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"DeletedMessage": allresult}})
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"Unbanned": allresult}})
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"Bans": allresult}})
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"JoinedServer": allresult}})
-                collection.update_one({"_id": ctx.guild.id}, {"$set": {"LeftServer": allresult}})
-                embed = discord.Embed(title="Logging - set", description=f"{ctx.author.mention} I have succsesfully updated all your `Logs` to the channel: <#{channel.id}>")
-                await ctx.send(embed=embed)
-
-
-    @logging.error
-    async def logging_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            a = error.retry_after
-            a = round(a)
-            await ctx.send(
-                f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.\nReason: `Could abuse database system.`"
-            )
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} you forgot to add a argument!")
+    @create.error
+    async def create_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f"Sorry {ctx.author.mention} you don't have permissions to do this.")
+            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+
+    @logging.command(name="shutdown", aliases=["delete"])
+    @commands.has_permissions(administrator=True)
+    async def shutdown(self, ctx):
+        if not (await self._has_guild_account(ctx.guild.id)):
+            embed = Embed(title="Shutdown", description=f"Hey {ctx.author.mention} your guild was not found.\nTry using: `w/logging create`", color=self.color)
+            return await ctx.send(embed=embed)
+
+        collection.remove({"_id": ctx.guild.id})
+        embed = Embed(title="Shutdown", description=f"Hey {ctx.author.mention} i have succsesfully removed your guild's account.", color=self.color)
+        await ctx.send(embed=embed)
+
+    @shutdown.error
+    async def shutdown_error(self, ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+
+    @logging.command(name="bans", aliases=["discordbans", "banlog"])
+    @commands.has_permissions(administrator=True)
+    async def bans(self, ctx, channel: discord.TextChannel):
+        if not (await self._has_guild_account(ctx.guild.id)):
+            await self._create_guild_account(ctx.guild.id)
+        query = {"_id": ctx.guild.id}
+        res = collection.find(query)
+        for result in res:
+            if collection.find_one({"_id": ctx.guild.id})["Bans"] == channel.id:
+                embed = discord.Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Ban Log`.", color=self.color)
+                return await ctx.send(embed=embed)
+            ban = result["Bans"]
+            banresult = int(channel.id)
+            collection.update_one({"_id": ctx.guild.id}, {"$set": {"Bans": banresult}})
+            embed = Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Ban Log` to the channel: <#{channel.id}>", color=self.color)
+            await ctx.send(embed=embed)
+
+    @bans.error
+    async def bans_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging bans <channel>`")
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+
+    @logging.command(name="unban", aliases=["discordunban", "unbanlog", "unbanslog", "unbans"])
+    @commands.has_permissions(administrator=True)
+    async def unban(self, ctx, channel: discord.TextChannel):
+    	if not (await self._has_guild_account(ctx.guild.id)):
+    		await self._create_guild_account(ctx.guild.id)
+    	query = {"_id": ctx.guild.id}
+    	res = collection.find(query)
+    	for result in res:
+            if collection.find_one({"_id": ctx.guild.id})["Unbanned"] == channel.id:
+                embed = discord.Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Unban Log`.", color=self.color)
+                return await ctx.send(embed=embed)
+            unban = result["Unbanned"]
+            unbanresult = int(channel.id)
+            collection.update_one({"_id": ctx.guild.id}, {"$set": {"Unbanned": unbanresult}})
+            embed = Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Unban Log` to the channel: <#{channel.id}>", color=self.color)
+            await ctx.send(embed=embed)
+
+    @unban.error
+    async def unban_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging unban <channel>`")
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+
+    @logging.command(name="deleted", aliases=["discorddeleted", "delmsg"])
+    @commands.has_permissions(administrator=True)
+    async def deleted(self, ctx, channel: discord.TextChannel):
+    	if not (await self._has_guild_account(ctx.guild.id)):
+    		await self._create_guild_account(ctx.guild.id)
+    	query = {"_id": ctx.guild.id}
+    	res = collection.find(query)
+    	for result in res:
+            if collection.find_one({"_id": ctx.guild.id})["DeletedMessage"] == channel.id:
+                embed = discord.Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Deleted messages Log`.", color=self.color)
+                return await ctx.send(embed=embed)
+            delete = result["DeletedMessage"]
+            delresult = int(channel.id)
+            collection.update_one({"_id": ctx.guild.id}, {"$set": {"DeletedMessage": delresult}})
+            embed = Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Deleted messages Log` to the channel: <#{channel.id}>", color=self.color)
+            await ctx.send(embed=embed)
+
+    @deleted.error
+    async def deleted_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging deleted <channel>`")
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+
+    @logging.command(name="edited", aliases=["discordedited", "editmsg"])
+    @commands.has_permissions(administrator=True)
+    async def edited(self, ctx, channel: discord.TextChannel):
+    	if not (await self._has_guild_account(ctx.guild.id)):
+    		await self._create_guild_account(ctx.guild.id)
+    	query = {"_id": ctx.guild.id}
+    	res = collection.find(query)
+    	for result in res:
+            if collection.find_one({"_id": ctx.guild.id})["EditedMessage"] == channel.id:
+                embed = discord.Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Edited messages Log`.", color=self.color)
+                return await ctx.send(embed=embed)
+            edit = result["EditedMessage"]
+            editresult = int(channel.id)
+            collection.update_one({"_id": ctx.guild.id}, {"$set": {"EditedMessage": editresult}})
+            embed = Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Edited messages Log` to the channel: <#{channel.id}>", color=self.color)
+            await ctx.send(embed=embed)
+
+    @edited.error
+    async def edited_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging edited <channel>`")
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+
+    @logging.command(name="welcomes", aliases=["joiner", "joins", "join", "welcomemessages", "welcomemsg", "welcome"])
+    @commands.has_permissions(administrator=True)
+    async def welcomes(self, ctx, channel: discord.TextChannel):
+    	if not (await self._has_guild_account(ctx.guild.id)):
+    		await self._create_guild_account(ctx.guild.id)
+    	query = {"_id": ctx.guild.id}
+    	res = collection.find(query)
+    	for result in res:
+            if collection.find_one({"_id": ctx.guild.id})["JoinedServer"] == channel.id:
+                embed = discord.Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Welcome messages Log`.", color=self.color)
+                return await ctx.send(embed=embed)
+            join = result["JoinedServer"]
+            joinresult = int(channel.id)
+            collection.update_one({"_id": ctx.guild.id}, {"$set": {"JoinedServer": joinresult}})
+            embed = Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Welcome messsages Log` to the channel: <#{channel.id}>", color=self.color)
+            await ctx.send(embed=embed)
+
+    @welcomes.error
+    async def welcomes_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging welcomes <channel>`")
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+
+    @logging.command(name="goodbye", aliases=["memberleave", "bye", "leftserver", "leaving", "goodbyes"])
+    @commands.has_permissions(administrator=True)
+    async def goodbye(self, ctx, channel: discord.TextChannel):
+    	if not (await self._has_guild_account(ctx.guild.id)):
+    		await self._create_guild_account(ctx.guild.id)
+    	query = {"_id": ctx.guild.id}
+    	res = collection.find(query)
+    	for result in res:
+            if collection.find_one({"_id": ctx.guild.id})["LeftServer"] == channel.id:
+                embed = discord.Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Goodbye messages Log`.", color=self.color)
+                return await ctx.send(embed=embed)
+            leave = result["LeftServer"]
+            leaveresult = int(channel.id)
+            collection.update_one({"_id": ctx.guild.id}, {"$set": {"LeftServer": leaveresult}})
+            embed = Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Goodbye messsages Log` to the channel: <#{channel.id}>", color=self.color)
+            await ctx.send(embed=embed)
+
+    @goodbye.error
+    async def goodbye_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging goodbye <channel>`")
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
@@ -224,15 +224,16 @@ class LoggingCog(commands.Cog):
         memberban = collection.find(query)
         post = {"Bans": 0}
         for result in memberban:
-            ban = result["Bans"]
-            if collection.find_one({"_id": guild.id})["Bans"] == 0:
-                return
-            else:
-                ban1 = await guild.fetch_ban(user)
-                reason = ban1.reason
-                embed = discord.Embed(title="Ban Log", description=f"A user from this guild has been banned.\nName: `{user.name}`\nID: `{user.id}`\nReason: `{reason}`", timestamp=datetime.datetime.utcnow())
-                channel = self.bot.get_channel(ban)
-                await channel.send(embed=embed)
+        	ban = result["Bans"]
+        	if collection.find_one({"_id": guild.id})["Bans"] == 0:
+        		return
+        	else:
+        		ban1 = await guild.fetch_ban(user)
+        		print(ban1)
+        		reason = ban1.reason
+        		embed = discord.Embed(title="Ban Log", description=f"A user from this guild has been banned.\nName: `{user.name}`\nID: `{user.id}`\nReason: `{reason}`", timestamp=datetime.datetime.utcnow())
+        		channel = self.bot.get_channel(ban)
+        		await channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
@@ -284,7 +285,6 @@ class LoggingCog(commands.Cog):
                 channel = self.bot.get_channel(editedm)
                 await channel.send(embed=embed)
 
-
     @commands.Cog.listener()
     async def on_member_join(self, member):
         query = {"_id": member.guild.id}
@@ -295,32 +295,116 @@ class LoggingCog(commands.Cog):
             if collection.find_one({"_id": member.guild.id})["JoinedServer"] == 0:
                 return
             else:
-                response = requests.get(f"https://some-random-api.ml/welcome/img/3/stars?type=join&username={member.name}&discriminator={member.discriminator}&guildName={urllib.parse.quote(member.guild.name)}&memberCount={member.guild.member_count}&avatar={member.avatar_url_as(format='png')}&textcolor=white")
-                img = Image.open(BytesIO(response.content))
-                with BytesIO() as image_binary:
-                    img.save(image_binary, "PNG")
-                    image_binary.seek(0)
-                    channel = self.bot.get_channel(joined)
-                    await channel.send(file=discord.File(fp=image_binary,filename="welcome.png"))
+            	picture = member.avatar_url_as(format='png')
+            	buf_avatar = io.BytesIO()
 
+            	await picture.save(buf_avatar)
+            	buf_avatar.seek(0)
+
+            	font = ImageFont.truetype("fonts/Arial-bold.ttf", 60, encoding="unic")
+            	fontsmall = ImageFont.truetype("fonts/Arial-bold.ttf", 45, encoding="unic")
+
+            	check_length = member.name if len(member.name) <= 14 else f'{member.name[0:11]}...'
+
+            	mainimage = Image.open("images/Welcome.png")
+
+            	parser = TwemojiParser(mainimage)
+            	parser.draw_text((275, 230), f"Welcome {check_length}", fill='black', font=font)
+            	parser.draw_text((279, 300), f"We now have {len(member.guild.members)} members!", fill='black', font=fontsmall)
+
+            	user_picture = Image.open(buf_avatar)
+
+            	resize = user_picture.resize((200, 200));
+            	size_bigger = (resize.size[0] * 3, resize.size[1] * 3)
+            	maskimage = Image.new('L', size_bigger, 0)
+            	draw = ImageDraw.Draw(maskimage)
+            	draw.ellipse((0, 0) + size_bigger, fill=255)
+            	maskimage = maskimage.resize(resize.size, Image.ANTIALIAS)
+            	resize.putalpha(maskimage)
+
+            	output = ImageOps.fit(resize, maskimage.size, centering=(0.5, 0.5))
+            	output.putalpha(maskimage)
+            	mainimage.paste(resize, (50, 195), resize)
+
+            	buffer = io.BytesIO()
+            	mainimage.save(buffer, format='PNG')
+            	buffer.seek(0)
+
+            	file = discord.File(buffer, "WelcomeImg.png")
+            	channel = self.bot.get_channel(joined)
+            	await channel.send(file=file)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         query = {"_id": member.guild.id}
-        member_left = collection.find(query)
+        member_joined = collection.find(query)
         post = {"LeftServer": 0}
-        for result in member_left:
-            byebye = result["LeftServer"]
+        for result in member_joined:
+            joined = result["LeftServer"]
             if collection.find_one({"_id": member.guild.id})["LeftServer"] == 0:
                 return
             else:
-                response = requests.get(f"https://some-random-api.ml/welcome/img/3/stars?type=leave&username={member.name}&discriminator={member.discriminator}&guildName={urllib.parse.quote(member.guild.name)}&memberCount={member.guild.member_count}&avatar={member.avatar_url_as(format='png')}&textcolor=white")
-                img = Image.open(BytesIO(response.content))
-                with BytesIO() as image_binary:
-                    img.save(image_binary, "PNG")
-                    image_binary.seek(0)
-                    channel = self.bot.get_channel(byebye)
-                    await channel.send(file=discord.File(fp=image_binary,filename="goodbye.png"))
+            	picture = member.avatar_url_as(format='png')
+            	buf_avatar = io.BytesIO()
+
+            	await picture.save(buf_avatar)
+            	buf_avatar.seek(0)
+
+            	font = ImageFont.truetype("fonts/Arial-bold.ttf", 60, encoding="unic")
+            	fontsmall = ImageFont.truetype("fonts/Arial-bold.ttf", 45, encoding="unic")
+
+            	check_length = member.name if len(member.name) <= 14 else f'{member.name[0:11]}...'
+
+            	mainimage = Image.open("images/Welcome.png")
+
+            	parser = TwemojiParser(mainimage)
+            	parser.draw_text((275, 230), f"Goodbye {check_length}", fill='black', font=font)
+            	parser.draw_text((279, 300), f"We loved having you here!", fill='black', font=fontsmall)
+
+            	user_picture = Image.open(buf_avatar)
+
+            	resize = user_picture.resize((200, 200));
+            	size_bigger = (resize.size[0] * 3, resize.size[1] * 3)
+            	maskimage = Image.new('L', size_bigger, 0)
+            	draw = ImageDraw.Draw(maskimage)
+            	draw.ellipse((0, 0) + size_bigger, fill=255)
+            	maskimage = maskimage.resize(resize.size, Image.ANTIALIAS)
+            	resize.putalpha(maskimage)
+
+            	output = ImageOps.fit(resize, maskimage.size, centering=(0.5, 0.5))
+            	output.putalpha(maskimage)
+            	mainimage.paste(resize, (50, 195), resize)
+
+            	buffer = io.BytesIO()
+            	mainimage.save(buffer, format='PNG')
+            	buffer.seek(0)
+
+            	file = discord.File(buffer, "Goodbye.png")
+            	channel = self.bot.get_channel(joined)
+            	await channel.send(file=file)
+
+    async def _create_guild_account(self, guild_id: int) -> None:
+        """Create a World guild account."""
+        collection.insert_one({
+            "_id": guild_id,
+            "Bans": 0,
+            "Kicks": 0,
+            "Mutes": 0,
+            "Unmute": 0,
+            "Slowmode": 0,
+            "DeletedMessage": 0,
+            "EditedMessage": 0,
+            "JoinedServer": 0,
+            "LeftServer": 0,
+            "Unbanned": 0,
+        })
+
+    async def _has_guild_account(self, guild_id: int) -> None:
+        """If True, will return guild id. If False, will return nothing."""
+        return bool(collection.find_one(
+            {"_id": guild_id}
+        ))
+
 
 
 def setup(bot):
