@@ -106,7 +106,12 @@ class HelpCog(commands.Cog):
         color=self.color,
         ).add_field(
         name="<:discordlogo:765648661039677481> | Guild Commands",
-        value="`w/logging create` | `w/logging shutdown` |\n`w/logging <option> <channel>` | `w/logging options`"
+        value="`w/logging create` | `w/logging shutdown`",
+        inline=False
+        ).add_field(
+        name=":question: | Logging options",
+        value="`w/logging bans` | `w/logging unban` | `w/logging welcomes` | `w/logging goodbye` | `w/logging edited` | `w/logging deleted`",
+        inline=False
         )
       await ctx.send(embed=em)
 
