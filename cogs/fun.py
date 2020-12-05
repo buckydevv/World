@@ -663,63 +663,61 @@ class FunCog(commands.Cog):
     async def spotify(self, ctx, user: Optional[discord.Member]):
         user = user or ctx.author
         spotify_activity = next(
-            (activity for activity in user.activities if isinstance(activity, Spotify)),
-            None
-            )
+        	(activity for activity in user.activities if isinstance(activity, Spotify)),
+        	None
+        	)
         if spotify_activity is None:
-            return await ctx.send(f"Sorry {ctx.author.mention} {user.name} is not currently listening to Spotify.")
+        	return await ctx.send(f"Sorry {ctx.author.mention} {user.name} is not currently listening to Spotify.")
 
         async with aiohttp.ClientSession() as cs:
-            async with cs.get(str(spotify_activity.album_cover_url)) as r:
-                res = io.BytesIO(await r.read())
+        	async with cs.get(str(spotify_activity.album_cover_url)) as r:
+        		res = io.BytesIO(await r.read())
 
-            color_thief = ColorThief(res)
-            dominant_color = color_thief.get_color(quality=40)
+        	color_thief = ColorThief(res)
+        	dominant_color = color_thief.get_color(quality=40)
 
-            font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
-            fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
+        	font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
+        	fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
 
-            title = kks.convert(spotify_activity.title)
-            album = kks.convert(spotify_activity.album)
-            artists = kks.convert(spotify_activity.artists)
+        	title = kks.convert(spotify_activity.title)
+        	album = kks.convert(spotify_activity.album)
+        	artists = kks.convert(spotify_activity.artists)
 
-            title_new = ''.join(item['hepburn'] for item in title)
-            album_new = ''.join(item['hepburn'] for item in album)
-            transliterated_artists = [kks.convert(artist) for artist in spotify_activity.artists]
-            artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
+        	title_new = ''.join(item['hepburn'] for item in title)
+        	album_new = ''.join(item['hepburn'] for item in album)
+        	transliterated_artists = [kks.convert(artist) for artist in spotify_activity.artists]
+        	artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
 
-            abridged = album_new if len(album_new) <= 20 else f'{album_new[0:17]}...'
+        	abridged = album_new if len(album_new) <= 30 else f'{album_new[0:27]}...'
 
-            cbridged = title_new if len(title_new) <= 30 else f'{title_new[0:27]}...'
+        	cbridged = title_new if len(title_new) <= 20 else f'{title_new[0:17]}...'
 
-            dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[0:27]}...'
+        	dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[0:27]}...'
 
-            duration = format_timespan(spotify_activity.duration)
+        	luminance = relative_luminance(dominant_color)
 
-            luminance = relative_luminance(dominant_color)
+        	text_colour = 'black' if luminance > 0.5 else 'white'
 
-            text_colour = 'black' if luminance > 0.5 else 'white'
+        	img = Image.new('RGB', (999, 395), color=dominant_color)
 
-            img = Image.new('RGB', (999, 395), color=dominant_color)
+        	album = Image.open(res)
+        	resized_album = album.resize((245, 245))
+        	img.paste(resized_album, (41, 76))
 
-            album = Image.open(res)
-            resized_album = album.resize((245, 245))
-            img.paste(resized_album, (41, 76))
+        	parser = TwemojiParser(img)
 
-            parser = TwemojiParser(img)
+        	parser.draw_text((303, 170), dbridged, fill=text_colour, font=font) # Artists - Middle section
+        	parser.draw_text((300, 90), cbridged, fill=text_colour, font=fontbold) # Title of song - Top section
+        	parser.draw_text((303, 228), abridged, fill=text_colour, font=font) # Album name - Bottom section
 
-            parser.draw_text((300, 90), abridged, fill=text_colour, font=fontbold)
-            parser.draw_text((303, 170), cbridged, fill=text_colour, font=font)
-            parser.draw_text((303, 228), dbridged, fill=text_colour, font=font)
+        	final = add_corners(img, 55)
 
-            final = add_corners(img, 55)
+        	buffer = io.BytesIO()
+        	final.save(buffer, format='PNG')
+        	buffer.seek(0)
 
-            buffer = io.BytesIO()
-            final.save(buffer, format='PNG')
-            buffer.seek(0)
-
-            file = discord.File(buffer, "spotify.png")
-            await ctx.send(file=file)
+        	file = discord.File(buffer, "spotify.png")
+        	await ctx.send(file=file)
 
 def setup(bot):
     bot.add_cog(FunCog(bot))
