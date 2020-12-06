@@ -10,6 +10,7 @@ import io
 import datetime
 import aggdraw
 import aiohttp
+import time
 import os
 import pykakasi
 import json
@@ -29,10 +30,13 @@ from colorthief import ColorThief
 
 from urllib.parse import urlparse, quote
 from akinator.async_aki import Akinator
+from time import time
 
 akiObj = akinator.async_aki.Akinator()
 
 kks = pykakasi.kakasi()
+
+milliseconds = lambda: int(time() * 1000)
 
 world_pfp = ("https://im-a-dev.xyz/EL35H6QC.png")
 
@@ -718,6 +722,54 @@ class FunCog(commands.Cog):
 
         	file = discord.File(buffer, "spotify.png")
         	await ctx.send(file=file)
+
+    @commands.command(help="Are you a fast typer?!", aliases=["type", "typingtest"])
+    async def fast(self, ctx):
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get("https://random-word-api.herokuapp.com/word?number=1") as r:
+                res = await r.json()
+                word = res[0]
+
+            goodmessages = ["Wow speedy!", "Nice time!", "That was pretty good!", "Wow, you fast at typing!", "You speedy, that's for sure!"]
+
+            badmessages = ["How slow can you type?", "That was slow!", "You need to practice more!", "It's ok i won't tell anybody that your a slow typer"]
+
+            font = ImageFont.truetype("fonts/Arial-bold.ttf", 25, encoding="unic")
+
+            wx, wy = font.getsize(word)
+            offset_y = font.getsize(word)[1]
+            height = offset_y + wy
+
+            img = Image.new('RGB', (wx+20, height), color='lightblue')
+
+            parser = TwemojiParser(img)
+
+            parser.draw_text((10, 9), word, fill='black', font=font)
+
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            buffer.seek(0)
+
+            file = discord.File(buffer, "Fast.png")
+            game = await ctx.send(file=file)
+
+            while True:
+                try:
+                    start = milliseconds()
+                    resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content.lower() == word, timeout=40)
+                    elapse = milliseconds() - start
+                    if resp.content == word:
+                        if elapse/1000 > 10:
+                            isfast = random.choice(badmessages)
+                        else:
+                            isfast = random.choice(goodmessages)
+                        embed = discord.Embed(title="Fastest typer!",description=f"{resp.author.mention} typed the word `{word}` first!", color=0x2F3136)
+                        embed.add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`")
+                        embed.add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False)
+                        return await ctx.send(embed=embed)
+                except asyncio.TimeoutError:
+                    await game.delete()
+                    return await ctx.send(f"Sorry {ctx.author.mention} nobody took part! So i have ended the game.")
 
 def setup(bot):
     bot.add_cog(FunCog(bot))
