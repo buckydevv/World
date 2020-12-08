@@ -183,7 +183,7 @@ class FunCog(commands.Cog):
         embed = Embed(title=f"{user}'s pepe size", description=f"8{dong}D", color=self.color)
         await ctx.send(embed=embed)
 
-    @commands.command(help="Steal a users avatar.")
+    @commands.command(help="Steal a users avatar.", aliases=["av"])
     async def avatar(self, ctx, *, user: discord.Member=None):
         format = "gif"
         user = user or ctx.author
@@ -773,6 +773,7 @@ class FunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
 
     @commands.command(help="Are you a fast typer?!", aliases=["type", "typingtest"])
+    @commands.cooldown(rate=3, per=8, type=commands.BucketType.member)
     async def fast(self, ctx):
 
         goodmessages = ["Wow speedy!", "Nice time!", "That was pretty good!", "Wow, you fast at typing!", "You speedy, that's for sure!"]
@@ -802,9 +803,9 @@ class FunCog(commands.Cog):
         while True:
             try:
                 start = milliseconds()
-                resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content.lower() == word, timeout=40)
+                resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content.lower() == word, timeout=18)
                 elapse = milliseconds() - start
-                if resp.content == word:
+                if resp.content.lower() == word:
                     if elapse/1000 > 10:
                         isfast = random.choice(badmessages)
                     else:
@@ -816,6 +817,13 @@ class FunCog(commands.Cog):
             except asyncio.TimeoutError:
                 await game.delete()
                 return await ctx.send(f"Sorry {ctx.author.mention} nobody took part! So i have ended the game.")
+
+    @fast.error
+    async def fast_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            a = error.retry_after
+            a = round(a)
+            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
 
 
 def setup(bot):
