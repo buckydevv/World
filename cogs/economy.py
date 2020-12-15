@@ -1,9 +1,6 @@
-import os
-import random
-import datetime
-import textwrap
+from random import randint, seed
+from textwrap import dedent
 from dataclasses import dataclass
-from datetime import datetime
 from os import environ
 from typing import Literal, Union
 
@@ -168,7 +165,7 @@ class EconomyCog(commands.Cog):
         """Returns all items you can buy or sell."""
         shop_embed = Embed(
             title="Shop",
-            description=textwrap.dedent("""
+            description=dedent("""
                 - Cookies
                 `1 coin per cookie.`
                 - Chocbars
@@ -317,7 +314,7 @@ class EconomyCog(commands.Cog):
     	if target.coins == 0:
     		return await ctx.send(f"Sorry {ctx.author.mention} That user has no coins, try again next time!")
     	else:
-    		robbed_amount = random.randint(1, round(target.coins))
+    		robbed_amount = randint(1, round(target.coins))
     		total_robbed = target.coins - robbed_amount
     		robber_total = robbed_amount + robber.coins
     		await self._database_collection.update_one({"_id": user.id}, {"$set": {"coins": total_robbed}})
@@ -436,8 +433,8 @@ class EconomyCog(commands.Cog):
         )
 
         # Get percentage
-        random.seed(datetime.now().timestamp())
-        percentage = random.randint(0, 100)
+        seed(datetime.now().timestamp())
+        percentage = randint(0, 100)
         if percentage <= 85:
             lost_embed = Embed(title="You lost.", color=0x2F3136, description=f"Hey {ctx.author.mention} You have lost {amount} coin{'s' if amount > 1 else ''}.")
             await ctx.send(embed=lost_embed)
@@ -486,8 +483,8 @@ class EconomyCog(commands.Cog):
             }
         )
 
-        random.seed(datetime.now().timestamp())
-        percentage = random.randint(1, 100)
+        seed(datetime.now().timestamp())
+        percentage = randint(1, 100)
         if percentage is not choice:
             embed_lost = Embed(title="Roulette", color=0x2F3136, description=f"Hey {ctx.author.mention} You have lost {amount} coin{'s' if amount > 1 else ''}.\nYou chose `{choice}`\nWorld chose: `{percentage}`")
             await ctx.send(embed=embed_lost)
@@ -514,8 +511,8 @@ class EconomyCog(commands.Cog):
         if not (await self._has_account(ctx.author.id)):
             await self._create_account(ctx.author.id)
 
-        random.seed(datetime.now().timestamp())
-        amount_of_coins = random.randint(0, 300)
+        seed(datetime.now().timestamp())
+        amount_of_coins = randint(0, 300)
         user = await self._get_user(ctx.author.id)
         await self._database_collection.update_one(
             {
@@ -681,7 +678,7 @@ class EconomyCog(commands.Cog):
         """
         load_dotenv()
         self._database_collection = motor.motor_asyncio.AsyncIOMotorClient(
-            os.environ["MONGODB_URL"]
+            environ["MONGODB_URL"]
         )["Coins"]["UserCoins"]
 
     async def _get_user(self, user_id: int) -> User:
@@ -750,8 +747,8 @@ class EconomyCog(commands.Cog):
         )
 
         # Get the chance
-        random.seed(datetime.now().timestamp())
-        chance = random.randint(0, 100)
+        seed(datetime.now().timestamp())
+        chance = randint(0, 100)
         if chance >= 75:
             return False
 
@@ -772,8 +769,7 @@ class EconomyCog(commands.Cog):
 
     async def _create_account(self, user_id: int) -> None:
         """Creates a record, setting the record's author as user_id."""
-        now = datetime.now()
-        _created_at = str(now.strftime("%m/%d/%Y at %H:%M:%S"))
+        _created_at = str(datetime.now().strftime("%m/%d/%Y at %H:%M:%S"))
         await self._database_collection.insert_one({
             "_id": user_id,
             "coins": 100,

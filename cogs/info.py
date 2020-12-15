@@ -1,22 +1,13 @@
-import textwrap
 import discord
 import psutil
-import asyncio
-import json
-import aiohttp
-import statcord
-import time
-
-
+from asyncio import sleep as _sleep
+from json import dumps, loads, load
 from typing import Optional
 from time import time
-
-from discord import Embed, Member
-from discord import __version__ as discord_version
+from textwrap import dedent
+from discord import Embed, Member, __version__
 from discord.ext import commands
-
-init_time = time()
-
+from aiohttp import ClientSession
 
 class InfoCog(commands.Cog):
     """Contains commands that provide useful information."""
@@ -24,6 +15,8 @@ class InfoCog(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         """Sets up the cog."""
         self.bot = bot
+        self.session = ClientSession()
+        self.init_time = time() # the time the cog is loaded
 
     @commands.command(name="userinfo", aliases=("ui", "user"))
     async def userinfo(self, ctx: commands.Context, member: Optional[Member]) -> None:
@@ -43,7 +36,7 @@ class InfoCog(commands.Cog):
         )
         user_information.add_field(
             name="General information",
-            value=textwrap.dedent(f"""
+            value=dedent(f"""
                 Name: `{user.name}`
                 ID: `{user.id}`
                 Created at: `{user.created_at.strftime('%m/%d/%Y')}`
@@ -142,15 +135,14 @@ class InfoCog(commands.Cog):
     @commands.command(name="botinfo", aliases=("bot", "about"))
     async def botinfo(self, ctx: commands.Context) -> None:
         """Shows info about World."""
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://api.statcord.com/v3/700292147311542282") as req:
-                if req.status != 200:
-                    return await ctx.send(f"Sorry {ctx.author.mention} a error has occured and will be fixed soon!")
-                r = await req.json()
-                p = json.dumps(r)
-                y = json.loads(p)
-        with open('prefixes.json', 'r') as f:
-            prefixes = json.load(f)
+        req = await self.session.get("https://api.statcord.com/v3/700292147311542282")
+        if req.status != 200:
+            return await ctx.send(f"Sorry {ctx.author.mention} a error has occured and will be fixed soon!")
+        r = await req.json()
+        p = dumps(r)
+        y = loads(p)
+        with open('prefixes.json', 'r') as f: # wow nice
+            prefixes = load(f)
         if str(ctx.guild.id) in prefixes:
             guild_prefix = prefixes[str(ctx.guild.id)]
         else:
@@ -165,7 +157,7 @@ class InfoCog(commands.Cog):
             color=0x2F3136,
             description=textwrap.dedent(f"""
                 > <:Worldhappy:768145777985454131> Bot Information
-                Version: `discord.py {discord_version}`
+                Version: `discord.py {__version__}`
                 CPU Load: `{psutil.cpu_percent()}%`
                 Cores: `{psutil.cpu_count()}`
                 Memory: `{psutil.virtual_memory().percent}%`
@@ -192,7 +184,7 @@ class InfoCog(commands.Cog):
             """),
             inline=False
         )
-        await asyncio.sleep(1)
+        await _sleep(1)
         await message.edit(embed=world_information)
 
     @commands.command(name="vote")
@@ -247,7 +239,7 @@ class InfoCog(commands.Cog):
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context) -> None:
         """Returns the bot's uptime."""
-        seconds = time() - init_time
+        seconds = time() - self.init_time
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
         days, hours = divmod(hours, 24)

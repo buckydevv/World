@@ -1,15 +1,9 @@
-import discord
-import typing
-import textwrap
 from typing import Optional
 from discord.ext.commands import Cog
 from discord import Embed
 from discord.ext.commands import command
 from discord.utils import get
 from discord.ext import commands
-
-world_pfp = ("https://im-a-dev.xyz/EL35H6QC.png")
-
 
 def syntax(command):
   cmd_and_aliases = " | ".join([str(command), *command.aliases])
@@ -41,8 +35,8 @@ class HelpCog(commands.Cog):
     async def show_help(self, ctx, cmd: Optional[str]):
       """Shows this message."""
       if cmd is None:
-        embed = discord.Embed(color=self.color)
-        embed.set_author(name='World - Help', icon_url=world_pfp)
+        embed = Embed(color=self.color)
+        embed.set_author(name='World - Help', icon_url="https://im-a-dev.xyz/EL35H6QC.png")
         embed.add_field(name="Shows multiple categories.", value="w/categories", inline=True)
         embed.add_field(name="Invite", value="[Invite World](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)", inline=True)
         embed.add_field(name="Vote", value="[Vote For World](https://top.gg/bot/700292147311542282/vote)", inline=True)
@@ -60,7 +54,7 @@ class HelpCog(commands.Cog):
 
     @commands.command(help="Shows categories")
     async def categories(self, ctx):
-      em = discord.Embed(color=self.color)
+      em = Embed(color=self.color)
       em.add_field(name="‎‎World", value=f"New\n`w/new`\nFun\n`w/fun`\nOther\n`w/other`")
       em.add_field(name=f"Categories", value=f"Logging\n`w/logs`\nEconomy\n`w/economy`\nModeration\n`w/mod`")
       await ctx.send(embed=em)
@@ -68,7 +62,7 @@ class HelpCog(commands.Cog):
 
     @commands.command(help="Shows other category.")
     async def other(self, ctx):
-      em = discord.Embed(
+      em = Embed(
         title="Other commands", 
         color=self.color,
         ).add_field(
@@ -86,7 +80,7 @@ class HelpCog(commands.Cog):
 
     @commands.command(help="Shows moderation category.")
     async def mod(self, ctx):
-      em = discord.Embed(
+      em = Embed(
         title="Moderation commands", 
         color=self.color,
         ).add_field(
@@ -101,7 +95,7 @@ class HelpCog(commands.Cog):
       
     @commands.command(help="Shows logging category.")
     async def logs(self, ctx):
-      em = discord.Embed(
+      em = Embed(
         title="Logging commands", 
         color=self.color,
         ).add_field(
@@ -118,7 +112,7 @@ class HelpCog(commands.Cog):
 
     @commands.command(hlep="Shows Fun category.")
     async def fun(self, ctx):
-      embed = discord.Embed(
+      embed = Embed(
         title="Fun commands", 
         color=self.color,
         ).add_field(
@@ -134,7 +128,7 @@ class HelpCog(commands.Cog):
 
     @commands.command(help="Shows economy category.")
     async def economy(self, ctx):
-      em = discord.Embed(
+      em = Embed(
         title="Economy commands", 
         color=self.color,
         ).add_field(
@@ -154,7 +148,7 @@ class HelpCog(commands.Cog):
 
     @commands.command(help="Shows new commands.")
     async def new(self, ctx):
-      em = discord.Embed(
+      em = Embed(
         title="New commands!", 
         color=self.color,
         description="`w/emotes` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur`\n\nTo see patches Join the support server! `w/invite`"

@@ -1,12 +1,9 @@
 import discord
-import datetime
-import asyncio
 
+from datetime import datetime
 from discord.ext import commands
 from discord import Embed
 from discord.utils import get
-
-world_pfp = ("https://im-a-dev.xyz/EL35H6QC.png")
 
 class ModCog(commands.Cog):
     def __init__(self, bot):
@@ -52,7 +49,7 @@ class ModCog(commands.Cog):
     @commands.command(help="Mute a specified discord member")
     @commands.has_permissions(manage_messages=True)
     async def mute(self, ctx, user: discord.Member, *, reason=None):
-        role = discord.utils.get(ctx.guild.roles, name="Muted")
+        role = get(ctx.guild.roles, name="Muted")
         if not role:
             try:
                 createrole = await ctx.guild.create_role(name="Muted", reason="This was created so the bot can mute discord members!")
@@ -166,7 +163,7 @@ class ModCog(commands.Cog):
                     await message_.send(f"{ctx.author.mention} <#{nuked_channel.id}> was nuked.\nhttps://tenor.com/view/explosion-explode-clouds-of-smoke-gif-17216934")
                     break
                 except Exception as e:
-                    embed = discord.Embed(title="Error:", description=e, color=0x2F3136)
+                    embed = Embed(title="Error:", description=e, color=0x2F3136)
                     return await ctx.send(embed=embed)
             if emoji=='❎':
                 await message.edit(embed=nuke_fail)
@@ -207,7 +204,7 @@ class ModCog(commands.Cog):
     async def unmute(self, ctx, user: discord.Member, *, reason=None):
         if user == ctx.author:
             return await ctx.send(f"Sorry {ctx.author.mention} you can't mute yourself!")
-        role = discord.utils.get(ctx.guild.roles, name="Muted")
+        role = get(ctx.guild.roles, name="Muted")
         if not role:
             return await ctx.send(f"Sorry {ctx.author.mention} there seems to not be a role called `Muted`!")
         if not discord.utils.find(lambda role: role.name == "Muted", user.roles):
@@ -244,7 +241,7 @@ class ModCog(commands.Cog):
             badwords = ["nigger", "nig", "coon", "nigga", "retard", "rapist", "rape", "niggar", "faggot", "fag", "dyke", "whore"]
             if self.snipeCache[ctx.channel.id]["content"] in badwords:
                 return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to snipe!")
-            embed = Embed(title="Snipe", color=0x2F3136, timestamp=datetime.datetime.utcnow())
+            embed = Embed(title="Snipe", color=0x2F3136, timestamp=datetime.utcnow())
             embed.add_field(name="User", value=self.snipeCache[ctx.channel.id]["user"])
             embed.add_field(name="Content", value=self.snipeCache[ctx.channel.id]["content"])
             embed.add_field(name="Channel", value=f"<#{self.snipeCache[ctx.channel.id]['channel']}>")
@@ -260,7 +257,7 @@ class ModCog(commands.Cog):
             badwords = ["nigger", "nig", "coon", "nigga", "retard", "rapist", "rape", "niggar", "faggot", "fag", "dyke", "whore"]
             if self.editSnipeCache[ctx.channel.id]["bcontent"] in badwords:
                 return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to snipe!")
-            embed = Embed(title="Edit Snipe", colour=0x2F3136, timestamp=datetime.datetime.utcnow())
+            embed = Embed(title="Edit Snipe", colour=0x2F3136, timestamp=datetime.utcnow())
             embed.add_field(name="User", value=self.editSnipeCache[ctx.channel.id]["user"])
             embed.add_field(name="Content", value=self.editSnipeCache[ctx.channel.id]["bcontent"])
             embed.add_field(name="Channel", value=f"<#{self.editSnipeCache[ctx.channel.id]['channel']}>")

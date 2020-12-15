@@ -1,11 +1,9 @@
 import discord
-import inspect
-import traceback
-import datetime
-import asyncio
+from datetime import datetime
+from asyncio import sleep as _sleep
+from traceback import format_exc
 from discord.ext import commands
 TOKEN = '||Think Ima Give You My Token!?||'
-
 
 class OwnerCog(commands.Cog):
 
@@ -58,7 +56,7 @@ class OwnerCog(commands.Cog):
     		title="Latest update",
     		description=desc,
     		color=0x2F3136,
-    		timestamp=datetime.datetime.utcnow()
+    		timestamp=datetime.utcnow()
     		)
     	await msg.edit(embed=embed)
     	await ctx.send(f"Hey {ctx.author.mention} i have updated the message in <#765632402680447006>")
@@ -80,7 +78,7 @@ class OwnerCog(commands.Cog):
 
             await locals()["__function"]()
         except Exception:
-            res = discord.Embed(title="Error!", description=f"```{traceback.format_exc()}```", color=discord.Color.red())
+            res = discord.Embed(title="Error!", description=f"```{format_exc()}```", color=discord.Color.red())
             res.set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png"))
             await ctx.send(embed=res)
     @eval_.error
@@ -97,7 +95,7 @@ class OwnerCog(commands.Cog):
     	await ctx.message.channel.purge(limit=amount, check=world, bulk=False)
     	embed = discord.Embed(title="Purged", description=f"{ctx.author.mention} i have successfully purged `{amount}` of messages in <#{ctx.message.channel.id}>", color=ctx.author.color)
     	yes = await ctx.send(embed=embed)
-    	await asyncio.sleep(3)
+    	await _sleep(3)
     	await yes.delete()
     	await ctx.message.delete()
 

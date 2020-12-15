@@ -1,16 +1,13 @@
-import textwrap
-import json
 import discord
 
 from os import environ, listdir
 
+from json import load, dump
 from discord import (
     Activity,
     ActivityType,
     Embed,
-    HTTPException,
     Intents,
-    Message,
     Status
 )
 from discord.ext import commands
@@ -30,7 +27,7 @@ async def get_prefix(world, message):
 	if await world.is_owner(message.author):
 		return commands.when_mentioned_or(*ownerprefix)(world, message)
 	with open('prefixes.json', 'r') as f:
-		prefixes = json.load(f)
+		prefixes = load(f)
 		if not str(message.guild.id) in prefixes:
 			return commands.when_mentioned_or(*defaultprefixes)(world, message)
 	return commands.when_mentioned_or(prefixes[str(message.guild.id)])(world, message)
@@ -58,12 +55,12 @@ async def changeprefix(ctx, prefix):
 	if len(prefix) >7:
 		return await ctx.send(f"Sorry {ctx.author.mention} a limit of `7` letters please.")
 	with open('prefixes.json', 'r') as f:
-		prefixes = json.load(f)
+		prefixes = load(f)
 
 	prefixes[str(ctx.guild.id)] = prefix
 
 	with open('prefixes.json', 'w') as f:
-		json.dump(prefixes, f, indent=4)
+		dump(prefixes, f, indent=4)
 
 	embed = Embed(
 		title="Custom prefix",
@@ -109,13 +106,13 @@ for cog in cogs:
 # -------
 # Blacklist area
 with open("blacklisted.json") as f:
-    blacklisted_people = json.load(f)
+    blacklisted_people = load(f)
 
 
 # -------
 # Message received area
 @world.event
-async def on_message(message: Message) -> None:
+async def on_message(message) -> None:
     """
     Dispatched every time a message is sent.
     Checks if the message wasn't send by a bot, the message wasn't send
@@ -152,10 +149,10 @@ async def on_ready() -> None:
 @world.event
 async def on_guild_remove(guild):
     with open('prefixes.json', 'r') as f:
-        prefixes = json.load(f)
+        prefixes = load(f)
     prefixes.pop(str(guild.id))
 
     with open('prefixes.json', 'w') as f:
-        json.dump(prefixes, f, indent=4)
+        dump(prefixes, f, indent=4)
 
 world.run(environ["TOKEN"], bot=True, reconnect=True)

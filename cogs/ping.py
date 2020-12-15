@@ -1,10 +1,7 @@
 import discord
-import asyncio
-import time
-
+from asyncio import sleep as _sleep
 from time import time
 from discord.ext import commands
-
 
 class PingCog(commands.Cog):
     def __init__(self, bot):
@@ -18,7 +15,7 @@ class PingCog(commands.Cog):
         start = time()
         msg = await ctx.send(embed=testing)
         end = time()
-        await asyncio.sleep(2)
+        await _sleep(2)
 
         finished = discord.Embed(title = f'<a:loading:772860569127878676> Pong!', description=f"Latency: `{round(self.bot.latency * 1000)}ms`\nResponse time: `{(end-start)*1000:,.0f}ms`", color=self.color)
         await msg.edit(embed=finished)
@@ -26,8 +23,7 @@ class PingCog(commands.Cog):
     @ping.error
     async def ping_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            a = error.retry_after
-            a = round(a)
+            a = round(error.retry_after)
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
 
 
