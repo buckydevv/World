@@ -36,7 +36,7 @@ class HelpCog(commands.Cog):
       """Shows this message."""
       if cmd is None:
         embed = Embed(color=self.color)
-        embed.set_author(name='World - Help', icon_url="https://im-a-dev.xyz/EL35H6QC.png")
+        embed.set_author(name='World - Help', icon_url="https://im-a-dev.xyz/1678m0pc.png")
         embed.add_field(name="Shows multiple categories.", value="w/categories", inline=True)
         embed.add_field(name="Invite", value="[Invite World](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)", inline=True)
         embed.add_field(name="Vote", value="[Vote For World](https://top.gg/bot/700292147311542282/vote)", inline=True)
