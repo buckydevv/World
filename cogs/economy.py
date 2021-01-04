@@ -3,16 +3,10 @@ from textwrap import dedent
 from dataclasses import dataclass
 from os import environ
 from typing import Literal, Union
-
-import aiohttp
-
 from discord import Embed, Member
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 from datetime import datetime
-
-from dotenv import load_dotenv
-
 import motor.motor_asyncio
 
 
@@ -33,18 +27,18 @@ class User:
     waffles: int
     Fish: int
     LastTransfer: str
-    #Premium: str
-    #Wallet: int
-    #Tickets: int
-    #TicketReason: str
-    #WorldFriends: int
-    #IsBlacklisted: str
-    #CurrentJob: str
+    #Premium: str -> Being added soon
+    #Wallet: int -> Being added soon
+    #Tickets: int -> Being added soon
+    #TicketReason: str -> Being added soon
+    #WorldFriends: int -> Being added soon
+    #IsBlacklisted: str -> Being added soon
+    #CurrentJob: str -> Being added soon
 
 
 class Item(type):
     """Base class for a World item."""
-
+    pass
 
 class Cookie(metaclass=Item):
     """Represents a World cookie."""
@@ -100,27 +94,26 @@ class Fish(metaclass=Item):
 
 class ItemConverter(commands.Converter):
     """Converts a string into a World item."""
+    def __init__(self, *args, **kwargs):
+        self.items = {
+            Cookie: ("cookie", "cookies"),
+            Choc: ("chocbar", "choc", "chocbars", "chocs"),
+            Poop: ("poop", "poops"),
+            Apple: ("apple", "apples"),
+            Beans: ("beans", "bean"),
+            Pizza: ("pizza", "pizzas"),
+            Waffles: ("waffle", "waffles"),
+            Fish: ("fish", "fishes")
+        }
 
     async def convert(self, ctx: commands.Context, argument: str) -> Item:
         """Converts a string into a World item."""
-        if argument.lower() in ("cookie", "cookies"):
-            return Cookie
-        elif argument.lower() in ("chocbar", "choc", "chocbars", "chocs"):
-            return Choc
-        elif argument.lower() in ("poop", "poops"):
-            return Poop
-        elif argument.lower() in ("apple", "apples"):
-            return Apple
-        elif argument.lower() in ("beans", "bean"):
-            return Beans
-        elif argument.lower() in ("pizza", "pizzas"):
-            return Pizza
-        elif argument.lower() in ("waffle", "waffles"):
-            return Waffles
-        elif argument.lower() in ("fish", "fishes"):
-            return Fish
-        else:
-            raise commands.errors.BadArgument("Invalid item provided.")
+        argument = argument.lower()
+        for key in self.items.keys():
+            if argument in self.items[key]:
+                return key
+
+        raise commands.errors.BadArgument("Invalid item provided.")
 
 
 class UnsignedIntegerConverter(commands.Converter):
@@ -311,21 +304,20 @@ class EconomyCog(commands.Cog):
             await self._create_account(ctx.author.id)
         robber = await self._get_user(ctx.author.id)
         target = await self._get_user(user.id)
-        if target.coins == 0:
+        if not target.coins:
             return await ctx.send(f"Sorry {ctx.author.mention} That user has no coins, try again next time!")
-        else:
-            robbed_amount = randint(1, round(target.coins))
-            total_robbed = target.coins - robbed_amount
-            robber_total = robbed_amount + robber.coins
-            await self._database_collection.update_one({"_id": user.id}, {"$set": {"coins": total_robbed}})
-            await self._database_collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": robber_total}})
+        robbed_amount = randint(1, round(target.coins))
+        total_robbed = target.coins - robbed_amount
+        robber_total = robbed_amount + robber.coins
+        await self._database_collection.update_one({"_id": user.id}, {"$set": {"coins": total_robbed}})
+        await self._database_collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": robber_total}})
 
-            embed = Embed(
-                title="Rob",
-                description=f"{ctx.author.mention} you haved robbed `{robbed_amount}` coins from {user.mention}",
-                color=self.color
-                )
-            await ctx.send(embed=embed)
+        embed = Embed(
+            title="Rob",
+            description=f"{ctx.author.mention} you haved robbed `{robbed_amount}` coins from {user.mention}",
+            color=self.color
+            )
+        await ctx.send(embed=embed)
 
     @rob.error
     async def rob_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
@@ -572,8 +564,7 @@ class EconomyCog(commands.Cog):
                 }
             }
         )
-        daily_embed = Embed(title="Daily", color=self.color, description=f"Hey {ctx.author.mention} You successfully received your daily amount of `200` coins.")
-        await ctx.send(embed=daily_embed)
+        await ctx.send(embed=Embed(title="Daily", color=self.color, description=f"Hey {ctx.author.mention} You successfully received your daily amount of `200` coins."))
 
     @daily.error
     async def daily_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
@@ -647,12 +638,11 @@ class EconomyCog(commands.Cog):
                 }
             }
         )
-        daily_embed = Embed(
+        await ctx.send(embed=Embed(
             title="Transfer",
             color=self.color,
             description=f"Hey {ctx.author.mention} You have successfully transfered `{amount}` coin{'s' if amount > 1 else ''} to {target.mention}.\nYour Last Transfer: `{user.LastTransfer}`"
-        )
-        await ctx.send(embed=daily_embed)
+        ))
 
     @transfer.error
     async def tranfer_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
@@ -674,7 +664,7 @@ class EconomyCog(commands.Cog):
         in the root directory of this folder.
         This doesn't return anything, in fact, this just sets `self._database_collection`.
         """
-        load_dotenv()
+        __import__("dotenv").load_dotenv()
         self._database_collection = motor.motor_asyncio.AsyncIOMotorClient(
             environ["MONGODB_URL"]
         )["Coins"]["UserCoins"]

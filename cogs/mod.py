@@ -1,9 +1,7 @@
-import discord
-
 from datetime import datetime
 from discord.ext import commands
-from discord import Embed
-from discord.utils import get
+from discord import Embed, Member
+from discord.utils import find, get
 
 class ModCog(commands.Cog):
     def __init__(self, bot):
@@ -14,13 +12,13 @@ class ModCog(commands.Cog):
 
     @commands.command(help="Ban a specified Discord Member.")
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.Member, *, reason=None):
+    async def ban(self, ctx, member: Member, *, reason=None):
         try:
             await member.ban(reason=reason)
             embed = Embed(title="Ban", description=f"Hey {ctx.author.mention} you have succsesfully banned {member}", color=self.color)
             await ctx.send(embed=embed)
-        except discord.Forbidden:
-            return await ctx.send(f"Sorry {ctx.author.mention} That person has higher permissions than me!")
+        except:
+            return await ctx.send(f"Sorry {ctx.author.mention} That person has higher or the same permissions as me!")
 
     @ban.error
     async def ban_error(self, ctx, error):
@@ -31,13 +29,13 @@ class ModCog(commands.Cog):
 
     @commands.command(help="Kick a specified Discord member.")
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member, *, reason=None):
+    async def kick(self, ctx, member: Member, *, reason=None):
         try:
             await member.kick(reason=reason)
             embed = Embed(title="Kick", description=f"Hey {ctx.author.mention} you have succsesfully kicked {member}", color=self.color)
             await ctx.send(embed=embed)
-        except discord.Forbidden:
-            return await ctx.send(f"Sorry {ctx.author.mention} That person has higher permissions than me!")
+        except:
+            return await ctx.send(f"Sorry {ctx.author.mention} That person has higher or the same permission as me!")
 
     @kick.error
     async def kick_error(self, ctx, error):
@@ -48,14 +46,14 @@ class ModCog(commands.Cog):
 
     @commands.command(help="Mute a specified discord member")
     @commands.has_permissions(manage_messages=True)
-    async def mute(self, ctx, user: discord.Member, *, reason=None):
+    async def mute(self, ctx, user: Member, *, reason=None):
         role = get(ctx.guild.roles, name="Muted")
         if not role:
             try:
                 createrole = await ctx.guild.create_role(name="Muted", reason="This was created so the bot can mute discord members!")
                 for channel in ctx.guild.channels:
                     await channel.set_permissions(createrole, send_messages=False)
-            except discord.Forbidden:
+            except:
                 return await ctx.send(f"Sorry {ctx.author.mention} i don't have permissions to create a roll called `Muted`.")
         else:
             await user.add_roles(role)
@@ -165,7 +163,7 @@ class ModCog(commands.Cog):
                 except Exception as e:
                     embed = Embed(title="Error:", description=e, color=self.color)
                     return await ctx.send(embed=embed)
-            if emoji=='❎':
+            elif emoji=='❎':
                 await message.edit(embed=nuke_fail)
                 break
 
@@ -201,13 +199,13 @@ class ModCog(commands.Cog):
 
     @commands.command(help="Unmute a member")
     @commands.has_permissions(manage_messages=True)
-    async def unmute(self, ctx, user: discord.Member, *, reason=None):
+    async def unmute(self, ctx, user: Member, *, reason=None):
         if user == ctx.author:
             return await ctx.send(f"Sorry {ctx.author.mention} you can't mute yourself!")
         role = get(ctx.guild.roles, name="Muted")
         if not role:
             return await ctx.send(f"Sorry {ctx.author.mention} there seems to not be a role called `Muted`!")
-        if not discord.utils.find(lambda role: role.name == "Muted", user.roles):
+        if not find(lambda role: role.name == "Muted", user.roles):
             return await ctx.send(f"Sorry {ctx.author.mention} that user is not muted?")
         await user.remove_roles(role)
         embed = Embed(title="Unmute", description=f"Hey {ctx.author.mention} you have succsesfully unmuted {user}!", color=self.color)
@@ -247,7 +245,7 @@ class ModCog(commands.Cog):
             embed.add_field(name="Channel", value=f"<#{self.snipeCache[ctx.channel.id]['channel']}>")
             await ctx.send(embed=embed)
             del self.snipeCache[ctx.channel.id]
-        except Exception as e:
+        except:
             return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to snipe!")
 
 
@@ -263,7 +261,7 @@ class ModCog(commands.Cog):
             embed.add_field(name="Channel", value=f"<#{self.editSnipeCache[ctx.channel.id]['channel']}>")
             await ctx.send(embed=embed)
             del self.editSnipeCache[ctx.channel.id]
-        except Exception as e:
+        except:
             return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to editsnipe!")
 
 
