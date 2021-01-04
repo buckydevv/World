@@ -13,6 +13,7 @@ from time import time
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from twemoji_parser import TwemojiParser
 from colorthief import ColorThief
+from asyncio import TimeoutError
 
 from urllib.parse import quote
 from akinator.async_aki import Akinator
@@ -41,7 +42,7 @@ class FunCog(commands.Cog):
             "Ali A Approves",
             "Ali A Dosnt Approve"
         ]
-        self.hearts = ['💔', '💝', '💚', '💙', '💜']
+        self.hearts = ['ðŸ’”', 'ðŸ’', 'ðŸ’š', 'ðŸ’™', 'ðŸ’œ']
 
     @commands.command(help="World can make you laugh with his amazing jokes!")
     async def joke(self, ctx):
@@ -71,7 +72,7 @@ class FunCog(commands.Cog):
     async def meme(self, ctx):
         r = await self.session.get(f"https://memes.blademaker.tv/api?lang=en")
         res = await r.json()
-        embed = Embed(title=f"Title: {res['title']}\nSubreddit: r/{res['subreddit']}", color=self.color).set_image(url=res["image"]).set_footer(text=f"👍Ups:{res['ups']}")
+        embed = Embed(title=f"Title: {res['title']}\nSubreddit: r/{res['subreddit']}", color=self.color).set_image(url=res["image"]).set_footer(text=f"ðŸ‘Ups:{res['ups']}")
         await ctx.send(embed=embed)
 
     @meme.error
@@ -268,7 +269,7 @@ class FunCog(commands.Cog):
                 return await ctx.send(f"Sorry {ctx.author.mention} This word was not found in Urban.")
             res = list1[0]
 
-            embed = Embed(title=res['word'], description=res['definition'], color=self.color).add_field(name="Example", value=res['example']).set_footer(text=f"👍 {res['thumbs_up']} | 👎{res['thumbs_down']}")
+            embed = Embed(title=res['word'], description=res['definition'], color=self.color).add_field(name="Example", value=res['example']).set_footer(text=f"ðŸ‘ {res['thumbs_up']} | ðŸ‘Ž{res['thumbs_down']}")
             await ctx.send(embed=embed)
 
     @urban.error
@@ -553,7 +554,7 @@ class FunCog(commands.Cog):
                         Misc.give_points(resp.author.id, random_points)
                     embed = Embed(title="Fastest typer!",description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False)
                     return await ctx.send(embed=embed)
-            except:
+            except TimeoutError:
                 await game.delete()
                 return await ctx.send(f"Sorry {ctx.author.mention} nobody took part! So i have ended the game.")
 
@@ -583,8 +584,6 @@ class FunCog(commands.Cog):
     	embed = Embed(title="Guess the flag!", color=self.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png")
     	FirstMessage = await ctx.send(embed=embed)
 
-    	print(FlagChosen['name'])
-
     	while True:
     		try:
     			start = round(time() * 100)
@@ -599,6 +598,6 @@ class FunCog(commands.Cog):
     				return await ctx.send(embed=embed)
     		except TimeoutError:
     			await FirstMessage.delete()
-    			return await ctx.send(f"Sorry {ctx.author.mention} nobody took part! So i have ended the game.")
+    			return await ctx.send(f"Sorry {ctx.author.mention} nobody got it right! It was: `{FlagChosen['name']}`")
 def setup(bot):
     bot.add_cog(FunCog(bot))
