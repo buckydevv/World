@@ -69,7 +69,7 @@ class EconomyFunCog(commands.Cog):
         if self.collection.find_one({"_id": ctx.author.id})["LastUsed"] == "Isnotset":
             return await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
 
-        result = self.collection.find_one({"_id": ctx.author.id}):
+        result = self.collection.find_one({"_id": ctx.author.id})
         last_used = result["LastUsed"]
         target_user = result["TargetMember"]
 
@@ -181,7 +181,7 @@ class EconomyFunCog(commands.Cog):
                 return await ctx.send(embed=embed)
 
             self.collection.update_one({"_id": ctx.author.id}, {"$set": {"coins": total_cost}})
-            self.collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot1": "<:WorldBadge1:779192872402026516>"}})
+        self.collection.update_one({"_id": ctx.author.id}, {"$set": {"BadgeSlot1": "<:WorldBadge1:779192872402026516>"}})
 
             embed = Embed(
                 title="World Badge",
