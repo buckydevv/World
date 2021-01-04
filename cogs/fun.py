@@ -599,6 +599,6 @@ class FunCog(commands.Cog):
     				return await ctx.send(embed=embed)
     		except TimeoutError:
     			await FirstMessage.delete()
-    			return await ctx.send(f"Sorry {ctx.author.mention} nobody took part! So i have ended the game.")
+    			return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
 def setup(bot):
     bot.add_cog(FunCog(bot))
