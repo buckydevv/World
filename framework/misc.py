@@ -72,22 +72,22 @@ class Misc:
         return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
     async def circle_pfp(author, x: int, y: int):
-    	pfp = author.avatar_url_as(format='png')
-    	buffer_avatar = BytesIO()
-    	await pfp.save(buffer_avatar)
-    	buffer_avatar.seek(0)
-    	av_img = Image.open(buffer_avatar)
+        pfp = author.avatar_url_as(format='png')
+        buffer_avatar = BytesIO()
+        await pfp.save(buffer_avatar)
+        buffer_avatar.seek(0)
+        av_img = Image.open(buffer_avatar)
 
-    	resize = av_img.resize((x,y));
-    	size_bigger = (resize.size[0] * 3, resize.size[1] * 3)
-    	maskimage = Image.new('L', size_bigger, 0)
-    	draw = ImageDraw.Draw(maskimage)
-    	draw.ellipse((0, 0) + size_bigger, fill=255)
-    	maskimage = maskimage.resize(resize.size, Image.ANTIALIAS)
-    	resize.putalpha(maskimage)
-    	output = ImageOps.fit(resize, maskimage.size, centering=(0.5, 0.5))
-    	output.putalpha(maskimage)
-    	return resize
+        resize = av_img.resize((x,y));
+        size_bigger = (resize.size[0] * 3, resize.size[1] * 3)
+        maskimage = Image.new('L', size_bigger, 0)
+        draw = ImageDraw.Draw(maskimage)
+        draw.ellipse((0, 0) + size_bigger, fill=255)
+        maskimage = maskimage.resize(resize.size, Image.ANTIALIAS)
+        resize.putalpha(maskimage)
+        output = ImageOps.fit(resize, maskimage.size, centering=(0.5, 0.5))
+        output.putalpha(maskimage)
+        return resize
 
     def save_image(image):
         """ Saves a PIL.Image.Image object to a discord.File object. """
@@ -98,14 +98,18 @@ class Misc:
         return File(buffer, "image.png")
 
     async def fetch_pfp(author):
-    	pfp = author.avatar_url_as(format='png')
-    	buffer_avatar = BytesIO()
-    	await pfp.save(buffer_avatar)
-    	buffer_avatar.seek(0)
-    	return Image.open(buffer_avatar)
+        pfp = author.avatar_url_as(format='png')
+        buffer_avatar = BytesIO()
+        await pfp.save(buffer_avatar)
+        buffer_avatar.seek(0)
+        return Image.open(buffer_avatar)
 
     async def parser_draw_text(source, text, textfont, color, x: int, y: int):
         return await source.draw_text((x, y), text, fill=color, font=textfont)
 
     def draw_text(source, text, textfont, color, x: int, y: int):
         return source.draw_text((x, y), text, fill=color, font=textfont)
+
+    def create_image(mode: str, l, h, imgcolor):
+        BaseImage = Image.new(mode, (l,h), color=imgcolor)
+        return BaseImage
