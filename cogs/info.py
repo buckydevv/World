@@ -1,18 +1,12 @@
-import discord
 import psutil
-
 from asyncio import sleep as _sleep
 from json import dumps, loads, load
 from typing import Optional
 from time import time
 from textwrap import dedent
-
-from discord import Embed, Member, __version__
+from discord import Embed, Member, Role, CategoryChannel, __version__
 from discord.ext import commands
 from aiohttp import ClientSession
-
-init_time = time()
-
 
 class InfoCog(commands.Cog):
     """Contains commands that provide useful information."""
@@ -104,7 +98,7 @@ class InfoCog(commands.Cog):
         await ctx.send(embed=server_information)
     
     @commands.command(aliases=["ri"], help="Role information")
-    async def roleinfo(self, ctx, role: discord.Role):
+    async def roleinfo(self, ctx, role: Role):
         embed = Embed(
             title="Role Information",
             color=self.color
@@ -120,7 +114,7 @@ class InfoCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/roleinfo <role>`")
 
     @commands.command(aliases=["ci", "catinfo"], help="Category information")
-    async def categoryinfo(self, ctx, *, category: discord.CategoryChannel):
+    async def categoryinfo(self, ctx, *, category: CategoryChannel):
         embed = Embed(
             title="Category Information",
             color=self.color
@@ -255,7 +249,7 @@ class InfoCog(commands.Cog):
     @commands.command(help="How to get World emotes!", aliases=["worldemotes", "worldemote", "emojis", "emoji"])
     async def emotes(self, ctx, allemote: Optional[str]) -> None:
         allemotes = ["--all", "all", "allemotes"]
-        if allemote == None:
+        if not allemote:
             embed = Embed(
                 title="World emotes",
                 description="`Support server:` [<:Worldhappy:768145777985454131> Join](https://discord.gg/gQSHvKCV)\n`World Emotes1:` [<:Worldhappy:768145777985454131> Join](https://discord.gg/TEfM7hEBpz)",
@@ -332,7 +326,7 @@ class InfoCog(commands.Cog):
                 except TimeoutError:
                     await message.clear_reactions()
                     break
-                if res == None:
+                if not res:
                     break
                 if str(res[1])!='World#4520':
                     emoji = str(res[0].emoji)

@@ -1,4 +1,4 @@
-import discord
+from discord import Embed
 from datetime import datetime
 from asyncio import sleep as _sleep
 from traceback import format_exc
@@ -19,7 +19,7 @@ class OwnerCog(commands.Cog):
         except Exception as e:
             await ctx.send('{}: {}'.format(type(e).__name__, e))
         else:
-            embed = discord.Embed(title='load!', description=f"I Have loaded `{module}`", colour=ctx.author.colour)
+            embed = Embed(title='load!', description=f"I Have loaded `{module}`", colour=ctx.author.colour)
             await ctx.send(content=None, embed=embed)  
 
     @commands.command(hidden=True, help="Unload a python file.")
@@ -31,7 +31,7 @@ class OwnerCog(commands.Cog):
         except Exception as e:
             await ctx.send('{}: {}'.format(type(e).__name__, e))
         else:
-            embed = discord.Embed(title='Unload!', description=f"I Have Unloaded `{module}`", colour=ctx.author.colour)
+            embed = Embed(title='Unload!', description=f"I Have Unloaded `{module}`", colour=ctx.author.colour)
             await ctx.send(content=None, embed=embed)
 
     @commands.command(name='reload', hidden=True, help="Reload python file.")
@@ -44,7 +44,7 @@ class OwnerCog(commands.Cog):
         except Exception as e:
             await ctx.send('{}: {}'.format(type(e).__name__, e))
         else:
-            embed = discord.Embed(title='Reload!', description=f"I Have Reloaded `{module}`", colour=ctx.author.colour)
+            embed = Embed(title='Reload!', description=f"I Have Reloaded `{module}`", colour=ctx.author.colour)
             await ctx.send(content=None, embed=embed)
 
     @commands.command(hidden=True, help="Set patches")
@@ -52,7 +52,7 @@ class OwnerCog(commands.Cog):
     async def update(self, ctx, *, desc):
     	channel = self.bot.get_channel(765632402680447006)
     	msg = await channel.fetch_message(765675535325069323)
-    	embed = discord.Embed(
+    	embed = Embed(
     		title="Latest update",
     		description=desc,
     		color=0x2F3136,
@@ -78,12 +78,12 @@ class OwnerCog(commands.Cog):
 
             await locals()["__function"]()
         except Exception:
-            res = discord.Embed(title="Error!", description=f"```{format_exc()}```", color=discord.Color.red())
+            res = Embed(title="Error!", description=f"```{format_exc()}```", color=discord.Color.red())
             res.set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png"))
             await ctx.send(embed=res)
     @eval_.error
     async def eval__error(self, ctx, error):
-        embed = discord.Embed(title="Error!", description=f"```{error}```", color=discord.Color.red())
+        embed = Embed(title="Error!", description=f"```{error}```", color=discord.Color.red())
         embed.set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png"))
         await ctx.send(embed=embed)
 
@@ -93,7 +93,7 @@ class OwnerCog(commands.Cog):
     	def world(m):
     		return self.bot.user.id == m.author.id
     	await ctx.message.channel.purge(limit=amount, check=world, bulk=False)
-    	embed = discord.Embed(title="Purged", description=f"{ctx.author.mention} i have successfully purged `{amount}` of messages in <#{ctx.message.channel.id}>", color=ctx.author.color)
+    	embed = Embed(title="Purged", description=f"{ctx.author.mention} i have successfully purged `{amount}` of messages in <#{ctx.message.channel.id}>", color=ctx.author.color)
     	yes = await ctx.send(embed=embed)
     	await _sleep(3)
     	await yes.delete()
@@ -102,17 +102,17 @@ class OwnerCog(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def shutdown(self, ctx):
-    	page1 = discord.Embed(
+    	page1 = Embed(
     		title="Shutdown World",
     		description="Would you like to shutdown World?",
     		)
 
-    	page2 = discord.Embed(
+    	page2 = Embed(
     		title="Shudown Failed",
     		description="You Chose not to shutdown World."
     		)
 
-    	page3 = discord.Embed(
+    	page3 = Embed(
     		title="Shutting Down",
     		description="I Have shut myself down."
     		)

@@ -11,10 +11,9 @@ from discord import (
     Status
 )
 from discord.ext import commands
-from dotenv import load_dotenv
 from discord.ext.commands import has_permissions
 
-load_dotenv()
+__import__("dotenv").load_dotenv()
 
 # -------
 # prefix area
@@ -144,7 +143,7 @@ async def on_ready() -> None:
             name="w/help"
         )
     )
-    print("Bot connected successfully into Discord!")
+    print("World connected successfully into Discord!")
 
 @world.event
 async def on_guild_remove(guild):
@@ -155,4 +154,4 @@ async def on_guild_remove(guild):
     with open('prefixes.json', 'w') as f:
         dump(prefixes, f, indent=4)
 
-world.run(environ["TOKEN"], bot=True, reconnect=True)
+world.run(environ["TOKEN"])

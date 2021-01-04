@@ -1,38 +1,24 @@
-import discord
-import pymongo
-import datetime
-import os
-
-from os import environ, listdir
-from discord import Spotify
-
+from os import environ
 from discord.ext import commands
-from dotenv import load_dotenv
 from pymongo import MongoClient
 from datetime import datetime
-
-load_dotenv()
-
-cluster = MongoClient(os.environ["MONGODB_URL"])
-
-db = cluster["Coins"]
-collection = db["UserCoins"]
+from random import choice
+__import__("dotenv").load_dotenv()
 
 class Wealth:
-    def __init__(self):
-        self.color = 0x2F3136
+    collection = MongoClient(environ["MONGODB_URL"])["Coins"]["UserCoins"]
 
     def _has_account(user_id: int) -> None:
         """Returns True if the user_id has an account. Otherwise False."""
-        return bool(collection.find_one(
+        return bool(Wealth.collection.find_one(
             {"_id": user_id}
-            ))
+        ))
 
     def _create_account(user_id: int) -> None:
         """Create a World account."""
         now = datetime.now()
         _created_at = str(now.strftime("%m/%d/%Y at %H:%M:%S"))
-        collection.insert_one({
+        Wealth.collection.insert_one({
             "_id": user_id,
             "coins": 100,
             "cookie": 0,
@@ -67,47 +53,35 @@ class Wealth:
         })
 
     def _deposit_coins(user_id: int, coins: int):
-        for result in collection.find_one({"_id": user_id}):
-            u_bank = result["Bank"]
-            u_coins = result["coins"]
-
-            remove_coins = u_coins - coins
-            total_coins = u_bank + coins
-
-            collection.update_one({"_id": user_id}, {"$set": {"Bank": total_coins}})
-            collection.update_one({"_id": user_id}, {"$set": {"coins": remove_coins}})
+        result = Wealth.collection.find_one({"_id": user_id})
+        if not result:
+            return
+        Wealth.collection.update_one({"_id": user_id}, {"$inc": {"Bank": coins}})
+        Wealth.collection.update_one({"_id": user_id}, {"$inc": {"coins": -coins}})
 
     def fetch_user(user_id: int, item: str):
-        for result in collection.find({"_id": user_id}):
-            fetched = result[item]
-            return fetched
-
+        result = Wealth.collection.find_one({"_id": user_id})
+        if not result:
+            return
+        return result.get(item)
 
     def mass_fetch(user_id: int):
-        for result in collection.find({"_id": user_id}):
-            return result
+        return Wealth.collection.find_one({"_id": user_id})
 
     def fishing_ran():
-        fishing_idle = "https://im-a-dev.xyz/1kKJXQSr.png"
-        caught_fish = "https://im-a-dev.xyz/ImWqkaSy.png"
-        caught_cookies = "https://im-a-dev.xyz/sqPSfhJJ.png"
-        caught_coins = "https://im-a-dev.xyz/syTQUdrV.png"
-
-        randomize = [fishing_idle, caught_fish, caught_cookies, caught_coins]
-        random_choice = random.choice(randomize)
-
-        return random_choice
+        return choice([
+            "https://im-a-dev.xyz/1kKJXQSr.png",
+            "https://im-a-dev.xyz/ImWqkaSy.png",
+            "https://im-a-dev.xyz/sqPSfhJJ.png",
+            "https://im-a-dev.xyz/syTQUdrV.png"
+        ])
 
     def shootout_ran():
-        shooter_world = "https://im-a-dev.xyz/QqoZ2M6m.png"
-        normal_world = "https://im-a-dev.xyz/BvdekLII.png"
-        nothing_world = "https://im-a-dev.xyz/MfSnYYAa.png"
-
-        all_worlds = [shooter_world, normal_world, nothing_world]
-
-        random_choice = random.choice(all_worlds)
-
-        return random_choice
+        return choice([
+            "https://im-a-dev.xyz/QqoZ2M6m.png",
+            "https://im-a-dev.xyz/BvdekLII.png",
+            "https://im-a-dev.xyz/MfSnYYAa.png"
+        ])
 
     def extract_props(doc, props):
         i = 0
