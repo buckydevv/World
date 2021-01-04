@@ -1,6 +1,6 @@
 from datetime import datetime
 from discord.ext import commands
-from discord import Embed
+from discord import Embed, Member
 from discord.utils import find, get
 
 class ModCog(commands.Cog):
@@ -18,7 +18,7 @@ class ModCog(commands.Cog):
             embed = Embed(title="Ban", description=f"Hey {ctx.author.mention} you have succsesfully banned {member}", color=self.color)
             await ctx.send(embed=embed)
         except:
-            return await ctx.send(f"Sorry {ctx.author.mention} That person has higher permissions than me!")
+            return await ctx.send(f"Sorry {ctx.author.mention} That person has higher or the same permissions as me!")
 
     @ban.error
     async def ban_error(self, ctx, error):
@@ -35,7 +35,7 @@ class ModCog(commands.Cog):
             embed = Embed(title="Kick", description=f"Hey {ctx.author.mention} you have succsesfully kicked {member}", color=self.color)
             await ctx.send(embed=embed)
         except:
-            return await ctx.send(f"Sorry {ctx.author.mention} That person has higher permissions than me!")
+            return await ctx.send(f"Sorry {ctx.author.mention} That person has higher or the same permission as me!")
 
     @kick.error
     async def kick_error(self, ctx, error):
