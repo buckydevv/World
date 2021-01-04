@@ -187,7 +187,6 @@ class InfoCog(commands.Cog):
     async def suggest(self, ctx: commands.Context, *, suggestion: str) -> None:
         """
         Suggest something for World.
-
         **WARNING:** Bad usage of this command may lead from a bot ban.
         """
         await ctx.send(
@@ -284,7 +283,7 @@ class InfoCog(commands.Cog):
 
             emote4 = Embed(
                 title="`Page 4` - World Emotes",
-                description="\n".join(world2[0:9]),
+                description="\n".join(world2[0:25]),
                 color=self.color
                 )
 
