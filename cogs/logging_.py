@@ -200,7 +200,7 @@ class LoggingCog(commands.Cog):
             return
         ban1 = await guild.fetch_ban(user)
         embed = Embed(title="Ban Log", description=f"A user from this guild has been banned.\nName: `{user.name}`\nID: `{user.id}`\nReason: `{ban1.reason}`", timestamp=datetime.utcnow())
-        channel = self.bot.get_channel(result["bans"])
+        channel = self.bot.get_channel(result["Bans"])
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
@@ -277,8 +277,7 @@ class LoggingCog(commands.Cog):
         CONVERT = await Misc.circle_pfp(member, 200, 200)
         mainimage.paste(CONVERT, (50, 195), CONVERT)
         channel = self.bot.get_channel(result["LeftServer"])
-        await channel.send(file=Misc.save_imaeg(mainimage))
-
+        await channel.send(file=Misc.save_image(mainimage))
 
 
 def setup(bot):
