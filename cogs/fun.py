@@ -546,11 +546,11 @@ class FunCog(commands.Cog):
                         await Misc._insert_to_collection(resp.author.id)
                     if elapse/1000 > 6:
                         isfast = choice(self.badmessages)
-                        random_points = randint(int(elapse/1000), int(elapse/1000 + 2))
+                        random_points = randint(10, 45)
                         Misc.give_points(resp.author.id, random_points)
                     else:
                         isfast = choice(self.goodmessages)
-                        random_points = (int(elapse/1000*8))
+                        random_points = randint(5, 17)
                         Misc.give_points(resp.author.id, random_points)
                     embed = Embed(title="Fastest typer!",description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False)
                     return await ctx.send(embed=embed)
