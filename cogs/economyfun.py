@@ -214,9 +214,7 @@ class EconomyFunCog(commands.Cog):
         if not result["MarriedTo"] == "Nobody":
             ctx.command.reset_cooldown(ctx)
             return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're already married.", color=self.color))
-
-        nl = "\n" # python doesn't support backslashes in f-strings, this will result to SyntaxError
-        msg = await ctx.send(f"Hey {user.mention} {ctx.author.mention} wants to marry you.{nl}Please react.")
+        msg = await ctx.send(f"Hey {user.mention} {ctx.author.mention} wants to marry you.\nPlease react.")
 
         emoji = ''
         await msg.add_reaction('☑')
@@ -412,12 +410,11 @@ class EconomyFunCog(commands.Cog):
         random = Wealth.fishing_ran()
         doc = Wealth.mass_fetch(ctx.author.id)
         random_coins = randint(1, 50)
-        nl = "\n" # python does not support new lines in f-strings, fuck
         fishing_ctx = { # using it here because it has randint() in it
             "https://im-a-dev.xyz/1kKJXQSr.png": None, # key_name, amount_added_to_db, message
             "https://im-a-dev.xyz/ImWqkaSy.png": ("Fish", 1, f"Great, looks like you have caught a fish! you now have a total of `{(doc['Fish'] + 1):,}` Fish!"),
             "https://im-a-dev.xyz/sqPSfhJJ.png": ("cookie", 5, f"Wow, you caught a box of cookies while fishing?! you now have a total of `{(doc['cookie'] + 5):,}` Cookies!"),
-            "https://im-a-dev.xyz/syTQUdrV.png": ("coins", random_coins, f"Wow, you caught a bag of coins while fishing?!{nl}Coins in the bag: `{random_coins}`\nyou now have a total of `{(doc['coins'] + random_coins):,}` Coins!")
+            "https://im-a-dev.xyz/syTQUdrV.png": ("coins", random_coins, f"Wow, you caught a bag of coins while fishing?!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{(doc['coins'] + random_coins):,}` Coins!")
         }        
 
         if not fishing_ctx[random]: # they didn't caught anything
@@ -444,8 +441,7 @@ class EconomyFunCog(commands.Cog):
             await Wealth._create_account(ctx.author.id)
 
         result = Wealth.mass_fetch(ctx.author.id)
-        nl = "\n" # this is the stack overflow "solution" to the "no backslashes in f-strings"
-        await ctx.send(embed=Embed(title="Your badges", description=f"Noob: {result['BadgeSlot1']}{nl}Beginner: {result['BadgeSlot2']}{nl}Leader: {result['BadgeSlot3']}{nl}{nl}[`Noob`](https://cdn.discordapp.com/emojis/779192872402026516.png?v=1) | [`Beginner`](https://cdn.discordapp.com/emojis/779192938617241600.png?v=1) | [`Leader`](https://cdn.discordapp.com/emojis/779193003024973835.png?v=1)", color=self.color))
+        await ctx.send(embed=Embed(title="Your badges", description=f"Noob: {result['BadgeSlot1']}\nBeginner: {result['BadgeSlot2']}\nLeader: {result['BadgeSlot3']}\n\n[`Noob`](https://cdn.discordapp.com/emojis/779192872402026516.png?v=1) | [`Beginner`](https://cdn.discordapp.com/emojis/779192938617241600.png?v=1) | [`Leader`](https://cdn.discordapp.com/emojis/779193003024973835.png?v=1)", color=self.color))
 
     @commands.command(help="Show your reputation", aliases=["myrep", "myreputation", "reputationcount"])
     async def repcount(self, ctx):

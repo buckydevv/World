@@ -415,9 +415,8 @@ class EconomyCog(commands.Cog):
         # Get percentage
         seed(datetime.now().timestamp())
         percentage = randint(0, 100)
-        nl = "\n" # python doesn't support backslashes in a f-string.
         if percentage <= 75:
-            return await ctx.send(embed=Embed(title="You lost.", color=self.color, description=f"Hey {ctx.author.mention} You have lost {amount} coin{'s' if amount > 1 else ''}.{nl}You had a {percentage}% chance of winning."))
+            return await ctx.send(embed=Embed(title="You lost.", color=self.color, description=f"Hey {ctx.author.mention} You have lost {amount} coin{'s' if amount > 1 else ''}.\nYou had a {percentage}% chance of winning."))
 
         user = await self._get_user(ctx.author.id)
         await self._database_collection.update_one(
