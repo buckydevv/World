@@ -265,7 +265,7 @@ class InfoCog(commands.Cog):
 
             emote1 = Embed(
                 title=f"`Page 1` - World Emotes",
-                description = "\n".join(world1[0:18]),
+                description = "\n".join(world1[:18]),
                 color=self.color
                 )
 
@@ -283,7 +283,7 @@ class InfoCog(commands.Cog):
 
             emote4 = Embed(
                 title="`Page 4` - World Emotes",
-                description="\n".join(world2[0:25]),
+                description="\n".join(world2[:25]),
                 color=self.color
                 )
 

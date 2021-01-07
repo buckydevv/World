@@ -17,7 +17,7 @@ class Wealth:
     def _create_account(user_id: int) -> None:
         """Create a World account."""
         now = datetime.now()
-        _created_at = str(now.strftime("%m/%d/%Y at %H:%M:%S"))
+        _created_at = now.strftime("%m/%d/%Y at %H:%M:%S")
         Wealth.collection.insert_one({
             "_id": user_id,
             "coins": 100,
