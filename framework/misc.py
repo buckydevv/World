@@ -2,6 +2,7 @@ from os import environ
 from discord import File
 from aggdraw import Draw, Brush
 from discord.ext import commands
+from time import time
 from io import BytesIO
 from pymongo import MongoClient
 from PIL import Image, ImageDraw, ImageOps, ImageColor
@@ -12,18 +13,23 @@ __import__("dotenv").load_dotenv()
 
 class Misc:
     collection = MongoClient(environ["MONGODB_URL"])["Coins"]["Points/others"]
+    _TIME = {
+        31536000: "year",
+        2592000: "month",
+        86400: "day",
+        3600: "hour",
+        60: "minute"
+    }
 
     def give_points(user_id: int, points: int) -> None:
         """Update a users points."""
         Misc.collection.update_one({"_id": user_id}, {"$inc": {"points": points}}) # $inc increments the number.
-
 
     def _has_account(user_id: int) -> None:
         """Returns True if the user has a acoount."""
         return bool(Misc.collection.find_one(
             {"_id": user_id}
         ))
-
 
     def _insert_to_collection(user_id: int) -> None:
         """insert user into database"""
@@ -63,10 +69,7 @@ class Misc:
         image = image.convert('RGBA')
         image.putalpha(mask)
         return image
-
-    def hex_to_rgb(value):
-        return ImageColor.getrgb(value)
-
+    
     def relative_luminance(rgb_triplet):
         r, g, b = tuple(x / 255 for x in rgb_triplet)
         return 0.2126 * r + 0.7152 * g + 0.0722 * b
@@ -103,13 +106,22 @@ class Misc:
         await pfp.save(buffer_avatar)
         buffer_avatar.seek(0)
         return Image.open(buffer_avatar)
-
-    async def parser_draw_text(source, text, textfont, color, x: int, y: int):
-        return await source.draw_text((x, y), text, fill=color, font=textfont)
-
-    def draw_text(source, text, textfont, color, x: int, y: int):
-        return source.draw_text((x, y), text, fill=color, font=textfont)
-
-    def create_image(mode: str, l, h, imgcolor):
-        BaseImage = Image.new(mode, (l,h), color=imgcolor)
-        return BaseImage
+    
+    async def image_from_url(bot, url):
+        response = await bot.http._HTTPClient__session.get(url) # this is the session discord.py uses
+        byte = await response.read()
+        return Image.open(BytesIO(byte))
+    
+    def __delayfstr(string):
+        """ Gets time delay from a string with a format of 'MONTH/DAY/YEAR at HOURS:MINUTES:SECONDS' """
+        seconds = round(time() - datetime.strptime(string, "%m/%d/%Y at %H:%M:%S").timestamp())
+        if seconds < 60:
+            return f"{seconds} second" + ("" if (seconds == 1) else "s")
+        
+        for key in Misc._TIME.keys():
+            if seconds >= key:
+                seconds //= key
+                return f"{seconds} {Misc._TIME[key]}" + ("" if seconds == 1 else "s")
+        
+        seconds //= 31536000
+        return f"{seconds} year" + ("" if seconds == 1 else "s")
