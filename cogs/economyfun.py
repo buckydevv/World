@@ -83,96 +83,102 @@ class EconomyFunCog(commands.Cog):
             )
         await ctx.send(embed=embed)
     
-    async def profile_canvas(self, user, result): # the function that draws everything
-        pfp = await Misc.fetch_pfp(user) # fetch the user pfp
-        font = ImageFont.truetype("./fonts/Whitney-Medium.ttf", 30) # epic
-        fontm = ImageFont.truetype("./fonts/Whitney-Medium.ttf", 25) # variable
-        fontmm = ImageFont.truetype("./fonts/Whitney-Medium.ttf", 20) # naming
+    async def profile_canvas(self, user, result):
+        pfp = await Misc.fetch_pfp(user)
+        pfp_resize = pfp.resize((49, 49))
+        font = ImageFont.truetype("./fonts/Whitney-Medium.ttf", 30)
+        fontm = ImageFont.truetype("./fonts/Whitney-Medium.ttf", 25)
+        fontmm = ImageFont.truetype("./fonts/Whitney-Medium.ttf", 20)
         
-        main = Image.open("./images/profile_template.png") # get the template
+        main = Image.open("./images/profile_template.png")
         draw = ImageDraw.Draw(main)
         if pfp.mode != "RGBA":
-            main.paste(pfp, (0, 0))
+            main.paste(pfp_resize, (0, 0))
         else:
-            main.paste(pfp, (0, 0), pfp) # also transparent for good measure
+            main.paste(pfp_resize, (0, 0), pfp_resize)
         
-        draw.text((60, 5), user.display_name, font=font, fill=(255, 255, 255)) # draw the user name
-        draw.text((10, 60), f"Created at: {Misc.__delayfstr(result['AccountCreated'])} ago\nLast transfer: {Misc.__delayfstr(result['LastTransfer'])} ago\nMarried to: {result['MarriedTo']}\nReputation: {result['Reputation']:,}", font=fontmm, fill=(255, 255, 255))
+        draw.text((60, 5), user.display_name, font=font, fill=(255, 255, 255))
+        draw.text((10, 60), f"Created account {Misc._delayfstr(result['AccountCreated'])} ago\nLast transfer: {Misc._delayfstr(result['LastTransfer'])} ago\nMarried to: {result['MarriedTo']}\nReputation: {result['Reputation']:,}", font=fontmm, fill=(255, 255, 255))
     
         cursor = 60
         for item in self.items_order:
-            width = font.getsize(text)[0]
-            draw.text((cursor - width, 555), f"{result[item]:,}", font=fontm, fill=(255, 255, 255))
+            width = font.getsize(f"{result[item]:,}")[0]
+            draw.text((564 - width, cursor), f"{result[item]:,}", font=fontm, fill=(255, 255, 255))
             cursor += 40
 
         cursor = 10
         for i in range(3):
-            if not result[f"BadgeSlot{i + 1}"].startswith("<:"): # if it has a badge then it's a custom emoji
-                continue # doesn't have the badge
+            if not result[f"BadgeSlot{i + 1}"].startswith("<:"):
+                continue
             badge_image = await Misc.image_from_url(self.bot, self.badge_urls[i])
-            badge_image = badge_image.convert("RGBA").resize((30, 30))
+            badge_image = badge_image.convert("RGBA").resize((90, 90))
             main.paste(badge_image, (cursor, 260), badge_image)
-            cursor += 40
+            cursor += 94
         
         pfp.close()
         del draw, cursor, pfp, font, fontm, fontmm
         return Misc.save_image(main)
 
     @commands.command()
-    async def profile(self, ctx, user: Member=None):
+    async def profile(self, ctx, user: Optional[Member], option: Optional[str]):
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
         user = user or ctx.author
         result = Wealth.mass_fetch(user.id)
-        if "--card" in ctx.message.content: # idk how to do this, i suck at default discord.py parsing xd
-            ctx.message.content = ctx.message.content.replace("--card", "")
-            buffer = await self.profile_canvas(user, result)
-            return await ctx.send(file=buffer)
 
-        noob_b, beginner_b, leader_b, marry, bank_, beans, pizza, waffles, fish, coins, rep, afk = Wealth.extract_props(result, ['BadgeSlot1', 'BadgeSlot2', 'BadgeSlot3', 'MarriedTo', "Bank", "beans", "pizza", "waffles", "Fish", "coins", "Reputation", "afk"])
-        last_trans, cookie, poop, apple, chocolate, created = Wealth.extract_props(result, ["LastTransfer", "cookie", "poop", "apple", "choc", "AccountCreated"])
-        page1 = Embed(title='Page 1/3', description=f"{user}'s Profile", colour=self.color).add_field(name="<:memberlogo:765649915031846912> | Account", value=f"Account Type: `World Account`\nCoins: `{coins}`\nBank: `{bank_}`\nReputation: `{rep}`\nStatus: `{afk}`")
-        page2 = Embed(title='Page 2/3', description=f"{user}'s Profile", colour=self.color).add_field(name=":handbag: | Inventory", value=f":cookie: Cookies: `{cookie}`\n:chocolate_bar: Chocbars: `{chocolate}`\n:apple: Apples: `{apple}`\n:poop: Poop: `{poop}`\n<:beanworld:774371828629635132> Beans: `{beans}`\n:pizza: Pizza: `{pizza}`\n:waffle: Waffles `{waffles}`\n:fish: Fish: `{fish}`")
-        page3 = Embed(title="Page 3/3", description=f"{user}'s Profile", colour=self.color).add_field(name="<:shufflelogo:765652804387471430> | Other", value=f"Created World Account: `{created}`\nYour Last Transfer: `{last_trans}`\nMarried to: `{marry}`\nBadges:\n{noob_b} Badge\n{beginner_b} Badge\n{leader_b} Badge")
-        pages = (page1, page2, page3) #tuplesarejustlightweightarrays
-        message = await ctx.send(embed=page1)
-        await message.add_reaction('\u23ee')
-        await message.add_reaction('\u25c0')
-        await message.add_reaction('\u25b6')
-        await message.add_reaction('\u23ed')
-        await message.add_reaction('\u23F9')
-        i, emoji = 0, ""
+        if not option:
+        	buffer = await self.profile_canvas(user, result)
+        	return await ctx.send(file=buffer)
 
-        while True:
-            if emoji == '\u23ee':
-                i=0
-                await message.edit(embed=pages[i])
-            if emoji == '\u25c0':
-                if i>0:
-                    i-=1
-                    await message.edit(embed=pages[i])
-            if emoji == '\u25b6':
-                if i<2:
-                    i+=1
-                    await message.edit(embed=pages[i])
-            if emoji=='\u23ed':
-                i=2
-                await message.edit(embed=pages[i])
-            if emoji == '\u23F9':
-                await message.clear_reactions()
-                break
+        elif option == "--embed":
+            noob_b, beginner_b, leader_b, marry, bank_, beans, pizza, waffles, fish, coins, rep, afk = Wealth.extract_props(result, ['BadgeSlot1', 'BadgeSlot2', 'BadgeSlot3', 'MarriedTo', "Bank", "beans", "pizza", "waffles", "Fish", "coins", "Reputation", "afk"])
+            last_trans, cookie, poop, apple, chocolate, created = Wealth.extract_props(result, ["LastTransfer", "cookie", "poop", "apple", "choc", "AccountCreated"])
+            page1 = Embed(title='Page 1/3', description=f"{user}'s Profile", colour=self.color).add_field(name="<:memberlogo:765649915031846912> | Account", value=f"Account Type: `World Account`\nCoins: `{coins}`\nBank: `{bank_}`\nReputation: `{rep}`\nStatus: `{afk}`")
+            page2 = Embed(title='Page 2/3', description=f"{user}'s Profile", colour=self.color).add_field(name=":handbag: | Inventory", value=f":cookie: Cookies: `{cookie}`\n:chocolate_bar: Chocbars: `{chocolate}`\n:apple: Apples: `{apple}`\n:poop: Poop: `{poop}`\n<:beanworld:774371828629635132> Beans: `{beans}`\n:pizza: Pizza: `{pizza}`\n:waffle: Waffles `{waffles}`\n:fish: Fish: `{fish}`")
+            page3 = Embed(title="Page 3/3", description=f"{user}'s Profile", colour=self.color).add_field(name="<:shufflelogo:765652804387471430> | Other", value=f"Created World Account: `{created}`\nYour Last Transfer: `{last_trans}`\nMarried to: `{marry}`\nBadges:\n{noob_b} Badge\n{beginner_b} Badge\n{leader_b} Badge")
+            pages = (page1, page2, page3)
+            message = await ctx.send(embed=page1)
 
-            try:
-                res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=10)
-            except:
-                await message.clear_reactions()
-                break
-            if not res:
-                break
-            if res[1].id != 700292147311542282: # use ID instead of user name
-                emoji = str(res[0].emoji)
+            await message.add_reaction('\u23ee')
+            await message.add_reaction('\u25c0')
+            await message.add_reaction('\u25b6')
+            await message.add_reaction('\u23ed')
+            await message.add_reaction('\u23F9')
 
-        await message.clear_reactions()
+            i, emoji = 0, ""
+
+            while True:
+            	if emoji == '\u23ee':
+            		i=0
+            		await message.edit(embed=pages[i])
+            	if emoji == '\u25c0':
+            		if i>0:
+            			i-=1
+            			await message.edit(embed=pages[i])
+            	if emoji == '\u25b6':
+            		if i<2:
+            			i+=1
+            			await message.edit(embed=pages[i])
+            	if emoji=='\u23ed':
+            		i=2
+            		await message.edit(embed=pages[i])
+            	if emoji == '\u23F9':
+            		await message.clear_reactions()
+            		break
+
+            	try:
+            		res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=10)
+            	except:
+            		await message.clear_reactions()
+            		break
+
+            	if not res:
+            		break
+
+            	if res[1].id != 700292147311542282:
+            		emoji = str(res[0].emoji)
+
+            await message.clear_reactions()
 
 
     @commands.command(help="Badge Shop!", aliases=["bshop"])
