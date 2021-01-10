@@ -257,7 +257,6 @@ class InfoCog(commands.Cog):
             return await ctx.send(embed=embed)
 
         if allemote in allemotes:
-
             server1 = self.bot.get_guild(738392767637487713)
             world1 = [f"`{emoji.name}` - {emoji}" for emoji in server1.emojis]
             server2 = self.bot.get_guild(774294150748831814)
