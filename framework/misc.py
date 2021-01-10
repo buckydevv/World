@@ -133,3 +133,7 @@ class Misc:
         
         seconds //= 31536000
         return f"{seconds} year" + ("" if seconds == 1 else "s")
+
+
+    def hex_to_rgb(value):  
+        return ImageColor.getrgb(value)
