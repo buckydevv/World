@@ -8,6 +8,7 @@ from pymongo import MongoClient
 from PIL import Image, ImageDraw, ImageOps, ImageColor
 from twemoji_parser import TwemojiParser
 from colorthief import ColorThief
+from datetime import datetime
 
 __import__("dotenv").load_dotenv()
 
@@ -39,6 +40,7 @@ class Misc:
         })
 
     def add_corners(im, rad):
+        """Round a PNG image"""
         circle = Image.new('L', (rad * 2, rad * 2), 0)
         draw = ImageDraw.Draw(circle)
         draw.ellipse((0, 0, rad * 2, rad * 2), fill=255)
@@ -52,6 +54,7 @@ class Misc:
         return im
 
     def round_corner_jpg(image, radius):
+        """Round a JPG image"""
         mask = Image.new('L', image.size)
         draw = Draw(mask)
         brush = Brush('white')
@@ -71,10 +74,12 @@ class Misc:
         return image
     
     def relative_luminance(rgb_triplet):
+        """Checks for relative colors"""
         r, g, b = tuple(x / 255 for x in rgb_triplet)
         return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
     async def circle_pfp(author, x: int, y: int):
+        """Turn a users avatar into a circle"""
         pfp = author.avatar_url_as(format='png')
         buffer_avatar = BytesIO()
         await pfp.save(buffer_avatar)
@@ -101,6 +106,7 @@ class Misc:
         return File(buffer, "image.png")
 
     async def fetch_pfp(author):
+        """Fetch a members Avatar"""
         pfp = author.avatar_url_as(format='png')
         buffer_avatar = BytesIO()
         await pfp.save(buffer_avatar)
@@ -108,12 +114,14 @@ class Misc:
         return Image.open(buffer_avatar)
     
     async def image_from_url(bot, url):
-        response = await bot.http._HTTPClient__session.get(url) # this is the session discord.py uses
+        """Read the image from the URL"""
+        response = await bot.http._HTTPClient__session.get(url)
         byte = await response.read()
         return Image.open(BytesIO(byte))
     
-    def __delayfstr(string):
+    def _delayfstr(string):
         """ Gets time delay from a string with a format of 'MONTH/DAY/YEAR at HOURS:MINUTES:SECONDS' """
+        if string == "No date": return string
         seconds = round(time() - datetime.strptime(string, "%m/%d/%Y at %H:%M:%S").timestamp())
         if seconds < 60:
             return f"{seconds} second" + ("" if (seconds == 1) else "s")
