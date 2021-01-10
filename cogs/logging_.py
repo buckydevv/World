@@ -32,7 +32,6 @@ class LoggingCog(commands.Cog):
     async def create(self, ctx):
         try:
             Guild._create_guild_account(self, ctx.guild.id)
-
             embed = Embed(title="Logging", description=f"I have succsesfully setup logging for `{ctx.guild.name}`.", color=self.color)
             await ctx.send(embed=embed)
         except:
