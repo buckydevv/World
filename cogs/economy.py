@@ -306,7 +306,7 @@ class EconomyCog(commands.Cog):
         
         if not (await self._has_account(ctx.author.id)):
             await self._create_account(ctx.author.id)
-        elif not (await self._has_account(user.id)): # use this just in case the target doesn't have any account
+        elif not (await self._has_account(user.id)):
             await self._create_account(user.id)
         
         target = await self._get_user(user.id)
@@ -375,7 +375,7 @@ class EconomyCog(commands.Cog):
             },
             {
                 "$set": {
-                    "afk": status[:80] # [:80] trims the string to the first 80 characters (if it's longer than 80)
+                    "afk": status[:80]
                 }
             }
         )
@@ -583,12 +583,11 @@ class EconomyCog(commands.Cog):
         The target is a member from your Discord server.
         """
         if target.id == ctx.author.id:
-            return await ctx.send(f"Sorry {ctx.author.mention} but you cant transfer money to yourself dummy! :moyai:") # moyai for good measure
+            return await ctx.send(f"Sorry {ctx.author.mention} but you cant transfer money to yourself dummy!")
         elif target.bot:
-            return await ctx.send(f"Sorry {ctx.author.mention} but you cant transfer money to a bot dummy! :moyai:") # moyai for good measure
-        
+            return await ctx.send(f"Sorry {ctx.author.mention} but you cant transfer money to a bot dummy!")
         now = datetime.now()
-        if not (await self._has_account(target.id)): # who knows, maybe the target doesn't have an account yet.
+        if not (await self._has_account(target.id)):
             await self._create_account(target.id)
 
         user = await self._get_user(ctx.author.id)
