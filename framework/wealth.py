@@ -89,13 +89,8 @@ class Wealth:
         ])
 
     def extract_props(doc, props):
-        """Extract props from the given document."""
-        i = 0
-        while i < len(props):
-            if (thing := doc.get(props[i])):
-                yield thing
-            i += 1
-
+        for prop in props:
+            yield doc.get(prop)
 
     def give_coins(user_id: int, amount: int) -> None:
         """Update a users Coins."""
