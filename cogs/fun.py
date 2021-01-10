@@ -42,6 +42,28 @@ class FunCog(commands.Cog):
             "Ali A Approves",
             "Ali A Dosnt Approve"
         ]
+        self._8ball_responses = [
+            "It is certain.",
+            "It is decidedly so.",
+            "Without a doubt.",
+            "Yes - definitely.",
+            "You may rely on it.",
+            "As I see it, yes.",
+            "Most likely.",
+            "Outlook good.",
+            "World Says Yes.",
+            "Signs point to yes.",
+            "Reply hazy, try again.",
+            "Ask again later.",
+            "Better not tell you now.",
+            "Cannot predict now.",
+            "Concentrate and ask again.",
+            "Dont count on it.",
+            "My reply is no.",
+            "My sources say no.",
+            "Outlook not so good.",
+            "World Thinks Its Very doubtful.",
+        ]
         self.hearts = ['💔', '💝', '💚', '💙', '💜']
 
     @commands.command(help="World can make you laugh with his amazing jokes!")
@@ -78,9 +100,7 @@ class FunCog(commands.Cog):
     @meme.error
     async def meme_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            a = error.retry_after
-            a = round(a)
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
     @commands.command(help="Enlarge a discord emoji!")
     async def enlarge(self, ctx, emoji: PartialEmoji):
@@ -97,36 +117,25 @@ class FunCog(commands.Cog):
 
     @commands.command(aliases=["pepe"], help="Shows users pp size.")
     async def pp(self, ctx, *, user: Member = None):
-        if user is None:
-            user = ctx.author
-        size = randint(1, 15)
-        dong = ""
-        for _i in range(0, size):
-            dong += "="
-        embed = Embed(title=f"{user}'s pepe size", description=f"8{dong}D", color=self.color)
+        user = user if user else ctx.author
+        dong = "=" * randint(1, 15)
+        embed = Embed(title=f"{user.display_name}'s pepe size", description=f"8{dong}D", color=self.color)
         await ctx.send(embed=embed)
 
     @commands.command(help="Steal a users avatar.", aliases=["av"])
     async def avatar(self, ctx, *, user: Member=None):
-        format = "gif"
         user = user or ctx.author
-        if user.is_avatar_animated() != True:
-            format = "png"
-        avatar = user.avatar_url_as(format = format if format != "gif" else None)
+        _format = "gif" if user.is_avatar_animated() else "png"
+        avatar = user.avatar_url_as(format=_format)
         resp = await self.session.get(str(avatar))
         image = await resp.read()
-        with BytesIO(image) as file:
-            await ctx.send(file=File(file, f"Avatar.{format}"))
+        await ctx.send(file=File(BytesIO(image), f"Avatar.{_format}"))
 
     @commands.command(help="Fake tweet text.")
     async def tweet(self, ctx, username: str, *, message: str):
-        if len(message) >50:
-            return await ctx.send(f"Sorry {ctx.author.mention} a limit of `50` chars please.")
-
-        r = await self.session.get(f"https://nekobot.xyz/api/imagegen?type=tweet&username={username}&text={message}")
+        r = await self.session.get(f"https://nekobot.xyz/api/imagegen?type=tweet&username={username}&text={message[:50]}") # [:50] trims the string to the first 50 characters (if it's longer than 50 characters)
         res = await r.json()
-        embed = Embed(color=self.color).set_image(url=res["message"])
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(color=self.color).set_image(url=res["message"]))
         await r.close(close_session=False)
 
     @tweet.error
@@ -136,9 +145,9 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Is that user gay?.")
     async def gay(self, ctx, *, user: Member=None):
-        user = user or (ctx.author)
+        user = user or ctx.author
         randomPercentage = randint(1, 100)
-        embed = Embed(title="Gayrate!", description=f"**{user}** is {randomPercentage}% gay", color=self.color).set_thumbnail(url=user.avatar_url)
+        embed = Embed(title="Gayrate!", description=f"**{user.display_name}** is {randomPercentage}% gay", color=self.color).set_thumbnail(url=user.avatar_url)
         await ctx.send(embed=embed)
 
     @gay.error
@@ -197,29 +206,7 @@ class FunCog(commands.Cog):
 
     @commands.command(aliases=["8ball"], help="The magical World 8ball.")
     async def _8ball(self, ctx, *, question):
-        responses = [
-            "It is certain.",
-            "It is decidedly so.",
-            "Without a doubt.",
-            "Yes - definitely.",
-            "You may rely on it.",
-            "As I see it, yes.",
-            "Most likely.",
-            "Outlook good.",
-            "World Says Yes.",
-            "Signs point to yes.",
-            "Reply hazy, try again.",
-            "Ask again later.",
-            "Better not tell you now.",
-            "Cannot predict now.",
-            "Concentrate and ask again.",
-            "Dont count on it.",
-            "My reply is no.",
-            "My sources say no.",
-            "Outlook not so good.",
-            "World Thinks Its Very doubtful.",
-        ]
-        embed = Embed(title=":8ball: The Almighty 8ball :8ball:", description=f"Question = `{question}`\n **Answer**: :8ball: {choice(responses)} :8ball:", color=self.color)
+        embed = Embed(title=":8ball: The Almighty 8ball :8ball:", description=f"Question = `{question}`\n **Answer**: :8ball: {choice(self._8ball_responses)} :8ball:", color=self.color)
         await ctx.send(embed=embed)
 
     @_8ball.error
@@ -299,8 +286,7 @@ class FunCog(commands.Cog):
     async def duck(self, ctx):
         r = await self.session.get('https://random-d.uk/api/v2/random')
         res = await r.json()
-        embed = Embed(title='Quack!', color=self.color).set_image(url=res['url'])
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title='Quack!', color=self.color).set_image(url=res['url']))
 
     @commands.command(help="Flip a users avatar!", aliases=["flipav", "avflip"])
     async def flip(self, ctx, user: Member=None):
@@ -330,16 +316,16 @@ class FunCog(commands.Cog):
         fontchannel = ImageFont.truetype("fonts/Whitney-Medium.ttf", 16, encoding="unic")
 
         userchar = font.getsize(user.name)[0]
-        color = (255, 255, 255) if (Misc.hex_to_rgb(str(user.color)) == (0, 0, 0)) else Misc.hex_to_rgb(str(user.color))
+        color = (255, 255, 255) if (user.color.to_rgb() == (0, 0, 0)) else Misc.hex_to_rgb(str(user.color))
 
         image = Image.open("images/fake.png")
 
-        msg = message if len(message) <= 30 else f'{message[0:38]}...'
+        msg = message if len(message) <= 30 else f'{message[:38]}...'
 
         parser = TwemojiParser(image, parse_discord_emoji=True)
-        await Misc.parser_draw_text(parser, user.name, font, color, 80, 30)
-        await Misc.parser_draw_text(parser, str(now.strftime("Today at %H:%M")), fontsmall, 'grey', 80 + userchar + 8, 33)
-        await Misc.parser_draw_text(parser, msg, fontnormal, (220,221,222), 80, 57)
+        await parser.draw_text((80, 30), user.name, font=font, fill=color)
+        await parser.draw_text((88 + userchar, 33), now.strftime("Today at %H:%M"), font=fontsmall, fill='grey')
+        await parser.draw_text((80, 57), msg, font=fontnormal, fill=(220,221,222))
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(user, 50, 50)
@@ -368,9 +354,9 @@ class FunCog(commands.Cog):
         mainimage = Image.open("images/tgg.png")
 
         parser = TwemojiParser(mainimage, parse_discord_emoji=True)
-        await Misc.parser_draw_text(parser, user.name, font, 'black', 126, 43)
-        await Misc.parser_draw_text(parser, f"{ran_days} days ago", fontsmall, 'grey', 132 + userchars + 2, 47)
-        await Misc.parser_draw_text(parser, message, font, 'black', 129, 84)
+        await parser.draw_text((126, 43), user.name, font=font, fill='black')
+        await parser.draw_text((134 + userchars, 47), f"{ran_days} days ago", font=fontsmall, fill='grey')
+        await parser.draw_text((129, 84), message, font=font, fill='black')
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(user, 41, 41)
@@ -453,13 +439,10 @@ class FunCog(commands.Cog):
         	transliterated_artists = [self.kks.convert(artist) for artist in spotify_activity.artists]
         	artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
 
-        	abridged = album_new if len(album_new) <= 30 else f'{album_new[0:27]}...'
-        	cbridged = title_new if len(title_new) <= 20 else f'{title_new[0:17]}...'
-        	dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[0:27]}...'
-
-        	luminance = Misc.relative_luminance(dominant_color)
-
-        	text_colour = 'black' if luminance > 0.5 else 'white'
+        	abridged = album_new if len(album_new) <= 30 else f'{album_new[:27]}...'
+        	cbridged = title_new if len(title_new) <= 20 else f'{title_new[:17]}...'
+        	dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[:27]}...'
+        	text_colour = 'black' if Misc.relative_luminance(dominant_color) > 0.5 else 'white'
 
         	img = Image.new('RGB', (999, 395), color=dominant_color)
 
@@ -468,9 +451,9 @@ class FunCog(commands.Cog):
         	img.paste(resized_album, (41, 76))
 
         	parser = TwemojiParser(img, parse_discord_emoji=False)
-        	await Misc.parser_draw_text(parser, cbridged, fontbold, text_colour, 300, 90) # Top section - Song name
-        	await Misc.parser_draw_text(parser, dbridged, font, text_colour, 303, 170) # Middle secion - Artists of the song
-        	await Misc.parser_draw_text(parser, abridged, font, text_colour, 303, 228) # Album name - Bottom section
+        	await parser.draw_text((300, 90), cbridged, font=fontbold, fill=text_colour) # Top section - Song name
+        	await parser.draw_text((303, 170), dbridged, font=font, fill=text_colour) # Middle secion - Artists of the song
+        	await parser.draw_text((303, 228), abridged, font=font, fill=text_colour) # Album name - Bottom section
         	await parser.close()
         	await ctx.send(file=Misc.save_image(Misc.add_corners(img, 42)))
         except Exception as e:
@@ -479,9 +462,7 @@ class FunCog(commands.Cog):
     @spotify.error
     async def spotify_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            a = error.retry_after
-            a = round(a)
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
     @commands.command(help="Are you a fast typer?!\nUse `w/fast --rank` to see rank.", aliases=["type", "typingtest"])
@@ -503,20 +484,16 @@ class FunCog(commands.Cog):
             rank = self.collection.find({"points":{"$gt":user_points}}).count() + 1
 
             CONVERT = await Misc.circle_pfp(user, 180, 180)
+            color = (255, 255, 255) if (user.color.to_rgb() == (0, 0, 0)) else user.color.to_rgb()
 
-            if Misc.hex_to_rgb(str(user.color)) == (0, 0, 0):
-                color = (255, 255, 255)
-            else:
-                color = Misc.hex_to_rgb(str(user.color))
-
-            name = user.name if len(user.name) <= 16 else f'{user.name[0:13]}...'
+            name = user.name if len(user.name) <= 16 else f'{user.name[:13]}...'
 
             result = self.collection.find_one({"_id": user.id})
             user_points = result['points']
 
             parser = TwemojiParser(img)
-            await Misc.parser_draw_text(parser, name, font, color, 249, 69) # Name of author
-            await Misc.parser_draw_text(parser, f"Global rank: #{rank}, Points: {user_points:,}", fontsmall, 'white', 250, 160) # Current rank, and points
+            await parser.draw_text((249, 69), name, font=font, fill=color) # Name of author
+            await parser.draw_text((250, 160), f"Global rank: #{rank}, Points: {user_points:,}", font=fontsmall, fill='white') # Current rank, and points
             await parser.close()
 
             img.paste(CONVERT, (50, 67), CONVERT)
@@ -568,9 +545,7 @@ class FunCog(commands.Cog):
     @fast.error
     async def fast_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            a = error.retry_after
-            a = round(a)
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
     @commands.command(help="Guess the flag from the picture!!", aliases=["gtf"])
     async def guesstheflag(self, ctx):

@@ -240,13 +240,13 @@ class LoggingCog(commands.Cog):
         font = ImageFont.truetype("fonts/Arial-bold.ttf", 60, encoding="unic")
         fontsmall = ImageFont.truetype("fonts/Arial-bold.ttf", 45, encoding="unic")
 
-        check_length = member.name if len(member.name) <= 14 else f'{member.name[0:11]}...'
+        check_length = member.name if len(member.name) <= 14 else f'{member.name[:11]}...'
 
         mainimage = Image.open("images/Welcome.png")
 
         parser = TwemojiParser(mainimage)
-        await Misc.parser_draw_text(parser, f"Welcome {check_length}", font, 'black', 275, 230)
-        await Misc.parser_draw_text(parser, f"We now have {len(member.guild.members)} members!", fontsmall, 'black', 279, 300)
+        await parser.draw_text((275, 230), f"Welcome {check_length}", font=font, fill='black')
+        await parser.draw_text((279, 300), f"We now have {member.guild.member_count:,} members!", font=fontsmall, fill='black')
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(member, 200, 200)
@@ -265,13 +265,13 @@ class LoggingCog(commands.Cog):
         font = ImageFont.truetype("fonts/Arial-bold.ttf", 60, encoding="unic")
         fontsmall = ImageFont.truetype("fonts/Arial-bold.ttf", 45, encoding="unic")
 
-        check_length = member.name if len(member.name) <= 14 else f'{member.name[0:11]}...'
+        check_length = member.name if len(member.name) <= 14 else f'{member.name[:11]}...'
 
         mainimage = Image.open("images/Welcome.png")
 
         parser = TwemojiParser(mainimage)
-        await Misc.parser_draw_text(parser, f"Goodbye {check_length}", font, 'black', 275, 230)
-        await Misc.parser_draw_text(parser, f"We loved having you here!", fontsmall, 'black', 279, 300)
+        await parser.draw_text((275, 230), f"Goodbye {check_length}", font=font, fill='black')
+        await parser.draw_text((279, 300), f"We loved having you here!", font=fontsmall, fill='black')
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(member, 200, 200)
