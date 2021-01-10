@@ -51,7 +51,7 @@ class FunCog(commands.Cog):
             "As I see it, yes.",
             "Most likely.",
             "Outlook good.",
-            "World Says Yes.",
+            "World Says Yes!",
             "Signs point to yes.",
             "Reply hazy, try again.",
             "Ask again later.",
