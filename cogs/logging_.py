@@ -30,8 +30,10 @@ class LoggingCog(commands.Cog):
     @logging.command(name="create")
     @commands.has_permissions(administrator=True)
     async def create(self, ctx):
+        """Register your Guild into World's Database."""
         try:
             Guild._create_guild_account(self, ctx.guild.id)
+
             embed = Embed(title="Logging", description=f"I have succsesfully setup logging for `{ctx.guild.name}`.", color=self.color)
             await ctx.send(embed=embed)
         except:
@@ -46,6 +48,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="shutdown", aliases=["delete"])
     @commands.has_permissions(administrator=True)
     async def shutdown(self, ctx):
+        """Remove ur Guild from World's Database."""
         if not (Guild._has_guild_account(self, ctx.guild.id)):
             embed = Embed(title="Shutdown", description=f"Hey {ctx.author.mention} your guild was not found.\nTry using: `w/logging create`", color=self.color)
             return await ctx.send(embed=embed)
@@ -62,6 +65,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="bans", aliases=["discordbans", "banlog"])
     @commands.has_permissions(administrator=True)
     async def bans(self, ctx, channel: TextChannel):
+        """Set's given channel to the place where `Bans` will be logged."""
         if not (Guild._has_guild_account(self, ctx.guild.id)):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
@@ -85,6 +89,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="unban", aliases=["discordunban", "unbanlog", "unbanslog", "unbans"])
     @commands.has_permissions(administrator=True)
     async def unban(self, ctx, channel: TextChannel):
+        """Set's given channel to the place where `Unbans` will be logged."""
         if not (Guild._has_guild_account(self, ctx.guild.id)):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find({"_id": ctx.guild.id})
@@ -107,6 +112,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="deleted", aliases=["discorddeleted", "delmsg"])
     @commands.has_permissions(administrator=True)
     async def deleted(self, ctx, channel: TextChannel):
+        """Set's given channel to the place where `Deleted Messages` will be logged."""
         if not (Guild._has_guild_account(self, ctx.guild.id)):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
@@ -129,6 +135,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="edited", aliases=["discordedited", "editmsg"])
     @commands.has_permissions(administrator=True)
     async def edited(self, ctx, channel: TextChannel):
+        """Set's given channel to the place where `Edited Messages` will be logged."""
         if not (Guild._has_guild_account(self, ctx.guild.id)):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
@@ -151,6 +158,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="welcomes", aliases=["joiner", "joins", "join", "welcomemessages", "welcomemsg", "welcome"])
     @commands.has_permissions(administrator=True)
     async def welcomes(self, ctx, channel: TextChannel):
+        """Set's given channel to the place where `Welcome messages` will be logged."""
         if not (Guild._has_guild_account(self, ctx.guild.id)):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
@@ -173,6 +181,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="goodbye", aliases=["memberleave", "bye", "leftserver", "leaving", "goodbyes"])
     @commands.has_permissions(administrator=True)
     async def goodbye(self, ctx, channel: TextChannel):
+        """Set's given channel to the place where `Goodbye messages` will be logged."""
         if not (Guild._has_guild_account(self, ctx.guild.id)):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
