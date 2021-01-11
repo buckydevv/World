@@ -9,8 +9,7 @@ from urllib.parse import urlparse, quote
 from discord.ext.commands import has_permissions, MissingPermissions
 from discord import Embed, File, Message
 from datetime import datetime
-from framework import Guild
-from framework import Misc
+from framework import Guild, Misc
 
 __import__("dotenv").load_dotenv()
 
@@ -180,32 +179,28 @@ class LoggingCog(commands.Cog):
         if (not result) or (not result["Bans"]):
             return
         ban1 = await guild.fetch_ban(user)
-        channel = self.bot.get_channel(result["Bans"])
-        await channel.send(embed=Embed(title="Ban Log", description=f"A user from this guild has been banned.\nName: `{user.name}`\nID: `{user.id}`\nReason: `{ban1.reason}`", timestamp=datetime.utcnow()))
+        await self.bot.get_channel(result["Bans"]).send(embed=Embed(title="Ban Log", description=f"A user from this guild has been banned.\nName: `{user.name}`\nID: `{user.id}`\nReason: `{ban1.reason}`", timestamp=datetime.utcnow()))
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
         result = self.collection.find_one({"_id": guild.id})
         if (not result) or (not result["Unbanned"]):
             return
-        channel = self.bot.get_channel(result["Unbanned"])
-        await channel.send(embed=Embed(title="Unban Log", description=f"A user from this guild has been unbanned.\nName: `{user.name}`\nID: `{user.id}`", timestamp=datetime.utcnow()))
+        await self.bot.get_channel(result["Unbanned"]).send(embed=Embed(title="Unban Log", description=f"A user from this guild has been unbanned.\nName: `{user.name}`\nID: `{user.id}`", timestamp=datetime.utcnow()))
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         result = self.collection.find_one({"_id": message.guild.id})
         if (not result) or (not result["DeletedMessage"]):
             return
-        channel = self.bot.get_channel(result["DeletedMessage"])
-        await channel.send(embed=Embed(title="Deleted message Log", description=f"A message was just deleted.\nContent: {message.content}\nUser: `{message.author}`\nChannel: `{message.channel}`", timestamp=datetime.utcnow()))
+        await self.bot.get_channel(result["DeletedMessage"]).send(embed=Embed(title="Deleted message Log", description=f"A message was just deleted.\nContent: {message.content}\nUser: `{message.author}`\nChannel: `{message.channel}`", timestamp=datetime.utcnow()))
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: Message, after: Message):
         result = self.collection.find_one({"_id": after.guild.id})
         if (not result) or (not result["EditedMessage"]) or after.attachments or (before.content == after.content):
             return
-        channel = self.bot.get_channel(result["EditedMessage"])
-        await channel.send(embed=Embed(title="Edited message Log", description=f"A message was just edited.\nUser: `{after.author}`\nChannel: `{after.channel}`", timestamp=datetime.utcnow()).add_field(name="Before content:", value=before.content).add_field(name="After content:", value=after.content))
+        await self.bot.get_channel(result["EditedMessage"]).send(embed=Embed(title="Edited message Log", description=f"A message was just edited.\nUser: `{after.author}`\nChannel: `{after.channel}`", timestamp=datetime.utcnow()).add_field(name="Before content:", value=before.content).add_field(name="After content:", value=after.content))
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -229,8 +224,7 @@ class LoggingCog(commands.Cog):
         CONVERT = await Misc.circle_pfp(member, 200, 200)
 
         mainimage.paste(CONVERT, (50, 195), CONVERT)
-        channel = self.bot.get_channel(result["JoinedServer"])
-        await channel.send(file=Misc.save_image(mainimage))
+        await self.bot.get_channel(result["JoinedServer"]).send(file=Misc.save_image(mainimage))
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -253,8 +247,7 @@ class LoggingCog(commands.Cog):
 
         CONVERT = await Misc.circle_pfp(member, 200, 200)
         mainimage.paste(CONVERT, (50, 195), CONVERT)
-        channel = self.bot.get_channel(result["LeftServer"])
-        await channel.send(file=Misc.save_image(mainimage))
+        await self.bot.get_channel(result["LeftServer"]).send(file=Misc.save_image(mainimage))
 
 
 def setup(bot):
