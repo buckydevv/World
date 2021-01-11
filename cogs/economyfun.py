@@ -9,12 +9,11 @@ from pymongo import MongoClient
 from datetime import datetime
 from typing import Optional
 from PIL import Image, ImageFont, ImageDraw
-from framework import Wealth, Misc
+from framework import Wealth, Misc, Paginator, require_account
 
 class EconomyFunCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.collection = MongoClient(environ["MONGODB_URL"])["Coins"]["UserCoins"]
         self.color = 0x2F3136
         self.items_order = ("coins", "Bank", "cookie", "choc", "apple", "poop", "beans", "pizza", "waffles", "Fish")
         self.badge_urls = ("https://cdn.discordapp.com/emojis/779192872402026516.png", "https://cdn.discordapp.com/emojis/779192938617241600.png", "https://cdn.discordapp.com/emojis/779193003024973835.png")
@@ -23,34 +22,31 @@ class EconomyFunCog(commands.Cog):
             "beginner": (2, 3500, "<:WorldBadge2:779192938617241600>", "Beginner Badge"),
             "leader": (3, 9500, "<:WorldBadge3:779193003024973835>", "Leader Badge")
         }
-        
+        self.shoot_ctx = ( # emoji, image url, amount, success message
+            ('✅', "https://im-a-dev.xyz/QqoZ2M6m.png", 250, "you caught World in the act! and have earned a total of `250` coins. Well done!"),
+            ('❎', "https://im-a-dev.xyz/BvdekLII.png", 100, "you have found innocent World! and have earned a total of `100` coins. Well done!"),
+            ('🚫', "https://im-a-dev.xyz/MfSnYYAa.png", None, "you found nothing...")
+        )
 
-    @commands.command(aliases=["rep"])
+    @commands.command(help="Add reputation points to a user.", aliases=["rep"])
     @commands.cooldown(rate=1, per=1800, type=commands.BucketType.member)
+    @require_account()
     async def reputation(self, ctx, user: Member):
-        """Update the Reputation points of a Member, Whoever you give Reputation to They must be nice to you!"""
         now = datetime.now()
 
         if user.id == ctx.author.id:
             ctx.command.reset_cooldown(ctx)
             return await ctx.send(f"Sorry {ctx.author.mention} You cant give yourself a reputation point.")
-
-        if not (Wealth._has_account(user.id)):
-            ctx.command.reset_cooldown(ctx)
-            return await ctx.send(f"Sorry {ctx.author.mention} that user does not have a World account")
-
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
+            
         last_used = now.strftime("%m/%d/%Y, %H:%M:%S")
 
-        self.collection.update_one({"_id": user.id}, {"$inc": {"Reputation": 1}})
-        self.collection.update_one({"_id": ctx.author.id}, {"$set": {
+        Wealth.collection.update_one({"_id": user.id}, {"$inc": {"Reputation": 1}})
+        Wealth.collection.update_one({"_id": ctx.author.id}, {"$set": {
             "TargetMember": user.id,
             "LastUsed": last_used
         }})
 
-        embed = Embed(title="Reputation", description=f"{ctx.author.mention} You added `+1` Reputation to {user.mention}", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Reputation", description=f"{ctx.author.mention} You added `+1` Reputation to {user.mention}", color=self.color))
 
     @reputation.error
     async def reputation_error(self, ctx, error):
@@ -59,34 +55,22 @@ class EconomyFunCog(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
-
-    @commands.command()
+    @commands.command(help="Info on your last given rep point.")
+    @require_account()
     async def repinfo(self, ctx):
-        """Fetches and Shows information on the Last Reputation point you gave!"""
         now = datetime.now()
-
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
-
-        if not self.collection.find_one({"_id": ctx.author.id}):
+        data = Wealth.collection.find_one({"_id": ctx.author.id})
+        if not data:
             return await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
-
-        if self.collection.find_one({"_id": ctx.author.id})["LastUsed"] == "Isnotset":
+        elif data["LastUsed"] == "Isnotset":
             return await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
-
-        result = self.collection.find_one({"_id": ctx.author.id})
-        last_used = result["LastUsed"]
-        target_user = result["TargetMember"]
-
-        embed = Embed(
+        await ctx.send(embed=Embed(
             title="Last Reputation",
-            description=f"{ctx.author.mention} You gave <@{target_user}> `1` Reputation point\nDate: `{last_used}`",
+            description=f"{ctx.author.mention} You gave <@{data['TargetMember']}> `1` Reputation point\nDate: `{data['LastUsed']}`",
             color=self.color
-            )
-        await ctx.send(embed=embed)
+        ))
     
     async def profile_canvas(self, user, result):
-        """Draw's the Canvas for the `Profile` Command."""
         pfp = await Misc.fetch_pfp(user)
         pfp_resize = pfp.resize((49, 49))
         font = ImageFont.truetype("./fonts/Whitney-Medium.ttf", 30)
@@ -123,71 +107,25 @@ class EconomyFunCog(commands.Cog):
         return Misc.save_image(main)
 
     @commands.command()
+    @require_account()
     async def profile(self, ctx, user: Optional[Member], option: Optional[str]):
-        """Fetches and Shows information on your Document in World's database.\nYou can also use `w/profile --embed` to not see a Image."""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
         user = user or ctx.author
-        result = Wealth.mass_fetch(user.id)
+        result = Wealth.collection.find_one({'_id': user.id})
 
         if not option:
         	buffer = await self.profile_canvas(user, result)
         	return await ctx.send(file=buffer)
 
         elif option == "--embed":
-            noob_b, beginner_b, leader_b, marry, bank_, beans, pizza, waffles, fish, coins, rep, afk = Wealth.extract_props(result, ['BadgeSlot1', 'BadgeSlot2', 'BadgeSlot3', 'MarriedTo', "Bank", "beans", "pizza", "waffles", "Fish", "coins", "Reputation", "afk"])
-            last_trans, cookie, poop, apple, chocolate, created = Wealth.extract_props(result, ["LastTransfer", "cookie", "poop", "apple", "choc", "AccountCreated"])
-            page1 = Embed(title='Page 1/3', description=f"{user}'s Profile", colour=self.color).add_field(name="<:memberlogo:765649915031846912> | Account", value=f"Account Type: `World Account`\nCoins: `{coins}`\nBank: `{bank_}`\nReputation: `{rep}`\nStatus: `{afk}`")
-            page2 = Embed(title='Page 2/3', description=f"{user}'s Profile", colour=self.color).add_field(name=":handbag: | Inventory", value=f":cookie: Cookies: `{cookie}`\n:chocolate_bar: Chocbars: `{chocolate}`\n:apple: Apples: `{apple}`\n:poop: Poop: `{poop}`\n<:beanworld:774371828629635132> Beans: `{beans}`\n:pizza: Pizza: `{pizza}`\n:waffle: Waffles `{waffles}`\n:fish: Fish: `{fish}`")
-            page3 = Embed(title="Page 3/3", description=f"{user}'s Profile", colour=self.color).add_field(name="<:shufflelogo:765652804387471430> | Other", value=f"Created World Account: `{created}`\nYour Last Transfer: `{last_trans}`\nMarried to: `{marry}`\nBadges:\n{noob_b} Badge\n{beginner_b} Badge\n{leader_b} Badge")
-            pages = (page1, page2, page3)
-            message = await ctx.send(embed=page1)
+            paginator = Paginator(ctx, [
+                Embed(title='Page 1/3', description=f"{user}'s Profile", colour=self.color).add_field(name="<:memberlogo:765649915031846912> | Account", value=f"Account Type: `World Account`\nCoins: `{result['coins']}`\nBank: `{result['Bank']}`\nReputation: `{result['Reputation']}`\nStatus: `{result['afk']}`"),
+                Embed(title='Page 2/3', description=f"{user}'s Profile", colour=self.color).add_field(name=":handbag: | Inventory", value=f":cookie: Cookies: `{result['cookie']}`\n:chocolate_bar: Chocbars: `{result['choc']}`\n:apple: Apples: `{result['apple']}`\n:poop: Poop: `{result['poop']}`\n<:beanworld:774371828629635132> Beans: `{result['beans']}`\n:pizza: Pizza: `{result['pizza']}`\n:waffle: Waffles `{result['waffles']}`\n:fish: Fish: `{result['Fish']}`"),
+                Embed(title="Page 3/3", description=f"{user}'s Profile", colour=self.color).add_field(name="<:shufflelogo:765652804387471430> | Other", value=f"Created World Account: `{result['AccountCreated']}`\nYour Last Transfer: `{result['LastTransfer']}`\nMarried to: `{result['MarriedTo']}`\nBadges:\n{result['BadgeSlot1']} Badge\n{result['BadgeSlot2']} Badge\n{result['BadgeSlot3']} Badge")
+            ])
+            return await paginator.execute()
 
-            await message.add_reaction('\u23ee')
-            await message.add_reaction('\u25c0')
-            await message.add_reaction('\u25b6')
-            await message.add_reaction('\u23ed')
-            await message.add_reaction('\u23F9')
-
-            i, emoji = 0, ""
-
-            while True:
-            	if emoji == '\u23ee':
-            		i=0
-            		await message.edit(embed=pages[i])
-            	if emoji == '\u25c0':
-            		if i>0:
-            			i-=1
-            			await message.edit(embed=pages[i])
-            	if emoji == '\u25b6':
-            		if i<2:
-            			i+=1
-            			await message.edit(embed=pages[i])
-            	if emoji=='\u23ed':
-            		i=2
-            		await message.edit(embed=pages[i])
-            	if emoji == '\u23F9':
-            		await message.clear_reactions()
-            		break
-
-            	try:
-            		res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=10)
-            	except:
-            		await message.clear_reactions()
-            		break
-
-            	if not res:
-            		break
-
-            	if res[1].id != 700292147311542282:
-            		emoji = str(res[0].emoji)
-
-            await message.clear_reactions()
-
-
-    @commands.command(aliases=["bshop"])
+    @commands.command(help="Badge Shop!", aliases=["bshop"])
     async def badgeshop(self, ctx):
-        """Shows a list of Avalible Badges to buy!, Use `w/buybadge <BADGE_NAME>`"""
         return await ctx.send(embed=Embed(
             title="World Badge Shop!",
             description=dedent("""
@@ -201,31 +139,26 @@ class EconomyFunCog(commands.Cog):
             color=self.color
         ))
 
-    @commands.command()
+    @commands.command(help="Buy a World Badge.")
+    @require_account()
     async def buybadge(self, ctx, item: str):
-        """Buy a badge from the Shop, To use: `w/buybadge <BADGE_NAME>`"""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
-
-        result = Wealth.mass_fetch(ctx.author.id)
+        result = Wealth.collection.find_one({'_id': ctx.author.id})
         if not self.badges_ctx.get(item.lower()): # the person entered something other than `noob, beginner, leader`
             return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention}, please select the correct badge, Badges available: `{', '.join(self.badges_ctx.keys())}`", color=self.color))
         
         order, price, emoji, full_name = self.badges_ctx[item.lower()]
         if result["coins"] < price:
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World {full_name}`", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World {full_name}`", color=self.color))
         elif result["BadgeSlot1"] == emoji:
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World {full_name}`.", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World {full_name}`.", color=self.color))
         
         await ctx.send(embed=Embed(
             title="World Badge",
             description=f"You have bought `World {full_name}` for `{price:,}` Coins. {emoji}",
             color=self.color
         ))
-        self.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": -price}})
-        self.collection.update_one({"_id": ctx.author.id}, {"$set": {f"BadgeSlot{order}": emoji}})
+        Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": -price}})
+        Wealth.collection.update_one({"_id": ctx.author.id}, {"$set": {f"BadgeSlot{order}": emoji}})
 
     @buybadge.error
     async def buybadge_error(self, ctx, error):
@@ -233,21 +166,18 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/buybadge <BadgeName>`")
 
 
-    @commands.command()
+    @commands.command(help="Marry a specified user!")
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
+    @require_account()
     async def marry(self, ctx, user: Member):
-        """Marry someone in Discord?!"""
         now = datetime.now()
         m_date = now.strftime("%m/%d/%Y")
-
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
 
         if user == ctx.author:
             ctx.command.reset_cooldown(ctx)
             return await ctx.send(f"Sorry {ctx.author.mention} but you can't marry yourself!")
 
-        result = Wealth.mass_fetch(ctx.author.id)
+        result = Wealth.collection.find_one({'_id': ctx.author.id})
         Marriedto_ = result["MarriedTo"]
         MarriedDate = result["MarriedDate"]
 
@@ -272,11 +202,11 @@ class EconomyFunCog(commands.Cog):
             emoji=str(res[0].emoji)
 
         if emoji == "☑":
-            self.collection.update_one({"_id": ctx.author.id}, {"$set": {
+            Wealth.collection.update_one({"_id": ctx.author.id}, {"$set": {
                 "MarriedTo": str(user),
                 "MarriedDate": str(m_date)
             }})
-            self.collection.update_one({"_id": user.id}, {"$set": {
+            Wealth.collection.update_one({"_id": user.id}, {"$set": {
                 "MarriedTo": str(ctx.author),
                 "MarriedDate": str(m_date)
             }})
@@ -295,33 +225,28 @@ class EconomyFunCog(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
-    @commands.command()
+    @commands.command(help="Divorce a specified user!")
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
+    @require_account()
     async def divorce(self, ctx, user: Member):
-        """You don't like who you married? Then divorce them with this command."""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
-
         if user == ctx.author:
             ctx.command.reset_cooldown(ctx)
             return await ctx.send(f"Sorry {ctx.author.mention} but you can't divorce yourself!")
 
-        result = Wealth.mass_fetch(ctx.author.id)
+        result = Wealth.collection.find_one({'_id': ctx.author.id})
         Marriedto_ = result["MarriedTo"]
         MarriedDate = result["MarriedDate"]
 
-        if self.collection.find_one({"_id": ctx.author.id})["MarriedTo"] == "Nobody":
+        if result["MarriedTo"] == "Nobody":
             ctx.command.reset_cooldown(ctx)
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You are not married yet!.", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You are not married yet!.", color=self.color))
 
-        if not self.collection.find_one({"_id": ctx.author.id})["MarriedTo"] == str(user):
+        if not result["MarriedTo"] == str(user):
             ctx.command.reset_cooldown(ctx)
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're not married to {user}.", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're not married to {user}.", color=self.color))
 
-        self.collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedTo": "Nobody"}})
-        self.collection.update_one({"_id": user.id}, {"$set": {
+        Wealth.collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedTo": "Nobody"}})
+        Wealth.collection.update_one({"_id": user.id}, {"$set": {
             "MarriedTo": "Nobody",
             "MarriedDate": "No date"
         }})
@@ -337,41 +262,33 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
-    @commands.command(aliases=["dep"])
+    @commands.command(help="Deposit money into your World bank account", aliases=["dep"])
+    @require_account()
     async def deposit(self, ctx, amount: int):
-        """Deposit the Specified amount into the bank, Can be withdrawed with `w/withdraw <amount>`"""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
-
         if amount < 0:
             return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
 
-        if self.collection.find_one({"_id": ctx.author.id})["coins"] < amount:
+        if Wealth.collection.find_one({"_id": ctx.author.id})["coins"] < amount:
             return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money."))
 
         Wealth._deposit_coins(ctx.author.id, amount)
         return await ctx.send(embed=Embed(title="Deposit", description=f"{ctx.author.mention} You have deposited `{amount}` coin(s)", color=self.color))
 
-    @commands.command(aliases=["with"])
+    @commands.command(help="Withdraw money from your World bank account.", aliases=["with"])
+    @require_account()
     async def withdraw(self, ctx, amount: int):
-        """Withdraw money from what you put into your bank account!"""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
-
         if amount < 0:
             return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
 
-        result = Wealth.mass_fetch(ctx.author.id)
+        result = Wealth.collection.find_one({'_id': ctx.author.id})
         if result["Bank"] < amount:
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't withdraw because you don't have that much money in the bank.", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't withdraw because you don't have that much money in the bank.", color=self.color))
 
-        self.collection.update_one({"_id": ctx.author.id}, {"$inc": {
+        Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {
             "Bank": -amount,
             "coins": amount
         }})
-        embed = Embed(title="Withdraw", description=f"{ctx.author.mention} you have just withdrawn `{amount}` coins.", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Withdraw", description=f"{ctx.author.mention} you have just withdrawn `{amount}` coins.", color=self.color))
 
     @deposit.error
     async def deposit_error(self, ctx, error):
@@ -385,49 +302,28 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/withdraw <amount>`")
 
 
-    @commands.command(aliases=["shoot", "worldshoot"])
+    @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
     @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
+    @require_account()
     async def shootout(self, ctx):
-        """Try to catch World in the act, Earn coins easilly!"""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
-        
         random = Wealth.shootout_ran()
+        message = await ctx.send(embed=Embed(title="Shootout", description="Is World a shooter?", color=self.color).set_image(url=random).set_footer(text="|✅ - shooter|❎ - innocent|🚫 - nothing"))
 
-        embed = Embed(title="Shootout", description="Is World a shooter?", color=self.color)
-        embed.set_image(url=random)
-        embed.set_footer(text="|✅ - shooter|❎ - innocent|🚫 - nothing")
-        message = await ctx.send(embed=embed)
-
-        await message.add_reaction('✅')
-        await message.add_reaction('❎')
-        await message.add_reaction('🚫')
+        for _emoji in self.shoot_ctx:
+            await message.add_reaction(_emoji[0])
 
         emoji = ''
 
-        while True: # just so you know, $inc increments the number so you don't have to use $set every time
-            if emoji == '✅':
-                if random == "https://im-a-dev.xyz/QqoZ2M6m.png":
-                    self.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": 250}})
+        while True: # sodaasdsaijdaubsjsdad
+            for _emoji, _image_url, _amount, _message in self.shoot_ctx:
+                if emoji == _emoji:
                     await message.delete()
-                    return await ctx.send(f"Hey {ctx.author.mention} you caught World in the act! and have earned a total of `250` coins. Well done!")
-                await message.delete()
-                return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
-
-            if emoji == '❎':
-                if random == "https://im-a-dev.xyz/BvdekLII.png":
-                    self.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": 100}})
-                    await message.delete()
-                    return await ctx.send(f"Hey {ctx.author.mention} you have found innocent World! and have earned a total of `100` coins. Well done!")
-                await message.delete()
-                return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
-
-            if emoji == '🚫':
-                if random == "https://im-a-dev.xyz/MfSnYYAa.png":
-                    await message.delete()
-                    return await ctx.send(f"Hey {ctx.author.mention} you found nothing...")
-                await message.delete()
-                return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
+                    if (random == _image_url):
+                        if _amount:
+                            Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": _amount}})
+                        return await ctx.send(f"Hey {ctx.author.mention} {_message}")
+                    return await ctx.send(f"Sorry {ctx.author.mention} you chose the wrong one! try again next time.")
+            
             try:
                 res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=4)
 
@@ -435,7 +331,7 @@ class EconomyFunCog(commands.Cog):
                     break
 
                 if res[1].id != 700292147311542282: # use ID instead of user name
-                    emoji=str(res[0].emoji)
+                    emoji = str(res[0].emoji)
 
             except:
                 await message.delete()
@@ -449,15 +345,12 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
-    @commands.command(aliases=["fish", "worldfishing"])
+    @commands.command(help="Fish for things in the lake", aliases=["fish", "worldfishing"])
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
+    @require_account()
     async def fishing(self, ctx):
-        """Fish for items in the lake of World!"""
-        if not (Wealth._has_account(ctx.author.id)):
-            Wealth._create_account(ctx.author.id)
-
         random = Wealth.fishing_ran()
-        doc = Wealth.mass_fetch(ctx.author.id)
+        doc = Wealth.collection.find_one({'_id': ctx.author.id})
         random_coins = randint(1, 50)
         fishing_ctx = { # using it here because it has randint() in it
             "https://im-a-dev.xyz/1kKJXQSr.png": None, # key_name, amount_added_to_db, message
@@ -467,49 +360,32 @@ class EconomyFunCog(commands.Cog):
         }        
 
         if not fishing_ctx[random]: # they didn't caught anything
-            embed = Embed(title="Fishing", description="There are no fish in the lake right now, come again soon!", color=self.color)
-            embed.set_image(url="https://im-a-dev.xyz/1kKJXQSr.png")
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Fishing", description="There are no fish in the lake right now, come again soon!", color=self.color).set_image(url="https://im-a-dev.xyz/1kKJXQSr.png"))
         # otherwise, they caught something
         key_name, amount_added_to_db, message = fishing_ctx[random]
-        self.collection.update_one({"_id": ctx.author.id}, {"$inc": {key_name: amount_added_to_db}})
-
-        embed = Embed(title="Fishing", description=message, color=self.color)
-        embed.set_image(url=random)
-        return await ctx.send(embed=embed)
+        Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {key_name: amount_added_to_db}})
+        return await ctx.send(embed=Embed(title="Fishing", description=message, color=self.color).set_image(url=Embed(title="Fishing", description=message, color=self.color)))
 
     @fishing.error
     async def fishing_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
-
-    @commands.command(aliases=["mybadges", "showbadges", "badge"])
+    @commands.command(help="What badges do you have?", aliases=["mybadges", "showbadges", "badge"])
+    @require_account()
     async def badges(self, ctx):
-        """Fetches and Shows what badges you have!"""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
-
-        result = Wealth.mass_fetch(ctx.author.id)
+        result = Wealth.collection.find_one({'_id': ctx.author.id})
         await ctx.send(embed=Embed(title="Your badges", description=f"Noob: {result['BadgeSlot1']}\nBeginner: {result['BadgeSlot2']}\nLeader: {result['BadgeSlot3']}\n\n[`Noob`](https://cdn.discordapp.com/emojis/779192872402026516.png?v=1) | [`Beginner`](https://cdn.discordapp.com/emojis/779192938617241600.png?v=1) | [`Leader`](https://cdn.discordapp.com/emojis/779193003024973835.png?v=1)", color=self.color))
 
-    @commands.command(aliases=["myrep", "myreputation", "reputationcount"])
+    @commands.command(help="Show your reputation", aliases=["myrep", "myreputation", "reputationcount"])
+    @require_account()
     async def repcount(self, ctx):
-        """Fetches and Shows how much Reputation points you have"""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
+        await ctx.send(embed=Embed(title="Your Reputation", description=f"Reputation Points: `{Wealth.collection.find_one({'_id': ctx.author.id})['Reputation']}`", color=self.color))
 
-        rep = Wealth.fetch_user(ctx.author.id, "Reputation")
-        await ctx.send(embed=Embed(title="Your Reputation", description=f"Reputation Points: `{rep}`", color=self.color))
-
-    @commands.command(aliases=["mystat", "worldstatus"])
+    @commands.command(help="Show your World status", aliases=["mystat", "worldstatus"])
+    @require_account()
     async def mystatus(self, ctx):
-        """Fetches and Shows the status you set."""
-        if not (Wealth._has_account(ctx.author.id)):
-            await Wealth._create_account(ctx.author.id)
-
-        status = Wealth.fetch_user(ctx.author.id, "afk")
-        await ctx.send(embed=Embed(title="Your Status", description=f"World status: `{status}`",color=self.color))
+        await ctx.send(embed=Embed(title="Your Status", description=f"World status: `{Wealth.collection.find_one({'_id': ctx.author.id})['afk']}`", color=self.color))
 
 def setup(bot):
     bot.add_cog(EconomyFunCog(bot))

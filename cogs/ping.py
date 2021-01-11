@@ -1,4 +1,4 @@
-import discord
+from discord import Embed
 from asyncio import sleep as _sleep
 from time import time
 from discord.ext import commands
@@ -8,18 +8,14 @@ class PingCog(commands.Cog):
         self.bot = bot
         self.color = 0x2F3136
 
-    @commands.command()
+    @commands.command(help="Show bots latency.")
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.member)
     async def ping(self, ctx):
-        """Returns the bots Latency/Ping in a embed."""
-        testing = discord.Embed(title = 'Testing Latency... <a:loading1:772860591190048768>', color=self.color)
         start = time()
-        msg = await ctx.send(embed=testing)
+        msg = await ctx.send(embed=Embed(title = 'Testing Latency... <a:loading1:772860591190048768>', color=self.color))
         end = time()
         await _sleep(2)
-
-        finished = discord.Embed(title = f'<a:loading:772860569127878676> Pong!', description=f"Latency: `{round(self.bot.latency * 1000)}ms`\nResponse time: `{(end-start)*1000:,.0f}ms`", color=self.color)
-        await msg.edit(embed=finished)
+        await msg.edit(embed=Embed(title = f'<a:loading:772860569127878676> Pong!', description=f"Latency: `{round(self.bot.latency * 1000)}ms`\nResponse time: `{(end-start)*1000:,.0f}ms`", color=self.color))
 
     @ping.error
     async def ping_error(self, ctx, error):

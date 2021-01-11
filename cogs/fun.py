@@ -7,7 +7,6 @@ from datetime import datetime
 from typing import Optional
 from io import BytesIO
 from os import environ
-from asyncio import TimeoutError
 from pymongo import MongoClient
 from framework import Misc, Wealth
 from time import time
@@ -51,7 +50,7 @@ class FunCog(commands.Cog):
             "As I see it, yes.",
             "Most likely.",
             "Outlook good.",
-            "World Says Yes.",
+            "World Says Yes!",
             "Signs point to yes.",
             "Reply hazy, try again.",
             "Ask again later.",
@@ -65,19 +64,24 @@ class FunCog(commands.Cog):
             "World Thinks Its Very doubtful.",
         ]
         self.hearts = ['💔', '💝', '💚', '💙', '💜']
+        self.kills = [
+            "they stole money from your bank",
+            "they ate your cookies",
+            "they tried to steal your phone",
+            "they smelled like poop",
+            "they didn't like you",
+            "they lied to you",
+            "they didnt trust you"
+        ]
 
-    @commands.command()
+    @commands.command(help="World can make you laugh with his amazing jokes!")
     async def joke(self, ctx):
-        """Returns what World thinks is a funny joke."""
-        headers = {"Accept": "application/json"}
-        req = await self.session.get("https://icanhazdadjoke.com", headers=headers)
+        req = await self.session.get("https://icanhazdadjoke.com", headers={"Accept": "application/json"})
         r = await req.json()
-        embed = Embed(title="Epic joke!",description=r["joke"], color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Epic joke!",description=r["joke"], color=self.color))
 
-    @commands.command()
+    @commands.command(help="Ask Alister-A a question!")
     async def askali(self, ctx, *, question):
-        """Ask Ali-a a question"""
         await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - {choice(self.aliaresponses)}", color=self.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
 
     @askali.error
@@ -88,29 +92,24 @@ class FunCog(commands.Cog):
 
     @commands.command(name="f")
     async def f(self, ctx, *, text: commands.clean_content = None):
-        """Press F to pay respects"""
         reason = f"for **{text}** " if text else ""
         await ctx.send(embed=Embed(title = f"**{ctx.author.name}** has paid their respect {reason}{choice(self.hearts)}", color=self.color))
 
-    @commands.command()
+    @commands.command(help="Shows a meme from random subreddits.")
     @commands.cooldown(rate=4, per=7, type=commands.BucketType.member)
     async def meme(self, ctx):
-        """Returns a meme from a reddit api"""
         r = await self.session.get(f"https://memes.blademaker.tv/api?lang=en")
         res = await r.json()
-        embed = Embed(title=f"Title: {res['title']}\nSubreddit: r/{res['subreddit']}", color=self.color).set_image(url=res["image"]).set_footer(text=f"👍Ups:{res['ups']}")
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title=f"Title: {res['title']}\nSubreddit: r/{res['subreddit']}", color=self.color).set_image(url=res["image"]).set_footer(text=f"👍Ups:{res['ups']}"))
 
     @meme.error
     async def meme_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
-    @commands.command()
+    @commands.command(help="Enlarge a discord emoji!")
     async def enlarge(self, ctx, emoji: PartialEmoji):
-        """Make a discord emoji grow"""
-        embed = Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=self.color).set_image(url=emoji.url)
-        await ctx.send(embed=embed)
+    	await ctx.send(embed=Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=self.color).set_image(url=emoji.url))
 
     @enlarge.error
     async def enlarge_error(self, ctx, error):
@@ -122,15 +121,12 @@ class FunCog(commands.Cog):
 
     @commands.command(aliases=["pepe"])
     async def pp(self, ctx, *, user: Member = None):
-        """How big is your pp?"""
         user = user if user else ctx.author
         dong = "=" * randint(1, 15)
-        embed = Embed(title=f"{user.display_name}'s pepe size", description=f"8{dong}D", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title=f"{user.display_name}'s pepe size", description=f"8{dong}D", color=self.color))
 
-    @commands.command(aliases=["av"])
+    @commands.command(help="Steal a users avatar.", aliases=["av"])
     async def avatar(self, ctx, *, user: Member=None):
-        """Fetch a Members Avatar"""
         user = user or ctx.author
         _format = "gif" if user.is_avatar_animated() else "png"
         avatar = user.avatar_url_as(format=_format)
@@ -138,9 +134,8 @@ class FunCog(commands.Cog):
         image = await resp.read()
         await ctx.send(file=File(BytesIO(image), f"Avatar.{_format}"))
 
-    @commands.command()
+    @commands.command(help="Fake tweet text.")
     async def tweet(self, ctx, username: str, *, message: str):
-        """Using nekobot api, Make a fake tweet"""
         r = await self.session.get(f"https://nekobot.xyz/api/imagegen?type=tweet&username={username}&text={message[:50]}") # [:50] trims the string to the first 50 characters (if it's longer than 50 characters)
         res = await r.json()
         await ctx.send(embed=Embed(color=self.color).set_image(url=res["message"]))
@@ -151,13 +146,11 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/tweet <username> <message>`")
 
-    @commands.command()
+    @commands.command(help="Is that user gay?.")
     async def gay(self, ctx, *, user: Member=None):
-        """Show a random % between 1 and 100, To see the truth about a Member"""
         user = user or ctx.author
         randomPercentage = randint(1, 100)
-        embed = Embed(title="Gayrate!", description=f"**{user.display_name}** is {randomPercentage}% gay", color=self.color).set_thumbnail(url=user.avatar_url)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Gayrate!", description=f"**{user.display_name}** is {randomPercentage}% gay", color=self.color).set_thumbnail(url=user.avatar_url))
 
     @gay.error
     async def gay_error(self, ctx, error):
@@ -166,7 +159,6 @@ class FunCog(commands.Cog):
 
     @commands.command(aliases=["aki"])
     async def akinator(self, ctx: commands.Context):
-        """Remake of the Akinator game, https://akinator.com/"""
         if ctx.channel.id in self.gameCache.keys():
             return await ctx.send(
                 "Sorry, {0[user]} is already playing akinator in <#{0[channel]}>, try again when they finish or move to another channel!"
@@ -207,58 +199,39 @@ class FunCog(commands.Cog):
                     return await ctx.send(embed=Embed(title="Invalid Answer", description="You typed a invalid answer the only answer options are:\n`y` OR `yes` for yes\n`n` OR `no` for no\n`i` OR `idk` for i dont know\n`p` OR `probably` for probably\n`pn` OR `probably not` for probably not\n`b` for back\n`q` or `quit` for stop the game", color=self.color))
 
         await self.akiObj.win()
-
-        embed = Embed(title="I have outsmarted your outsmarting", color=self.color).add_field(name="I think...", value="it is {0.first_guess[name]} {0.first_guess[description]}?\n\nSorry if im wrong, Akinator has tried.".format(akiObj)).set_image(url=self.akiObj.first_guess['absolute_picture_path'])
-
         del self.gameCache[ctx.channel.id]
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="I have outsmarted your outsmarting", color=self.color).add_field(name="I think...", value="it is {0.first_guess[name]} {0.first_guess[description]}?\n\nSorry if im wrong, Akinator has tried.".format(akiObj)).set_image(url=self.akiObj.first_guess['absolute_picture_path']))
 
 
     @commands.command(aliases=["8ball"])
     async def _8ball(self, ctx, *, question):
-        """The magical World 8ball"""
-        embed = Embed(title=":8ball: The Almighty 8ball :8ball:", description=f"Question = `{question}`\n **Answer**: :8ball: {choice(self._8ball_responses)} :8ball:", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title=":8ball: The Almighty 8ball :8ball:", description=f"Question = `{question}`\n **Answer**: :8ball: {choice(self._8ball_responses)} :8ball:", color=self.color))
 
     @_8ball.error
     async def _8ball_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/8ball <question>`")
 
-    @commands.command()
+    @commands.command(help="Turn text into emojis!.")
     async def emojify(self, ctx, *, stuff):
-        """Turn Text into a Emoji"""
         if len(stuff) > 20:
             return await ctx.send(f"Sorry {ctx.author.mention} a limit of `20` chars please!")
         emj = ("".join([":regional_indicator_"+l+":"  if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in stuff.lower()]))
-        embed = Embed(title='Emojify', description=f'{emj}', color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title='Emojify', description=f'{emj}', color=self.color))
 
     @emojify.error
     async def emojify_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/emojify <text>`")
 
-    @commands.command()
+    @commands.command(help="Kill a user")
     async def kill(self, ctx, user: Member):
-        """Kill someone"""
         user = user or (ctx.author)
-        kills = [
-        "they stole money from your bank",
-        "they ate your cookies",
-        "they tried to steal your phone",
-        "they smelled like poop",
-        "they didn't like you",
-        "they lied to you",
-        "they didnt trust you"
-        ]
-        embed = Embed(title="Murder", description=f"{ctx.author.mention} you killed {user.mention} because {choice(kills)}", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Murder", description=f"{ctx.author.mention} you killed {user.mention} because {choice(self.kills)}", color=self.color))
 
-    @commands.command()
+    @commands.command(help="Urban Dictionary")
     @commands.is_nsfw()
     async def urban(self, ctx, *name):
-        """NSFW, Search urban for words."""
         if ctx.channel.is_nsfw():
             r = await self.session.get(f"http://api.urbandictionary.com/v0/define?term={'%20'.join(name)}")
             if r.status != 200:
@@ -266,48 +239,39 @@ class FunCog(commands.Cog):
 
             json = await r.json()
             list1 = json['list']
-            if len(list1) < 1:
+            if not list1:
                 return await ctx.send(f"Sorry {ctx.author.mention} This word was not found in Urban.")
             res = list1[0]
-
-            embed = Embed(title=res['word'], description=res['definition'], color=self.color).add_field(name="Example", value=res['example']).set_footer(text=f"👍 {res['thumbs_up']} | 👎{res['thumbs_down']}")
-            await ctx.send(embed=embed)
+            await ctx.send(embed=Embed(title=res['word'], description=res['definition'], color=self.color).add_field(name="Example", value=res['example']).set_footer(text=f"👍 {res['thumbs_up']} | 👎{res['thumbs_down']}"))
 
     @urban.error
     async def urban_error(self, ctx, error):
         if isinstance(error, commands.errors.NSFWChannelRequired):
-            embed = Embed(title="NSFW", description=f"Sorry {ctx.author.mention} but this command is nsfw and this is not a nsfw channel.", color=self.color).set_image(url="https://media.discordapp.net/attachments/265156286406983680/728328135942340699/nsfw.gif")
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="NSFW", description=f"Sorry {ctx.author.mention} but this command is nsfw and this is not a nsfw channel.", color=self.color).set_image(url="https://media.discordapp.net/attachments/265156286406983680/728328135942340699/nsfw.gif"))
 
-    @commands.command()
+    @commands.command(help="Advice from world.")
     async def advice(self, ctx):
-        """Fetch some advice, Might come in handy"""
         r = await self.session.get(f"https://api.adviceslip.com/advice", headers={"Accept": "application/json"})
         res = await r.json(content_type="text/html")
-        embed = Embed(title="Advice", description=f"{res['slip']['advice']}", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Advice", description=f"{res['slip']['advice']}", color=self.color))
 
-    @commands.command()
+    @commands.command(help="Generate qr code")
     async def qr(self, ctx, *, text):
-        """Transform text into a QR code."""
-        embed = Embed(title="Qr code", description=f"Generated `{text}`", color=self.color).set_image(url=f"http://api.qrserver.com/v1/create-qr-code/?data={quote(text)}&margin=25")
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Qr code", description=f"Generated `{text}`", color=self.color).set_image(url=f"http://api.qrserver.com/v1/create-qr-code/?data={quote(text)}&margin=25"))
 
     @qr.error
     async def qr_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/qr <text>`")
 
-    @commands.command(aliases=['quack', 'duk'])
+    @commands.command(help="This command will show you a cute duck", aliases=['quack', 'duk'])
     async def duck(self, ctx):
-        """Ducks are cute?"""
         r = await self.session.get('https://random-d.uk/api/v2/random')
         res = await r.json()
         await ctx.send(embed=Embed(title='Quack!', color=self.color).set_image(url=res['url']))
 
-    @commands.command(aliases=["flipav", "avflip"])
+    @commands.command(help="Flip a users avatar!", aliases=["flipav", "avflip"])
     async def flip(self, ctx, user: Member=None):
-        """Flip a Members Discord avatar."""
         user = user or ctx.author
 
         av_img = await Misc.fetch_pfp(user)
@@ -315,18 +279,16 @@ class FunCog(commands.Cog):
         await ctx.send(file=Misc.save_image(done))
 
 
-    @commands.command()
+    @commands.command(help="Blur a users avatar!")
     async def blur(self, ctx, user: Member=None):
-        """Add the GuassianBlur Filter to the Members avatar."""
         user = user or ctx.author
 
         av_img = await Misc.fetch_pfp(user)
         done = av_img.filter(ImageFilter.GaussianBlur(radius=8))
         await ctx.send(file=Misc.save_image(done))
 
-    @commands.command(aliases=["fq", "fakeq", "fakemessage", "fakemsg"])
+    @commands.command(hlep="Generate a fake discord message!", aliases=["fq", "fakeq", "fakemessage", "fakemsg"])
     async def fakequote(self, ctx, user: Optional[Member], *, message) -> None:
-        """Generate a FAKE Discord Message, Using Pillow"""
         now = datetime.now()
         user = user or ctx.author
 
@@ -357,9 +319,8 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/fakequote <user> <text>`")
 
-    @commands.command(aliases=["tgg", "topggreview", "topggbotreview", "botreview"])
+    @commands.command(help="Write a top.gg Review", aliases=["tgg", "topggreview", "topggbotreview", "botreview"])
     async def topgg(self, ctx, user: Optional[Member], *, message):
-        """Generate a FAKE Top.gg review!"""
         user = user or ctx.author
         if len(message) > 30:
             return await ctx.send(f"Sorry {ctx.author.mention} there is a limit of `30` chars.")
@@ -389,98 +350,89 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/topgg <user> <text>`")
 
-    @commands.command(aliases=["widen", "putin", "wideputin"])
+    @commands.command(help="Widen a discord avatar!", aliases=["widen", "putin", "wideputin"])
     async def wide(self, ctx, user: Member=None):
-        """Stretch a Member avatar."""
         user = user or ctx.author
         av_img = await Misc.fetch_pfp(user)
         await ctx.send(file=Misc.save_image(av_img.resize((350, 180))))
 
-    @commands.command(aliases=["sp"])
+    @commands.command(help="Show what you are listening to in a photo!\nYou can also use `w/spotify --artist <artist>` and `w/spotify --song <song>` to find out information about a artist or song.", aliases=["sp"])
     @commands.cooldown(rate=2, per=8, type=commands.BucketType.member)
     async def spotify(self, ctx, user: Optional[Member], option: Optional[str], *, song: Optional[str]):
-        """Generate a Image based on what your Spotify activity is\nYou can also use `w/spotify --artist <artist>` and `w/spotify --song <song>` to fetch information about a artist or song."""
         if option == "--artist":
-            if not song:
-                return await ctx.send(f"Sorry {ctx.author.mention} please specify a artist's name!")
+        	if not song:
+        		return await ctx.send(f"Sorry {ctx.author.mention} please specify a artist's name!")
 
-            results = self.sp.search(q=song, limit=1, type='artist')
-            for track in self.sp.search(q=song, limit=1, type='artist'):
-                items = results['artists']['items']
+        	results = self.sp.search(q=song, limit=1, type='artist')
+        	for track in self.sp.search(q=song, limit=1, type='artist'):
+        		items = results['artists']['items']
 
-                try:
-                    artist = items[0]
-                except IndexError:
-                    return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
-
-                embed = Embed(title=artist['name'], color=self.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url'])
-                return await ctx.send(embed=embed)
+        		try:
+        			artist = items[0]
+        		except IndexError:
+        			return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
+        		return await ctx.send(embed=Embed(title=artist['name'], color=self.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
 
         if option == "--song":
-            if not song:
-                return await ctx.send(f"Sorry {ctx.author.mention} Please specify a song name!")
+        	if not song:
+        		return await ctx.send(f"Sorry {ctx.author.mention} Please specify a song name!")
 
-            results = self.sp.search(q=song, limit=1, type='track')
-            for track in results:
-                items = results['tracks']['items']
+        	results = self.sp.search(q=song, limit=1, type='track')
+        	for track in results:
+        		items = results['tracks']['items']
 
-                try:
-                    song = items[0]
-                    spotify = results['tracks']['items'][0]
-                    name = ', '.join([artist['name'] for artist in spotify['artists']])
-                except IndexError:
-                    return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
-
-                embed = Embed(title=song['name'], color=self.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{song['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nSong Link: [`{song['name']}`](https://open.spotify.com/track/{song['id']})").set_thumbnail(url=spotify['album']['images'][0]['url'])
-                return await ctx.send(embed=embed)
+        		try:
+        			song = items[0]
+        			spotify = results['tracks']['items'][0]
+        			name = ', '.join([artist['name'] for artist in spotify['artists']])
+        		except IndexError:
+        			return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
+        		return await ctx.send(embed=Embed(title=song['name'], color=self.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{song['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nSong Link: [`{song['name']}`](https://open.spotify.com/track/{song['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
         try:
-            user = user or ctx.author
-            spotify_activity = next(
-                (activity for activity in user.activities if isinstance(activity, Spotify)),
-                None
-                )
+        	user = user or ctx.author
+        	spotify_activity = next((activity for activity in user.activities if isinstance(activity, Spotify)), None)
 
-            if spotify_activity is None:
-                return await ctx.send(f"Sorry {ctx.author.mention} {user.name} is not currently listening to Spotify.")
+        	if not spotify_activity:
+        		return await ctx.send(f"Sorry {ctx.author.mention} {user.name} is not currently listening to Spotify.")
 
-            r = await self.session.get(str(spotify_activity.album_cover_url))
-            res = BytesIO(await r.read())
-            r.close()
+        	r = await self.session.get(str(spotify_activity.album_cover_url))
+        	res = BytesIO(await r.read())
+        	r.close()
 
-            color_thief = ColorThief(res)
-            dominant_color = color_thief.get_color(quality=40)
+        	color_thief = ColorThief(res)
+        	dominant_color = color_thief.get_color(quality=40)
 
-            font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
-            fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
+        	font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
+        	fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
 
-            title = self.kks.convert(spotify_activity.title)
-            album = self.kks.convert(spotify_activity.album)
-            artists = self.kks.convert(spotify_activity.artists)
+        	title = self.kks.convert(spotify_activity.title)
+        	album = self.kks.convert(spotify_activity.album)
+        	artists = self.kks.convert(spotify_activity.artists)
 
-            title_new = ''.join(item['hepburn'] for item in title)
-            album_new = ''.join(item['hepburn'] for item in album)
-            transliterated_artists = [self.kks.convert(artist) for artist in spotify_activity.artists]
-            artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
+        	title_new = ''.join(item['hepburn'] for item in title)
+        	album_new = ''.join(item['hepburn'] for item in album)
+        	transliterated_artists = [self.kks.convert(artist) for artist in spotify_activity.artists]
+        	artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
 
-            abridged = album_new if len(album_new) <= 30 else f'{album_new[:27]}...'
-            cbridged = title_new if len(title_new) <= 20 else f'{title_new[:17]}...'
-            dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[:27]}...'
-            text_colour = 'black' if Misc.relative_luminance(dominant_color) > 0.5 else 'white'
+        	abridged = album_new if len(album_new) <= 30 else f'{album_new[:27]}...'
+        	cbridged = title_new if len(title_new) <= 20 else f'{title_new[:17]}...'
+        	dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[:27]}...'
+        	text_colour = 'black' if Misc.relative_luminance(dominant_color) > 0.5 else 'white'
 
-            img = Image.new('RGB', (999, 395), color=dominant_color)
+        	img = Image.new('RGB', (999, 395), color=dominant_color)
 
-            album = Image.open(res)
-            resized_album = album.resize((245, 245))
-            img.paste(resized_album, (41, 76))
+        	album = Image.open(res)
+        	resized_album = album.resize((245, 245))
+        	img.paste(resized_album, (41, 76))
 
-            parser = TwemojiParser(img, parse_discord_emoji=False)
-            await parser.draw_text((300, 90), cbridged, font=fontbold, fill=text_colour) # Top section - Song name
-            await parser.draw_text((303, 170), dbridged, font=font, fill=text_colour) # Middle secion - Artists of the song
-            await parser.draw_text((303, 228), abridged, font=font, fill=text_colour) # Album name - Bottom section
-            await parser.close()
-            await ctx.send(file=Misc.save_image(Misc.add_corners(img, 42)))
+        	parser = TwemojiParser(img, parse_discord_emoji=False)
+        	await parser.draw_text((300, 90), cbridged, font=fontbold, fill=text_colour) # Top section - Song name
+        	await parser.draw_text((303, 170), dbridged, font=font, fill=text_colour) # Middle secion - Artists of the song
+        	await parser.draw_text((303, 228), abridged, font=font, fill=text_colour) # Album name - Bottom section
+        	await parser.close()
+        	await ctx.send(file=Misc.save_image(Misc.add_corners(img, 42)))
         except Exception as e:
-            return await ctx.send(e)
+        	return await ctx.send(e)
 
     @spotify.error
     async def spotify_error(self, ctx, error):
@@ -488,31 +440,23 @@ class FunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
-    @commands.command(aliases=["type", "typingtest"])
+    @commands.command(help="Are you a fast typer?!\nUse `w/fast --rank` to see rank.", aliases=["type", "typingtest"])
     @commands.cooldown(rate=3, per=8, type=commands.BucketType.member)
     async def fast(self, ctx, option: Optional[str], user: Optional[Member]=None):
-        """Generate a Image with Text, The fastest Member to type the word gets some Points\nTo see your points use the command: `w/fast --rank`"""
         user = user or ctx.author
         if option in ["--rank", "rank"]:
-            if not (Misc._has_account(user.id)):
+            if not Wealth.collection.find_one({"_id": user.id}):
                 return await ctx.send(f"Sorry {ctx.author.mention} that user is not ranked yet.")
-                
+            
             img = Image.new('RGB', (1000, 300), color=(35, 39, 42))
-
             font = ImageFont.truetype("fonts/Whitney-Medium.ttf", 65, encoding="unic")
             fontsmall = ImageFont.truetype("fonts/Whitney-Medium.ttf", 49, encoding="unic")
-
             result = self.collection.find_one({"_id": user.id})
             user_points = result['points']
-
             rank = self.collection.find({"points":{"$gt":user_points}}).count() + 1
-
             CONVERT = await Misc.circle_pfp(user, 180, 180)
             color = (255, 255, 255) if (user.color.to_rgb() == (0, 0, 0)) else user.color.to_rgb()
-
             name = user.name if len(user.name) <= 16 else f'{user.name[:13]}...'
-
-            result = self.collection.find_one({"_id": user.id})
             user_points = result['points']
 
             parser = TwemojiParser(img)
@@ -543,28 +487,24 @@ class FunCog(commands.Cog):
                 resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content.lower() == word, timeout=18)
                 elapse = round(time() * 100) - start
                 if resp.content.lower() == word:
-                    if not (Misc._has_account(resp.author.id)):
-                        await Misc._insert_to_collection(resp.author.id)
-                    if elapse/1000 > 6:
-                        isfast = choice(self.badmessages)
-                        random_points = randint(10, 45)
-                        Misc.give_points(resp.author.id, random_points)
-                    else:
-                        isfast = choice(self.goodmessages)
-                        random_points = randint(5, 17)
-                        Misc.give_points(resp.author.id, random_points)
-                    embed = Embed(title="Fastest typer!",description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False)
-                    return await ctx.send(embed=embed)
+                    if not Wealth.collection.find_one({"_id": user.id}):
+                        Wealth.collection.insert_one({
+                            "_id": user.id,
+                            "points": 0
+                        })
+                    
+                    isfast = choice(self.badmessages) if (elapse/1000 > 6) else choice(self.goodmessages)
+                    random_points = randint(10, 45) if (elapse/1000 > 6) else randint(5, 17)
+                    Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": random_points}})
+                    return await ctx.send(embed=Embed(title="Fastest typer!", description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False))
             except:
                 await game.delete()
                 return await ctx.send(f"Sorry {ctx.author.mention} nobody took part! So i have ended the game.")
 
-    @commands.command()
+    @commands.command(help="Mock some text.")
     async def mock(self, ctx, *, text) -> None:
-        """Turns text into Lower and Uppercase, Known as Mocking."""
         if not text:
-            return await ctx.send(f"Sorry {ctx.author.mention} you forgot to add some text for me to mock.")
-        " ".join(text)
+            text = "shuana is qt"#return await ctx.send(f"Sorry {ctx.author.mention} you forgot to add some text for me to mock.")
         return await ctx.send("".join([choice([index.lower(), index.upper()]) for index in list(text)]))
 
     @fast.error
@@ -572,34 +512,30 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
-    @commands.command(aliases=["gtf"])
+    @commands.command(help="Guess the flag from the picture!!", aliases=["gtf"])
     async def guesstheflag(self, ctx):
-        """Generate a flag image, First Member to guess the flag wins some coins!"""
-        FlagChosen = choice(self.Country)
+    	FlagChosen = choice(self.Country)
 
-        req = await self.session.get(f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png")
-        if req.status != 200:
-            return await ctx.send(f"Sorry {ctx.author.mention} The api is down.")
-        req.close()
+    	req = await self.session.get(f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png")
+    	if req.status != 200:
+    		return await ctx.send(f"Sorry {ctx.author.mention} The api is down.")
+    	req.close()
 
-        embed = Embed(title="Guess the flag!", color=self.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png")
-        FirstMessage = await ctx.send(embed=embed)
+    	FirstMessage = await ctx.send(embed=Embed(title="Guess the flag!", color=self.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png"))
 
-
-        while True:
-            try:
-                start = round(time() * 100)
-                resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content == FlagChosen['name'], timeout=18)
-                elapse = round(time() * 100) - start
-                if resp.content.lower() == FlagChosen['name'].lower():
-                    if not Wealth._has_account(resp.author.id):
-                        Wealth._create_account(resp.author.id)
-                    RandomCoins = randint(15, 60)
-                    Wealth.give_coins(resp.author.id, RandomCoins)
-                    embed = Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.color)
-                    return await ctx.send(embed=embed)
-            except TimeoutError:
-                await FirstMessage.delete()
-                return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
+    	while True:
+    		try:
+    			start = round(time() * 100)
+    			resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content == FlagChosen['name'], timeout=18)
+    			elapse = round(time() * 100) - start
+    			if resp.content.lower() == FlagChosen['name'].lower():
+    				if not Wealth._has_account(resp.author.id):
+    					Wealth._create_account(resp.author.id)
+    				RandomCoins = randint(15, 60)
+    				Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
+    				return await ctx.send(embed=Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.color))
+    		except:
+    			await FirstMessage.delete()
+    			return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
 def setup(bot):
     bot.add_cog(FunCog(bot))

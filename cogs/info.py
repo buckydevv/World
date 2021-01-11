@@ -3,6 +3,7 @@ from asyncio import sleep as _sleep
 from json import dumps, loads, load
 from typing import Optional
 from time import time
+from framework import Paginator
 from textwrap import dedent
 from discord import Embed, Member, Role, CategoryChannel, __version__
 from discord.ext import commands
@@ -25,7 +26,7 @@ class InfoCog(commands.Cog):
         If the `member` parameter is not specified, the info will be from the author.
         """
         user = member or ctx.author
-        user_information = Embed(
+        await ctx.send(embed=Embed(
             title=f"Information about {user} {f'({user.nick})' if user.nick else ''}",
             color=self.color
         ).add_field(
@@ -49,8 +50,7 @@ class InfoCog(commands.Cog):
                 System user: `{user.system}`
             """),
             inline=False
-        ).set_thumbnail(url=user.avatar_url)
-        await ctx.send(embed=user_information)
+        ).set_thumbnail(url=user.avatar_url))
 
     @userinfo.error
     async def userinfo_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
@@ -58,56 +58,38 @@ class InfoCog(commands.Cog):
         if isinstance(error, commands.errors.BadArgument):
             await ctx.send(f"Sorry {ctx.author.mention} That member doesn't exist.")
 
-    @commands.command(name="serverinfo", aliases=("server",))
+    @commands.command(name="serverinfo", aliases=("server", "guild"))
     async def serverinfo(self, ctx: commands.Context) -> None:
         """Shows information about the server."""
-        server_information = Embed(
+        await ctx.send(embed=Embed(
             title=f"Information about {ctx.guild.name}",
             color=self.color
-        ).add_field(
-        name="**Name**", value=f"{ctx.guild}", inline=True
-        ).add_field(
-        name="**Owner**", value=f"{ctx.guild.owner}", inline=True
-        ).add_field(
-        name="**Region**", value=f"{ctx.guild.region}", inline=True
-        ).add_field(
-        name="**Boosts**", value=f"{ctx.guild.premium_subscription_count}", inline=True
-        ).add_field(
-        name="**Boost Tier**", value=f"{ctx.guild.premium_tier}", inline=True
-        ).add_field(
-        name="**Locale**", value=f"{ctx.guild.preferred_locale}", inline=True
-        ).add_field(
-        name="**Members**", value=f"{len(ctx.guild.members)}", inline=True
-        ).add_field(
-        name="**Roles**", value=f"{len(ctx.guild.roles)}", inline=True
-        ).add_field(
-        name="**Channels**", value=f"{len(ctx.guild.channels)}", inline=True
-        ).add_field(
-        name="**Emojis**", value=f"{len(ctx.guild.emojis)}", inline=True
-        ).add_field(
-        name="**2FA**", value=f"{ctx.guild.mfa_level}"
-        ).add_field(
-        name="**Emoji limit**", value=f"{ctx.guild.emoji_limit}", inline=True
-        ).add_field(
-        name="**Verify Level**", value=f"{ctx.guild.verification_level}"
-        ).add_field(
-        name="**File Size limit**", value=f"{ctx.guild.filesize_limit}", inline=True
-        ).add_field(
-        name="**Birate Limit**", value=f"{ctx.guild.bitrate_limit}", inline=True
-        ).set_thumbnail(url=ctx.guild.icon_url)
-        await ctx.send(embed=server_information)
+        ).add_field(name="**Name**", value=ctx.guild.name
+        ).add_field(name="**Owner**", value=f"{ctx.guild.owner}"
+        ).add_field(name="**Region**", value=f"{ctx.guild.region}"
+        ).add_field(name="**Boosts**", value=f"{ctx.guild.premium_subscription_count}"
+        ).add_field(name="**Boost Tier**", value=f"{ctx.guild.premium_tier}"
+        ).add_field(name="**Locale**", value=f"{ctx.guild.preferred_locale}"
+        ).add_field(name="**Members**", value=f"{len(ctx.guild.members)}"
+        ).add_field(name="**Roles**", value=f"{len(ctx.guild.roles)}"
+        ).add_field(name="**Channels**", value=f"{len(ctx.guild.channels)}"
+        ).add_field(name="**Emojis**", value=f"{len(ctx.guild.emojis)}"
+        ).add_field(name="**2FA**", value=f"{ctx.guild.mfa_level}"
+        ).add_field(name="**Emoji limit**", value=f"{ctx.guild.emoji_limit}"
+        ).add_field(name="**Verify Level**", value=f"{ctx.guild.verification_level}"
+        ).add_field(name="**File Size limit**", value=f"{ctx.guild.filesize_limit}"
+        ).add_field(name="**Birate Limit**", value=f"{ctx.guild.bitrate_limit}"
+        ).set_thumbnail(url=ctx.guild.icon_url))
     
     @commands.command(aliases=["ri"])
     async def roleinfo(self, ctx, role: Role):
-        """Fetches and Shows information about the specified Discord Role!"""
-        embed = Embed(
+        await ctx.send(embed=Embed(
             title="Role Information",
             color=self.color
             ).add_field(
             name=f"{role.name} - Info",
             value=f"{role.mention}\nUsers: `{len(role.members)}`\nColor: `{role.color}`\nMentionable: `{role.mentionable}`\nDisplayed: `{role.hoist}`"
-            )
-        await ctx.send(embed=embed)
+        ))
 
     @roleinfo.error
     async def roleinfo_error(self, ctx, error):
@@ -116,15 +98,13 @@ class InfoCog(commands.Cog):
 
     @commands.command(aliases=["ci", "catinfo"])
     async def categoryinfo(self, ctx, *, category: CategoryChannel):
-        """Fetches and Shows information about the specified Discord category!"""
-        embed = Embed(
+        await ctx.send(embed=Embed(
             title="Category Information",
             color=self.color
             ).add_field(
             name=f"{category.name} - Info",
             value=f"Type: `{category.type}`\nText channels: `{len(category.text_channels)}`\nVoice channels: `{len(category.voice_channels)}`\nNsfw: `{category.is_nsfw()}`"
-            )
-        await ctx.send(embed=embed)
+        ))
 
     @categoryinfo.error
     async def categoryinfo_error(self, ctx, error):
@@ -142,16 +122,12 @@ class InfoCog(commands.Cog):
         y = loads(p)
         with open('prefixes.json', 'r') as f: # wow nice
             prefixes = load(f)
-        if str(ctx.guild.id) in prefixes:
-            guild_prefix = prefixes[str(ctx.guild.id)]
-        else:
-            yes = ""
-            guild_prefix = yes.join("w/, world")
+        guild_prefix = "w/, world" if (str(ctx.guild.id) in prefixes) else prefixes[str(ctx.guild.id)]
         start = time()
-        loading = Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.color)
-        message = await ctx.send(embed=loading)
+        message = await ctx.send(embed=Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.color))
         end = time()
-        world_information = Embed(
+        await _sleep(1)
+        await message.edit(embed=Embed(
             title="World's info!",
             color=self.color,
             description=dedent(f"""
@@ -171,19 +147,16 @@ class InfoCog(commands.Cog):
                 Commands used today: `{y['data'][0]['commands']}`
                 Popular commands: `w/{y['data'][0]['popular'][0]['name']}`, `w/{y['data'][0]['popular'][1]['name']}`, `w/{y['data'][0]['popular'][2]['name']}`,\n`w/{y['data'][0]['popular'][3]['name']}`, `w/{y['data'][0]['popular'][4]['name']}`
             """)
-        )
-        await _sleep(1)
-        await message.edit(embed=world_information)
+        ))
 
     @commands.command(name="vote")
     async def vote(self, ctx: commands.Context) -> None:
         """Sends a link where you can vote for World."""
-        vote_embed = Embed(
+        await ctx.send(embed=Embed(
             title="Vote for World!",
             description="You can vote for World [Here](https://top.gg/bot/700292147311542282/vote)",
             color=self.color
-        )
-        await ctx.send(embed=vote_embed)
+        ))
 
     @commands.command(name="suggest")
     async def suggest(self, ctx: commands.Context, *, suggestion: str) -> None:
@@ -201,21 +174,18 @@ class InfoCog(commands.Cog):
             )
         )
         suggestion_channel = await self.bot.fetch_channel(763110868791459860)
-        suggestion_embed = Embed(
+        suggestion_embed.set_thumbnail(url=ctx.author.avatar_url)
+        await suggestion_channel.send(embed=Embed(
             title=f"Suggestion from {ctx.author}",
             description=suggestion,
             color=self.color
-        )
-        suggestion_embed.add_field(
-            name="Information about the suggester",
+        ).add_field(name="Information about the suggester",
             value=dedent(f"""
                 Name: {ctx.author}
                 ID: {ctx.author.id}
             """),
             inline=False
-        )
-        suggestion_embed.set_thumbnail(url=ctx.author.avatar_url)
-        await suggestion_channel.send(embed=suggestion_embed)
+        ))
 
     @suggest.error
     async def suggest_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
@@ -230,111 +200,45 @@ class InfoCog(commands.Cog):
         minutes, seconds = divmod(seconds, 60)
         hours, minutes = divmod(minutes, 60)
         days, hours = divmod(hours, 24)
-        uptime_embed = Embed(
+        await ctx.send(embed=Embed(
             title="Uptime",
             description=f"`{days:.2f} days {hours:.2f} hours {minutes:.2f} minutes {seconds:.2f} seconds`",
             color=self.color
-        )
-        await ctx.send(embed=uptime_embed)
+        ))
 
     @commands.command(name="invite")
     async def invite(self, ctx: commands.Context) -> None:
         """Gives a World invite link to the user."""
-        embed = Embed(
+        await ctx.send(embed=Embed(
             title="Invite world",
             description=f"[Invite - Admin perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)\n[Invite - No perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=0&scope=bot)\n[Support server](https://discord.gg/AyWjtRncHA)",
             color=self.color
-            )
-        await ctx.send(embed=embed)
+        ))
 
-    @commands.command(aliases=["worldemotes", "worldemote", "emojis", "emoji"])
+    @commands.command(help="How to get World emotes!", aliases=["worldemotes", "worldemote", "emojis", "emoji"])
     async def emotes(self, ctx, allemote: Optional[str]) -> None:
-        """Information on World emotes, You can see all the emotes by doing `w/emotes --all`"""
-        allemotes = ["--all", "all", "allemotes"]
+        allemotes = ("--all", "all", "allemotes")
         if not allemote:
-            embed = Embed(
+            return await ctx.send(embed=Embed(
                 title="World emotes",
                 description="`Support server:` [<:Worldhappy:768145777985454131> Join](https://discord.gg/gQSHvKCV)\n`World Emotes1:` [<:Worldhappy:768145777985454131> Join](https://discord.gg/TEfM7hEBpz)",
                 color=self.color
-                ).set_footer(text="To see all emotes run `w/emotes --all`")
-            return await ctx.send(embed=embed)
+            ).set_footer(text="To see all emotes run `w/emotes --all`"))
 
         if allemote in allemotes:
-
             server1 = self.bot.get_guild(738392767637487713)
             world1 = [f"`{emoji.name}` - {emoji}" for emoji in server1.emojis]
             server2 = self.bot.get_guild(774294150748831814)
             world2 = [f"`{emoji.name}` - {emoji}" for emoji in server2.emojis]
 
-            emote1 = Embed(
-                title=f"`Page 1` - World Emotes",
-                description = "\n".join(world1[:18]),
-                color=self.color
-                )
-
-            emote2 = Embed(
-                title="`Page 2` - World Emotes",
-                description="\n".join(world1[19:34]),
-                color=self.color
-                )
-
-            emote3 = Embed(
-                title="`Page 3` - World Emotes",
-                description="\n".join(world1[35:51]),
-                color=self.color
-                )
-
-            emote4 = Embed(
-                title="`Page 4` - World Emotes",
-                description="\n".join(world2[:25]),
-                color=self.color
-                )
-
-
-            pages = [emote1, emote2, emote3, emote4]
-
-            message = await ctx.send(embed=emote1)
-
-            await message.add_reaction('\u23ee')
-            await message.add_reaction('\u25c0')
-            await message.add_reaction('\u25b6')
-            await message.add_reaction('\u23ed')
-            await message.add_reaction('\u23F9')
-
-            operator = 0
-            emoji = ''
-
-            while True:
-                if emoji == '\u23ee':
-                    operator=0
-                    await message.edit(embed=pages[operator])
-                if emoji == '\u25c0':
-                    if operator>0:
-                        operator-=1
-                        await message.edit(embed=pages[operator])
-                if emoji == '\u25b6':
-                    if operator<3:
-                        operator+=1
-                        await message.edit(embed=pages[operator])
-                if emoji=='\u23ed':
-                    operator=3
-                    await message.edit(embed=pages[operator])
-                if emoji == '\u23F9':
-                    await message.clear_reactions()
-                    break
-
-                try:
-                    res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=10)
-                except TimeoutError:
-                    await message.clear_reactions()
-                    break
-                if not res:
-                    break
-                if str(res[1])!='World#4520':
-                    emoji = str(res[0].emoji)
-
-            await message.clear_reactions()
-
+            paginator = Paginator(ctx, [
+                Embed(title="`Page 1` - World Emotes", description = "\n".join(world1[:18]), color=self.color),
+                Embed(title="`Page 2` - World Emotes", description="\n".join(world1[19:34]), color=self.color)
+                Embed(title="`Page 3` - World Emotes", description="\n".join(world1[35:51]), color=self.color)
+                Embed(title="`Page 4` - World Emotes", description="\n".join(world2[:25]), color=self.color)
+            ])
+            return await paginator.execute()
+        
 def setup(bot: commands.Bot) -> None:
     """Adds the cog into the bot."""
     bot.add_cog(InfoCog(bot))
