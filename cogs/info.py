@@ -233,9 +233,9 @@ class InfoCog(commands.Cog):
 
             paginator = Paginator(ctx, [
                 Embed(title="`Page 1` - World Emotes", description = "\n".join(world1[:18]), color=self.color),
-                Embed(title="`Page 2` - World Emotes", description="\n".join(world1[19:34]), color=self.color)
-                Embed(title="`Page 3` - World Emotes", description="\n".join(world1[35:51]), color=self.color)
-                Embed(title="`Page 4` - World Emotes", description="\n".join(world2[:25]), color=self.color)
+                Embed(title="`Page 2` - World Emotes", description="\n".join(world1[19:34]), color=self.color),
+                Embed(title="`Page 3` - World Emotes", description="\n".join(world1[35:51]), color=self.color),
+                Embed(title="`Page 4` - World Emotes", description="\n".join(world2[:25]), color=self.color),
             ])
             return await paginator.execute()
         
