@@ -31,12 +31,12 @@ class HelpCog(commands.Cog):
       await ctx.send(embed=embed)
 
 
-    @command(name="help", help="Shows this message.")
+    @command(name="help")
     async def show_help(self, ctx, cmd: Optional[str]):
       """Shows this message."""
       if cmd is None:
         embed = Embed(color=self.color)
-        embed.set_author(name='World - Help', icon_url="https://im-a-dev.xyz/1678m0pc.png")
+        embed.set_author(name='World - Help', icon_url="https://im-a-dev.xyz/EL35H6QC.png")
         embed.add_field(name="Shows multiple categories.", value="w/categories", inline=True)
         embed.add_field(name="Invite", value="[Invite World](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)", inline=True)
         embed.add_field(name="Vote", value="[Vote For World](https://top.gg/bot/700292147311542282/vote)", inline=True)
@@ -52,16 +52,18 @@ class HelpCog(commands.Cog):
           await ctx.send(f"Sorry {ctx.author.mention} thats not a valid command.")
 
 
-    @commands.command(help="Shows categories")
+    @commands.command()
     async def categories(self, ctx):
+      """Returns World's Categories"""
       em = Embed(color=self.color)
       em.add_field(name="‎‎World", value=f"New\n`w/new`\nFun\n`w/fun`\nOther\n`w/other`")
       em.add_field(name=f"Categories", value=f"Logging\n`w/logs`\nEconomy\n`w/economy`\nModeration\n`w/mod`")
       await ctx.send(embed=em)
 
 
-    @commands.command(help="Shows other category.")
+    @commands.command()
     async def other(self, ctx):
+      """Show's the category of Other commands"""
       em = Embed(
         title="Other commands", 
         color=self.color,
@@ -78,8 +80,9 @@ class HelpCog(commands.Cog):
 
 
 
-    @commands.command(help="Shows moderation category.")
+    @commands.command()
     async def mod(self, ctx):
+      """Show's the category of Moderation commands"""
       em = Embed(
         title="Moderation commands", 
         color=self.color,
@@ -93,8 +96,9 @@ class HelpCog(commands.Cog):
         )
       await ctx.send(embed=em)
       
-    @commands.command(help="Shows logging category.")
+    @commands.command()
     async def logs(self, ctx):
+      """Show's the category of Logging commands"""
       em = Embed(
         title="Logging commands", 
         color=self.color,
@@ -110,14 +114,15 @@ class HelpCog(commands.Cog):
       await ctx.send(embed=em)
 
 
-    @commands.command(hlep="Shows Fun category.")
+    @commands.command()
     async def fun(self, ctx):
+      """Show's the category of Fun commands"""
       embed = Embed(
         title="Fun commands", 
         color=self.color,
         ).add_field(
         name="<:Worldcool:768201555492864030> | Normal fun",
-        value="`w/gay` | `w/askali` | `w/pp` | `w/8ball` | `w/f` | `w/joke` | `w/emojify` | `w/akinator` | `w/kill` | `w/fast` | `w/mock` | `w/gtf`"
+        value="`w/gay` | `w/askali` | `w/pp` | `w/8ball` | `w/f` | `w/joke` | `w/emojify` | `w/akinator` | `w/kill` | `w/fast` | `w/mock`"
         ).add_field(
         name=":frame_photo: | Image fun",
         value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/tweet` | `w/blur` | `w/avatar` | `w/qr` | `w/flip` | `w/wide`",
@@ -126,8 +131,9 @@ class HelpCog(commands.Cog):
       await ctx.send(embed=embed)
 
 
-    @commands.command(help="Shows economy category.")
+    @commands.command()
     async def economy(self, ctx):
+      """Show's the category of Economy commands"""
       em = Embed(
         title="Economy commands", 
         color=self.color,
@@ -146,8 +152,9 @@ class HelpCog(commands.Cog):
       await ctx.send(embed=em)
    
 
-    @commands.command(help="Shows new commands.")
+    @commands.command()
     async def new(self, ctx):
+      """Show's the category of Newly added commands."""
       em = Embed(
         title="New commands!", 
         color=self.color,
