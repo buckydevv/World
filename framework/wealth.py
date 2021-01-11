@@ -8,12 +8,6 @@ __import__("dotenv").load_dotenv()
 class Wealth:
     collection = MongoClient(environ["MONGODB_URL"])["Coins"]["UserCoins"]
 
-    def _has_account(user_id: int) -> None:
-        """Returns True if the user_id has an account. Otherwise False."""
-        return bool(Wealth.collection.find_one(
-            {"_id": user_id}
-        ))
-
     def _create_account(user_id: int) -> None:
         """Create a World account."""
         now = datetime.now()
@@ -54,22 +48,12 @@ class Wealth:
 
     def _deposit_coins(user_id: int, coins: int):
         """Deposit coins into the users bank prop"""
-        result = Wealth.collection.find_one({"_id": user_id})
-        if not result:
+        if not Wealth.collection.find_one({"_id": user_id}):
             return
-        Wealth.collection.update_one({"_id": user_id}, {"$inc": {"Bank": coins}})
-        Wealth.collection.update_one({"_id": user_id}, {"$inc": {"coins": -coins}})
-
-    def fetch_user(user_id: int, item: str):
-        """Fetch a single prop from the given user's id"""
-        result = Wealth.collection.find_one({"_id": user_id})
-        if not result:
-            return
-        return result.get(item)
-
-    def mass_fetch(user_id: int):
-        """Fetch multiple props from one document."""
-        return Wealth.collection.find_one({"_id": user_id})
+        Wealth.collection.update_one({"_id": user_id}, {"$inc": {
+            "Bank": coins,
+            "coins": -coins
+        }})
 
     def fishing_ran():
         """Pick a random photo for the `Fishing` command."""
@@ -87,11 +71,3 @@ class Wealth:
             "https://im-a-dev.xyz/BvdekLII.png",
             "https://im-a-dev.xyz/MfSnYYAa.png"
         ])
-
-    def extract_props(doc, props):
-        for prop in props:
-            yield doc.get(prop)
-
-    def give_coins(user_id: int, amount: int) -> None:
-        """Update a users Coins."""
-        Wealth.collection.update_one({"_id": user_id}, {"$inc": {"coins": amount}}) # Increment the number to the document.

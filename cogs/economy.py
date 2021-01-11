@@ -7,6 +7,7 @@ from discord import Embed, Member
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 from datetime import datetime
+from framework import require_account, Wealth
 import motor.motor_asyncio
 
 
@@ -56,6 +57,7 @@ class Choc(metaclass=Item):
 
 class Poop(metaclass=Item):
     """Represents a World poop."""
+
 
     name = "poop"
     price = 6
@@ -151,13 +153,12 @@ class EconomyCog(commands.Cog):
 
     def __init__(self) -> None:
         """Sets up the cog."""
-        self._connect_to_database()
         self.color = 0x2F3136
 
     @commands.command(name="shop", aliases=("items",))
     async def shop(self, ctx: commands.Context) -> None:
         """Returns all items you can buy or sell."""
-        shop_embed = Embed(
+        await ctx.send(embed=Embed(
             title="Shop",
             description=dedent("""
                 - Cookies
@@ -178,123 +179,79 @@ class EconomyCog(commands.Cog):
                 `30 coins per Fish.`
             """),
             color=self.color
-        )
-        await ctx.send(embed=shop_embed)
+        ))
 
     @commands.command(name="inventory", aliases=("inv",))
+    @require_account()
     async def inventory(self, ctx: commands.Context) -> None:
         """Returns the current items from the user inventory."""
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
 
-        author = await self._get_user(ctx.author.id)
-        inventory_embed = Embed(
-            title=f"{ctx.author}'s inventory",
-            color=self.color
-        )
-        inventory_embed.add_field(
-            name="Coins",
-            value=f":moneybag: {author.coins:.2f}"
-        )
-        inventory_embed.add_field(
-            name="Apples",
-            value=f":apple: {author.apple}"
-        )
-        inventory_embed.add_field(
-            name="Cookies",
-            value=f":cookie: {author.cookie}"
-        )
-        inventory_embed.add_field(
-            name="Chocolate bars",
-            value=f":chocolate_bar: {author.choc}"
-        )
-        inventory_embed.add_field(
-            name="Poops",
-            value=f":poop: {author.poop}"
-        )
-        inventory_embed.add_field(
-            name="Beans",
-            value=f"<:beanworld:774371828629635132> {author.beans}"
-        )
-        inventory_embed.add_field(
-            name="Pizza",
-            value=f":pizza: {author.pizza}"
-        )
-        inventory_embed.add_field(
-            name="Waffles",
-            value=f":waffle: {author.waffles}"
-        )
-        inventory_embed.add_field(
-            name="Fish",
-            value=f":fish: {author.Fish}"
-        )
-        inventory_embed.set_thumbnail(url=ctx.author.avatar_url)
-        await ctx.send(embed=inventory_embed)
+        author = self._get_user(ctx.author.id)
+        await ctx.send(embed=Embed(title=f"{ctx.author}'s inventory", color=self.color
+        ).add_field(name="Coins", value=f":moneybag: {author.coins:,}"
+        ).add_field(name="Apples", value=f":apple: {author.apple}"
+        ).add_field(name="Cookies", value=f":cookie: {author.cookie}"
+        ).add_field(name="Chocolate bars", value=f":chocolate_bar: {author.choc}"
+        ).add_field(name="Poops", value=f":poop: {author.poop}"
+        ).add_field(name="Beans", value=f"<:beanworld:774371828629635132> {author.beans}"
+        ).add_field(name="Pizza", value=f":pizza: {author.pizza}"
+        ).add_field(name="Waffles", value=f":waffle: {author.waffles}"
+        ).add_field(name="Fish", value=f":fish: {author.Fish}"
+        ).set_thumbnail(url=ctx.author.avatar_url))
 
     @commands.command(name="balance", aliases=("bal",))
+    @require_account()
     async def balance(self, ctx: commands.Context) -> None:
         """Returns the current balance of the user."""
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-
-        author = await self._get_user(ctx.author.id)
-        bal_embed = Embed(
+        author = self._get_user(ctx.author.id)
+        await ctx.send(embed=Embed(
             title=f"{ctx.author}'s balance",
             color=self.color,
-            description=f"Coins: `{author.coins:.2f}`\nBank: `{author.Bank}`"
-        )
-        await ctx.send(embed=bal_embed)
+            description=f"Coins: `{author.coins:,}`\nBank: `{author.Bank}`"
+        ))
 
     @commands.command(name="buy")
+    @require_account()
     async def buy(self, ctx: commands.Context, item: ItemConverter, amount: UnsignedIntegerConverter) -> None:
         """
         Buys items.
         Run `w/shop` for a list of items.
         """
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-
-        user = await self._get_user(ctx.author.id)
+        user = self._get_user(ctx.author.id)
         await self._buy(item, amount, user)
-        buy_embed = Embed(
+        await ctx.send(embed=Embed(
             title="You successfully bought",
             color=self.color,
             description=f"{ctx.author.mention} bought `{amount} {item.name}{'s' if amount > 1 else ''}`\n\nTo see your inventory run the command `w/inventory`"
-        )
-        await ctx.send(embed=buy_embed)
+        ))
 
     @buy.error
     async def buy_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when buying something."""
         error = getattr(error, "original", error)
-        if isinstance(error, NotEnoughCoins):
-            await ctx.send(error)
-        elif isinstance(error, commands.errors.BadArgument):
+        if isinstance(error, NotEnoughCoins) or isinstance(error, commands.errors.BadArgument):
             await ctx.send(error)
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} You missed the `item` or `amount` arguments.")
 
     @commands.command(name="sell")
     @commands.cooldown(1, 60, BucketType.member)
+    @require_account()
     async def sell(self, ctx: commands.Context, item: ItemConverter, amount: UnsignedIntegerConverter) -> None:
         """
         Sells items.
         Run `w/shop` for a list of items.
         """
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-
-        user = await self._get_user(ctx.author.id)
+        user = self._get_user(ctx.author.id)
         coins_earned = await self._sell(item, amount, user)
         if not coins_earned:
-            robbed_embed = Embed(title="Sorry", color=self.color, description=f"Sorry {ctx.author.mention} your items couldn't be sold because you got robbed. Good luck the next time!")
-            await ctx.send(embed=robbed_embed)
-        else:
-            sold_embed = Embed(title="Congrats!", color=self.color, description=f"Hey {ctx.author.mention} You sold your items successfully! You earned `{coins_earned}` coins.")
-            await ctx.send(embed=sold_embed)
+            return await ctx.send(embed=Embed(title="Sorry", color=self.color, description=f"Sorry {ctx.author.mention} your items couldn't be sold because you got robbed. Good luck the next time!"))
+        return await ctx.send(embed=Embed(title="Congrats!", color=self.color, description=f"Hey {ctx.author.mention} You sold your items successfully! You earned `{coins_earned}` coins."))
 
     @commands.command(name="rob")
     @commands.cooldown(1, 1800, BucketType.member)
+    @require_account()
+    @require_account()
     async def rob(self, ctx: commands.Context, user: Member) -> None:
         """Rob a user!"""
         if user.id == ctx.author.id:
@@ -304,17 +261,12 @@ class EconomyCog(commands.Cog):
             ctx.command.reset_cooldown(ctx)
             return await ctx.send(f"Sorry {ctx.author.mention} you can't a bot silly <:Worldkek:768145777926078474>")
         
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-        elif not (await self._has_account(user.id)):
-            await self._create_account(user.id)
-        
-        target = await self._get_user(user.id)
+        target = self._get_user(user.id)
         if not target.coins:
             return await ctx.send(f"Sorry {ctx.author.mention} That user has no coins, try again next time!")
         robbed_amount = randint(1, round(target.coins))
-        await self._database_collection.update_one({"_id": user.id}, {"$inc": {"coins": -total_robbed}})
-        await self._database_collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": robbed_amount}})
+        Wealth.collection.update_one({"_id": user.id}, {"$inc": {"coins": -total_robbed}})
+        Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": robbed_amount}})
 
         await ctx.send(embed=Embed(
             title="Rob",
@@ -333,7 +285,7 @@ class EconomyCog(commands.Cog):
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:.2f} seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
         elif isinstance(error, UserNotFound):
             await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
 
@@ -344,32 +296,31 @@ class EconomyCog(commands.Cog):
         if isinstance(error, NotEnoughItems) or isinstance(error, commands.errors.BadArgument):
             return await ctx.send(error)
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            return await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:.2f} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             return await ctx.send(f"Sorry {ctx.author.mention} You missed the `item` or `amount` arguments.")
 
     @commands.command(name="delete")
     async def delete(self, ctx: commands.Context) -> None:
         """Deletes the economy account associated to the user."""
-        if not (await self._has_account(ctx.author.id)):
+        if not Wealth.collection.find_one({"_id": ctx.author.id}):
             return await ctx.send(embed=Embed(title="Uh oh!", color=self.color, description=f"Hey {ctx.author.mention} You dont have a World account, Run the following command `w/create`"))
-        await self._database_collection.delete_one({"_id": ctx.author.id})
+        Wealth.collection.delete_one({"_id": ctx.author.id})
         return await ctx.send(embed=Embed(title="Goodbye", color=self.color, description=f"Hey {ctx.author.mention} I have successfully removed your World account."))
 
     @commands.command(name="create")
     async def create(self, ctx: commands.Context) -> None:
         """Creates a World account."""
-        if (await self._has_account(ctx.author.id)):
+        if not Wealth.collection.find_one({"_id": ctx.author.id}):
             return await ctx.send(embed=Embed(title="Uh oh!", color=self.color, description=f"Hey {ctx.author.mention} You already have a World account."))
-        await self._create_account(ctx.author.id)
+        Wealth._create_account(ctx.author.id)
         return await ctx.send(embed=Embed(title="Welcome!", color=self.color, description=f"Hey {ctx.author.mention} I have successfully made your World account."))
 
     @commands.command(name="status")
+    @require_account()
     async def status(self, ctx: commands.Context, *, status: str) -> None:
         """Sets a custom status for the user."""
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": ctx.author.id
             },
@@ -388,20 +339,19 @@ class EconomyCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} You missed the `status` argument.")
 
     @commands.command(name="gamble")
+    @require_account()
     async def gamble(self, ctx: commands.Context, amount: UnsignedIntegerConverter) -> None:
         """
         Gambles your amount money.
         If you win, you get your money back but doubled, Otherwise, you lose it.
         The winning percentage is 15%.
         """
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
 
-        user = await self._get_user(ctx.author.id)
+        user = self._get_user(ctx.author.id)
         if user.coins < amount:
             raise NotEnoughCoins(f"Sorry {ctx.author.mention} The amount of money to gamble is larger than your current balance.")
 
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": ctx.author.id
             },
@@ -418,8 +368,8 @@ class EconomyCog(commands.Cog):
         if percentage <= 75:
             return await ctx.send(embed=Embed(title="You lost.", color=self.color, description=f"Hey {ctx.author.mention} You have lost {amount} coin{'s' if amount > 1 else ''}.\nYou had a {percentage}% chance of winning."))
 
-        user = await self._get_user(ctx.author.id)
-        await self._database_collection.update_one(
+        user = self._get_user(ctx.author.id)
+        Wealth.collection.update_one(
             {
                 "_id": user._id
             },
@@ -432,6 +382,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(title="Congrats!", color=self.color, description=f"Hey {ctx.author.mention} You have won `{amount}` coins."))
 
     @commands.command(name="roulette")
+    @require_account()
     async def roulette(self, ctx: commands.Context, amount: UnsignedIntegerConverter, choice: UnsignedIntegerConverter) -> None:
         """
         Roulette.
@@ -440,15 +391,11 @@ class EconomyCog(commands.Cog):
         """
         if choice > 100:
             return await ctx.send(f"Sorry {ctx.author.mention} you can only pick a number between 1 and 100.")
-
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-
-        user = await self._get_user(ctx.author.id)
+        user = self._get_user(ctx.author.id)
         if user.coins < amount:
             raise NotEnoughCoins(f"Sorry {ctx.author.mention} The amount of money to roulette is larger than your current balance.")
 
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": ctx.author.id
             },
@@ -464,8 +411,8 @@ class EconomyCog(commands.Cog):
         if percentage is not choice:
             return await ctx.send(embed=Embed(title="Roulette", color=self.color, description=f"Hey {ctx.author.mention} You have lost {amount} coin{'s' if amount > 1 else ''}.\nYou chose `{choice}`\nWorld chose: `{percentage}`"))
 
-        user = await self._get_user(ctx.author.id)
-        await self._database_collection.update_one(
+        user = self._get_user(ctx.author.id)
+        Wealth.collection.update_one(
             {
                 "_id": user._id
             },
@@ -479,15 +426,13 @@ class EconomyCog(commands.Cog):
 
     @commands.command(name="beg")
     @commands.cooldown(1, 45, BucketType.member)
+    @require_account()
     async def beg(self, ctx: commands.Context) -> None:
         """User can beg for coins, and World will generate a random number between 10 and 300."""
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-
         seed(datetime.now().timestamp())
         amount_of_coins = randint(0, 300)
-        user = await self._get_user(ctx.author.id)
-        await self._database_collection.update_one(
+        user = self._get_user(ctx.author.id)
+        Wealth.collection.update_one(
             {
                 "_id": ctx.author.id
             },
@@ -500,7 +445,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(
             title="You have begged.",
             color=self.color,
-            description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins:.2f}` Coins"
+            description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins:,}` Coins"
         ))
 
     @roulette.error
@@ -516,7 +461,7 @@ class EconomyCog(commands.Cog):
     async def beg_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when running the beg command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:.2f} seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:,} seconds.")
 
     @gamble.error
     async def gamble_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
@@ -529,11 +474,10 @@ class EconomyCog(commands.Cog):
 
     @commands.command(name="daily")
     @commands.cooldown(1, 86400, BucketType.member)
+    @require_account()
     async def daily(self, ctx: commands.Context) -> None:
         """Gives to the user a daily account of money."""
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": ctx.author.id
             },
@@ -549,15 +493,14 @@ class EconomyCog(commands.Cog):
     async def daily_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when running the daily command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:.2f} hours.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:,} hours.")
 
     @commands.command(name="weekly")
     @commands.cooldown(1, 604800, BucketType.member)
+    @require_account()
     async def weekly(self, ctx: commands.Context) -> None:
         """Gives to the user a weekly account of money."""
-        if not (await self._has_account(ctx.author.id)):
-            await self._create_account(ctx.author.id)
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": user._id
             },
@@ -567,16 +510,16 @@ class EconomyCog(commands.Cog):
                 }
             }
         )
-        weekly_embed = Embed(title="Weekly", color=self.color, description=f"Hey {ctx.author.mention} You successfully received your weekly amount of `800` coins.")
-        await ctx.send(embed=weekly_embed)
+        await ctx.send(embed=Embed(title="Weekly", color=self.color, description=f"Hey {ctx.author.mention} You successfully received your weekly amount of `800` coins."))
 
     @weekly.error
     async def weekly_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when running the weekly command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:.2f} days.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:,} days.")
 
     @commands.command(name="transfer")
+    @require_account()
     async def transfer(self, ctx: commands.Context, target: Member, amount: UnsignedIntegerConverter) -> None:
         """
         Transfers an amount of money to the target specified.
@@ -587,14 +530,11 @@ class EconomyCog(commands.Cog):
         elif target.bot:
             return await ctx.send(f"Sorry {ctx.author.mention} but you cant transfer money to a bot dummy!")
         now = datetime.now()
-        if not (await self._has_account(target.id)):
-            await self._create_account(target.id)
-
-        user = await self._get_user(ctx.author.id)
+        user = self._get_user(ctx.author.id)
         if amount > user.coins:
             raise NotEnoughCoins(f"Sorry {ctx.author.mention} You don't have enough coins to perform this operation.")
 
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": user._id
             },
@@ -605,7 +545,7 @@ class EconomyCog(commands.Cog):
                 }
             }
         )
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": target.id
             },
@@ -634,25 +574,13 @@ class EconomyCog(commands.Cog):
         elif isinstance(error, UserNotFound):
             return await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
 
-    def _connect_to_database(self) -> None:
-        """
-        Connects into the MongoDB database.
-        The URL is specified on the `MONGODB_URL` key in the `.env` file
-        in the root directory of this folder.
-        This doesn't return anything, in fact, this just sets `self._database_collection`.
-        """
-        __import__("dotenv").load_dotenv()
-        self._database_collection = motor.motor_asyncio.AsyncIOMotorClient(
-            environ["MONGODB_URL"]
-        )["Coins"]["UserCoins"]
-
-    async def _get_user(self, user_id: int) -> User:
+    def _get_user(self, user_id: int) -> User:
         """
         Gets a user from the Coins collection.
         Returns a `User` object.
         Raises `UserNotFound` if the user was not found.
         """
-        user_data = await self._database_collection.find_one(
+        user_data = Wealth.collection.find_one(
             {"_id": user_id}
         )
         if not user_data:
@@ -665,7 +593,7 @@ class EconomyCog(commands.Cog):
             user_data["LastTransfer"]
         )
 
-    async def _buy(self, item: Item, amount: int, user: User) -> None:
+    def _buy(self, item: Item, amount: int, user: User) -> None:
         """
         The core of the `buy` command.
         This performs the buy operation. This will check if the user has enough coins,
@@ -675,7 +603,7 @@ class EconomyCog(commands.Cog):
         if (user.coins - (item.price * amount)) < 0:
             raise NotEnoughCoins(f"Sorry <@{user._id}> You don't have enough coins to buy this item.")
 
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": user._id
             },
@@ -697,7 +625,7 @@ class EconomyCog(commands.Cog):
         if getattr(user, item.name) < amount:
             raise NotEnoughItems(f"Sorry <@{user._id}> You don't have enough items to perform this operation.")
 
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": user._id
             },
@@ -716,7 +644,7 @@ class EconomyCog(commands.Cog):
 
         coins_earned = (item.price * amount / 100 * 15) + item.price * amount
 
-        await self._database_collection.update_one(
+        Wealth.collection.update_one(
             {
                 "_id": user._id
             },
@@ -728,50 +656,6 @@ class EconomyCog(commands.Cog):
         )
 
         return coins_earned
-
-    async def _create_account(self, user_id: int) -> None:
-        """Creates a record, setting the record's author as user_id."""
-        _created_at = str(datetime.now().strftime("%m/%d/%Y at %H:%M:%S"))
-        await self._database_collection.insert_one({
-            "_id": user_id,
-            "coins": 100,
-            "cookie": 0,
-            "choc": 0,
-            "poop": 0,
-            "beans": 0,
-            "pizza": 0,
-            "waffles": 0,
-            "Fish": 0,
-            "apple": 0,
-            "afk": "No status set, run w/status to set a status",
-            "Reputation": 0,
-            "LastUsed": "Isnotset",
-            "TargetMember": 0,
-            "BadgeSlot1": "Doesn't Have Noob",
-            "BadgeSlot2": "Doesn't Have Beginner",
-            "BadgeSlot3": "Doesn't Have Leader",
-            "AccountCreated": _created_at,
-            "Premium": "No",
-            "Developer": "No",
-            "Bank": 0,
-            "Wallet": 0,
-            "Tickets": 0,
-            "TicketReason": "No reason",
-            "WorldFriends": 0,
-            "IsBlacklisted": "No",
-            "CurrentJob": "No job",
-            "LastWithdraw": "No date",
-            "LastTransfer": "No date",
-            "MarriedTo": "Nobody",
-            "MarriedDate": "No date",
-        })
-
-    async def _has_account(self, user_id: int) -> None:
-        """Returns True if the user_id has an account. Otherwise False."""
-        return bool(await self._database_collection.find_one(
-            {"_id": user_id}
-        ))
-
 
 def setup(bot: commands.Bot) -> None:
     """Adds the EconomyBot into the bot."""

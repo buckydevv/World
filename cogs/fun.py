@@ -569,7 +569,7 @@ class FunCog(commands.Cog):
     				if not Wealth._has_account(resp.author.id):
     					Wealth._create_account(resp.author.id)
     				RandomCoins = randint(15, 60)
-    				Wealth.give_coins(resp.author.id, RandomCoins)
+    				Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
     				embed = Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.color)
     				return await ctx.send(embed=embed)
     		except TimeoutError:
