@@ -14,13 +14,11 @@ from framework import Misc
 
 __import__("dotenv").load_dotenv()
 
-cluster = MongoClient(environ["MONGODB_URL"])
-
 class LoggingCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.color = 0x2F3136
-        self.collection = cluster["Logging"]["Guilds"]
+        self.collection = MongoClient(environ["MONGODB_URL"])["Logging"]["Guilds"]
 
     @commands.group(name="logging")
     async def logging(self, ctx):

@@ -41,8 +41,8 @@ class Paginator:
         if (current_time - self.last_reaction) <= self.ratelimit:
             return
         self.last_reaction = current_time
-        if (str(reaction.emoji) == self.valid_emojis[0]) and (self.index > 0): self.index = 0
-        elif (str(reaction.emoji) == self.valid_emojis[1]) and (self.index > 0): self.index -= 1
+        if (str(reaction.emoji) == self.valid_emojis[0]) and self.index: self.index = 0
+        elif (str(reaction.emoji) == self.valid_emojis[1]) and self.index: self.index -= 1
         elif (str(reaction.emoji) == self.valid_emojis[2]):
             await self.delete()
             return -1

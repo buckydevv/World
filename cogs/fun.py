@@ -239,7 +239,7 @@ class FunCog(commands.Cog):
 
             json = await r.json()
             list1 = json['list']
-            if len(list1) < 1:
+            if not list1:
                 return await ctx.send(f"Sorry {ctx.author.mention} This word was not found in Urban.")
             res = list1[0]
             await ctx.send(embed=Embed(title=res['word'], description=res['definition'], color=self.color).add_field(name="Example", value=res['example']).set_footer(text=f"👍 {res['thumbs_up']} | 👎{res['thumbs_down']}"))

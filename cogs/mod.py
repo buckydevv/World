@@ -154,7 +154,7 @@ class ModCog(commands.Cog):
                 break
 
             res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=15)
-            if res==None:
+            if not res:
                 break
             if res[1].id != 700292147311542282:
                 emoji = str(res[0].emoji)
