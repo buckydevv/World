@@ -29,7 +29,7 @@ class LoggingCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def create(self, ctx):
         try:
-            Guild._create_guild_account(self, ctx.guild.id)
+            Guild._create_guild_account(ctx.guild.id)
             return await ctx.send(embed=Embed(title="Logging", description=f"I have succsesfully setup logging for `{ctx.guild.name}`.", color=self.color))
         except:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} your guild already has a logging system setup!", color=self.color))
@@ -57,7 +57,7 @@ class LoggingCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def bans(self, ctx, channel: TextChannel):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
-            Guild._create_guild_account(self, ctx.guild.id)
+            Guild._create_guild_account(ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
@@ -78,7 +78,7 @@ class LoggingCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def unban(self, ctx, channel: TextChannel):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
-            Guild._create_guild_account(self, ctx.guild.id)
+            Guild._create_guild_account(ctx.guild.id)
         result = self.collection.find({"_id": ctx.guild.id})
         if not result:
             return
@@ -98,7 +98,7 @@ class LoggingCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def deleted(self, ctx, channel: TextChannel):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
-            Guild._create_guild_account(self, ctx.guild.id)
+            Guild._create_guild_account(ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
@@ -118,7 +118,7 @@ class LoggingCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def edited(self, ctx, channel: TextChannel):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
-            Guild._create_guild_account(self, ctx.guild.id)
+            Guild._create_guild_account(ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
@@ -138,7 +138,7 @@ class LoggingCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def welcomes(self, ctx, channel: TextChannel):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
-            Guild._create_guild_account(self, ctx.guild.id)
+            Guild._create_guild_account(ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
@@ -158,7 +158,7 @@ class LoggingCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def goodbye(self, ctx, channel: TextChannel):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
-            Guild._create_guild_account(self, ctx.guild.id)
+            Guild._create_guild_account(ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return

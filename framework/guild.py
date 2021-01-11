@@ -4,10 +4,9 @@ from pymongo import MongoClient
 
 __import__("dotenv").load_dotenv()
 class Guild:
-    def __init__(self):
-        self.collection = MongoClient(environ["MONGODB_URL"])["Logging"]["Guilds"]
+    collection = MongoClient(environ["MONGODB_URL"])["Logging"]["Guilds"]
 
-    def _create_guild_account(self, guild_id: int) -> None:
+    def _create_guild_account(guild_id: int) -> None:
         """Create a World guild account."""
         self.collection.insert_one({
             "_id": guild_id,
