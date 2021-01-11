@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw, ImageOps, ImageColor
 from twemoji_parser import TwemojiParser
 from colorthief import ColorThief
 from datetime import datetime
+from json import loads
 
 __import__("dotenv").load_dotenv()
 
@@ -20,6 +21,8 @@ class Misc:
         3600: "hour",
         60: "minute"
     }
+    
+    ALL_WORDS = loads(open("framework/words.json", "r").read())
 
     def add_corners(im, rad):
         """Round a PNG image"""
