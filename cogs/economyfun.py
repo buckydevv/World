@@ -25,9 +25,10 @@ class EconomyFunCog(commands.Cog):
         }
         
 
-    @commands.command(help="Add reputation points to a user.", aliases=["rep"])
+    @commands.command(aliases=["rep"])
     @commands.cooldown(rate=1, per=1800, type=commands.BucketType.member)
     async def reputation(self, ctx, user: Member):
+        """Update the Reputation points of a Member, Whoever you give Reputation to They must be nice to you!"""
         now = datetime.now()
 
         if user.id == ctx.author.id:
@@ -59,8 +60,9 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
-    @commands.command(help="Info on your last given rep point.")
+    @commands.command()
     async def repinfo(self, ctx):
+        """Fetches and Shows information on the Last Reputation point you gave!"""
         now = datetime.now()
 
         if not (Wealth._has_account(ctx.author.id)):
@@ -84,6 +86,7 @@ class EconomyFunCog(commands.Cog):
         await ctx.send(embed=embed)
     
     async def profile_canvas(self, user, result):
+        """Draw's the Canvas for the `Profile` Command."""
         pfp = await Misc.fetch_pfp(user)
         pfp_resize = pfp.resize((49, 49))
         font = ImageFont.truetype("./fonts/Whitney-Medium.ttf", 30)
@@ -121,6 +124,7 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command()
     async def profile(self, ctx, user: Optional[Member], option: Optional[str]):
+        """Fetches and Shows information on your Document in World's database.\nYou can also use `w/profile --embed` to not see a Image."""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
         user = user or ctx.author
@@ -181,8 +185,9 @@ class EconomyFunCog(commands.Cog):
             await message.clear_reactions()
 
 
-    @commands.command(help="Badge Shop!", aliases=["bshop"])
+    @commands.command(aliases=["bshop"])
     async def badgeshop(self, ctx):
+        """Shows a list of Avalible Badges to buy!, Use `w/buybadge <BADGE_NAME>`"""
         return await ctx.send(embed=Embed(
             title="World Badge Shop!",
             description=dedent("""
@@ -196,8 +201,9 @@ class EconomyFunCog(commands.Cog):
             color=self.color
         ))
 
-    @commands.command(help="Buy a World Badge.")
+    @commands.command()
     async def buybadge(self, ctx, item: str):
+        """Buy a badge from the Shop, To use: `w/buybadge <BADGE_NAME>`"""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
 
@@ -227,9 +233,10 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/buybadge <BadgeName>`")
 
 
-    @commands.command(help="Marry a specified user!")
+    @commands.command()
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     async def marry(self, ctx, user: Member):
+        """Marry someone in Discord?!"""
         now = datetime.now()
         m_date = now.strftime("%m/%d/%Y")
 
@@ -288,9 +295,10 @@ class EconomyFunCog(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
-    @commands.command(help="Divorce a specified user!")
+    @commands.command()
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     async def divorce(self, ctx, user: Member):
+        """You don't like who you married? Then divorce them with this command."""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
 
@@ -329,8 +337,9 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
-    @commands.command(help="Deposit money into your World bank account", aliases=["dep"])
+    @commands.command(aliases=["dep"])
     async def deposit(self, ctx, amount: int):
+        """Deposit the Specified amount into the bank, Can be withdrawed with `w/withdraw <amount>`"""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
 
@@ -343,8 +352,9 @@ class EconomyFunCog(commands.Cog):
         Wealth._deposit_coins(ctx.author.id, amount)
         return await ctx.send(embed=Embed(title="Deposit", description=f"{ctx.author.mention} You have deposited `{amount}` coin(s)", color=self.color))
 
-    @commands.command(help="Withdraw money from your World bank account.", aliases=["with"])
+    @commands.command(aliases=["with"])
     async def withdraw(self, ctx, amount: int):
+        """Withdraw money from what you put into your bank account!"""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
 
@@ -375,9 +385,10 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/withdraw <amount>`")
 
 
-    @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
+    @commands.command(aliases=["shoot", "worldshoot"])
     @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
     async def shootout(self, ctx):
+        """Try to catch World in the act, Earn coins easilly!"""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
         
@@ -438,9 +449,10 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
-    @commands.command(help="Fish for things in the lake", aliases=["fish", "worldfishing"])
+    @commands.command(aliases=["fish", "worldfishing"])
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     async def fishing(self, ctx):
+        """Fish for items in the lake of World!"""
         if not (Wealth._has_account(ctx.author.id)):
             Wealth._create_account(ctx.author.id)
 
@@ -472,24 +484,27 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
-    @commands.command(help="What badges do you have?", aliases=["mybadges", "showbadges", "badge"])
+    @commands.command(aliases=["mybadges", "showbadges", "badge"])
     async def badges(self, ctx):
+        """Fetches and Shows what badges you have!"""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
 
         result = Wealth.mass_fetch(ctx.author.id)
         await ctx.send(embed=Embed(title="Your badges", description=f"Noob: {result['BadgeSlot1']}\nBeginner: {result['BadgeSlot2']}\nLeader: {result['BadgeSlot3']}\n\n[`Noob`](https://cdn.discordapp.com/emojis/779192872402026516.png?v=1) | [`Beginner`](https://cdn.discordapp.com/emojis/779192938617241600.png?v=1) | [`Leader`](https://cdn.discordapp.com/emojis/779193003024973835.png?v=1)", color=self.color))
 
-    @commands.command(help="Show your reputation", aliases=["myrep", "myreputation", "reputationcount"])
+    @commands.command(aliases=["myrep", "myreputation", "reputationcount"])
     async def repcount(self, ctx):
+        """Fetches and Shows how much Reputation points you have"""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
 
         rep = Wealth.fetch_user(ctx.author.id, "Reputation")
         await ctx.send(embed=Embed(title="Your Reputation", description=f"Reputation Points: `{rep}`", color=self.color))
 
-    @commands.command(help="Show your World status", aliases=["mystat", "worldstatus"])
+    @commands.command(aliases=["mystat", "worldstatus"])
     async def mystatus(self, ctx):
+        """Fetches and Shows the status you set."""
         if not (Wealth._has_account(ctx.author.id)):
             await Wealth._create_account(ctx.author.id)
 
