@@ -8,9 +8,10 @@ class PingCog(commands.Cog):
         self.bot = bot
         self.color = 0x2F3136
 
-    @commands.command(help="Show bots latency.")
+    @commands.command()
     @commands.cooldown(rate=1, per=5, type=commands.BucketType.member)
     async def ping(self, ctx):
+        """Returns the bots Latency/Ping in a embed."""
         testing = discord.Embed(title = 'Testing Latency... <a:loading1:772860591190048768>', color=self.color)
         start = time()
         msg = await ctx.send(embed=testing)
