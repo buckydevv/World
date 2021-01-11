@@ -22,14 +22,7 @@ class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.color = 0x2F3136
-
-    async def cmd_help(self, ctx, command):
-      await ctx.send(embed=Embed(title=f"{command} - Help",
-        description=syntax(command),
-        color=self.color
-      ).add_field(name="Command info", value=command.help))
-
-
+    
     @command(name="help")
     async def show_help(self, ctx, cmd: Optional[str]):
       """Shows this message."""
@@ -42,7 +35,10 @@ class HelpCog(commands.Cog):
         ).set_image(url="https://im-a-dev.xyz/Yr0rRrcP.png"
         ).set_footer(text="Use \"w/help <command>\" For more info"))
       if (command := get(self.bot.commands, name=cmd)):
-        return await self.cmd_help(ctx, command)
+        return await ctx.send(embed=Embed(title=f"{command} - Help",
+          description=syntax(command),
+          color=self.color
+        ).add_field(name="Command info", value=command.help))
       await ctx.send(f"Sorry {ctx.author.mention} thats not a valid command.")
 
 

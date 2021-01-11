@@ -392,7 +392,7 @@ class FunCog(commands.Cog):
         	user = user or ctx.author
         	spotify_activity = next((activity for activity in user.activities if isinstance(activity, Spotify)), None)
 
-        	if spotify_activity is None:
+        	if not spotify_activity:
         		return await ctx.send(f"Sorry {ctx.author.mention} {user.name} is not currently listening to Spotify.")
 
         	r = await self.session.get(str(spotify_activity.album_cover_url))

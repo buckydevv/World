@@ -22,7 +22,7 @@ class LoggingCog(commands.Cog):
 
     @commands.group(name="logging")
     async def logging(self, ctx):
-        if ctx.invoked_subcommand is None:
+        if not ctx.invoked_subcommand:
             return await ctx.send(f"Sorry {ctx.author.mention} please type `w/logging <command>`")
 
     @logging.command(name="create")
@@ -42,7 +42,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="shutdown", aliases=["delete"])
     @commands.has_permissions(administrator=True)
     async def shutdown(self, ctx):
-        if not (Guild._has_guild_account(self, ctx.guild.id)):
+        if not Guild.collection.find_one({'_id': ctx.guild.id}):
             return await ctx.send(embed=Embed(title="Shutdown", description=f"Hey {ctx.author.mention} your guild was not found.\nTry using: `w/logging create`", color=self.color))
 
         self.collection.remove({"_id": ctx.guild.id})
@@ -56,7 +56,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="bans", aliases=["discordbans", "banlog"])
     @commands.has_permissions(administrator=True)
     async def bans(self, ctx, channel: TextChannel):
-        if not (Guild._has_guild_account(self, ctx.guild.id)):
+        if not Guild.collection.find_one({'_id': ctx.guild.id}):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
@@ -77,7 +77,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="unban", aliases=["discordunban", "unbanlog", "unbanslog", "unbans"])
     @commands.has_permissions(administrator=True)
     async def unban(self, ctx, channel: TextChannel):
-        if not (Guild._has_guild_account(self, ctx.guild.id)):
+        if not Guild.collection.find_one({'_id': ctx.guild.id}):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find({"_id": ctx.guild.id})
         if not result:
@@ -97,7 +97,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="deleted", aliases=["discorddeleted", "delmsg"])
     @commands.has_permissions(administrator=True)
     async def deleted(self, ctx, channel: TextChannel):
-        if not (Guild._has_guild_account(self, ctx.guild.id)):
+        if not Guild.collection.find_one({'_id': ctx.guild.id}):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
@@ -117,7 +117,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="edited", aliases=["discordedited", "editmsg"])
     @commands.has_permissions(administrator=True)
     async def edited(self, ctx, channel: TextChannel):
-        if not (Guild._has_guild_account(self, ctx.guild.id)):
+        if not Guild.collection.find_one({'_id': ctx.guild.id}):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
@@ -137,7 +137,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="welcomes", aliases=["joiner", "joins", "join", "welcomemessages", "welcomemsg", "welcome"])
     @commands.has_permissions(administrator=True)
     async def welcomes(self, ctx, channel: TextChannel):
-        if not (Guild._has_guild_account(self, ctx.guild.id)):
+        if not Guild.collection.find_one({'_id': ctx.guild.id}):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
@@ -157,7 +157,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="goodbye", aliases=["memberleave", "bye", "leftserver", "leaving", "goodbyes"])
     @commands.has_permissions(administrator=True)
     async def goodbye(self, ctx, channel: TextChannel):
-        if not (Guild._has_guild_account(self, ctx.guild.id)):
+        if not Guild.collection.find_one({'_id': ctx.guild.id}):
             Guild._create_guild_account(self, ctx.guild.id)
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
