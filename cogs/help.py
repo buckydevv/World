@@ -24,45 +24,35 @@ class HelpCog(commands.Cog):
         self.color = 0x2F3136
 
     async def cmd_help(self, ctx, command):
-      embed = Embed(title=f"{command} - Help",
-            description=syntax(command),
-            color=self.color)
-      embed.add_field(name="Command info", value=command.help)
-      await ctx.send(embed=embed)
+      await ctx.send(embed=Embed(title=f"{command} - Help",
+        description=syntax(command),
+        color=self.color
+      ).add_field(name="Command info", value=command.help))
 
 
-    @command(name="help", help="Shows this message.")
+    @command(name="help")
     async def show_help(self, ctx, cmd: Optional[str]):
       """Shows this message."""
-      if cmd is None:
-        embed = Embed(color=self.color)
-        embed.set_author(name='World - Help', icon_url="https://im-a-dev.xyz/1678m0pc.png")
-        embed.add_field(name="Shows multiple categories.", value="w/categories", inline=True)
-        embed.add_field(name="Invite", value="[Invite World](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)", inline=True)
-        embed.add_field(name="Vote", value="[Vote For World](https://top.gg/bot/700292147311542282/vote)", inline=True)
-        embed.set_image(url="https://im-a-dev.xyz/Yr0rRrcP.png")
-        embed.set_footer(text="Use \"w/help <command>\" For more info")
-        await ctx.send(embed=embed)
-
-      else:
-        if (command := get(self.bot.commands, name=cmd)):
-          await self.cmd_help(ctx, command)
-
-        else:
-          await ctx.send(f"Sorry {ctx.author.mention} thats not a valid command.")
+      if not cmd:
+        return await ctx.send(embed=Embed(color=self.color
+        ).set_author(name='World - Help', icon_url="https://im-a-dev.xyz/1678m0pc.png"
+        ).add_field(name="Shows multiple categories.", value="w/categories"
+        ).add_field(name="Invite", value="[Invite World](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)"
+        ).add_field(name="Vote", value="[Vote For World](https://top.gg/bot/700292147311542282/vote)"
+        ).set_image(url="https://im-a-dev.xyz/Yr0rRrcP.png"
+        ).set_footer(text="Use \"w/help <command>\" For more info"))
+      if (command := get(self.bot.commands, name=cmd)):
+        return await self.cmd_help(ctx, command)
+      await ctx.send(f"Sorry {ctx.author.mention} thats not a valid command.")
 
 
     @commands.command(help="Shows categories")
     async def categories(self, ctx):
-      em = Embed(color=self.color)
-      em.add_field(name="‎‎World", value=f"New\n`w/new`\nFun\n`w/fun`\nOther\n`w/other`")
-      em.add_field(name=f"Categories", value=f"Logging\n`w/logs`\nEconomy\n`w/economy`\nModeration\n`w/mod`")
-      await ctx.send(embed=em)
-
+      await ctx.send(embed=Embed(color=self.color).add_field(name="‎‎World", value=f"New\n`w/new`\nFun\n`w/fun`\nOther\n`w/other`").add_field(name=f"Categories", value=f"Logging\n`w/logs`\nEconomy\n`w/economy`\nModeration\n`w/mod`"))
 
     @commands.command(help="Shows other category.")
     async def other(self, ctx):
-      em = Embed(
+      await ctx.send(embed=Embed(
         title="Other commands", 
         color=self.color,
         ).add_field(
@@ -73,14 +63,11 @@ class HelpCog(commands.Cog):
         name="<:Worldhappy:768145777985454131> | World commands",
         value="`w/botinfo` | `w/invite` | `w/vote` | `w/uptime` | `w/emotes`",
         inline=False
-        )
-      await ctx.send(embed=em)
-
-
-
+      ))
+      
     @commands.command(help="Shows moderation category.")
     async def mod(self, ctx):
-      em = Embed(
+      await ctx.send(embed=Embed(
         title="Moderation commands", 
         color=self.color,
         ).add_field(
@@ -90,12 +77,11 @@ class HelpCog(commands.Cog):
         name="<:channellogo:765650652797468682> | Channel Commands",
         value="`w/slowmode` | `w/lock` | `w/unlock` | `w/nuke` | `w/purge`",
         inline=False
-        )
-      await ctx.send(embed=em)
+      ))
       
     @commands.command(help="Shows logging category.")
     async def logs(self, ctx):
-      em = Embed(
+      await ctx.send(embed=Embed(
         title="Logging commands", 
         color=self.color,
         ).add_field(
@@ -106,13 +92,12 @@ class HelpCog(commands.Cog):
         name=":question: | Logging options",
         value="`w/logging bans` | `w/logging unban` | `w/logging welcomes` | `w/logging goodbye` | `w/logging edited` | `w/logging deleted`",
         inline=False
-        )
-      await ctx.send(embed=em)
+      ))
 
 
     @commands.command(hlep="Shows Fun category.")
     async def fun(self, ctx):
-      embed = Embed(
+      await ctx.send(embed=Embed(
         title="Fun commands", 
         color=self.color,
         ).add_field(
@@ -122,13 +107,12 @@ class HelpCog(commands.Cog):
         name=":frame_photo: | Image fun",
         value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/tweet` | `w/blur` | `w/avatar` | `w/qr` | `w/flip` | `w/wide`",
         inline=False
-        )
-      await ctx.send(embed=embed)
+      ))
 
 
     @commands.command(help="Shows economy category.")
     async def economy(self, ctx):
-      em = Embed(
+      await ctx.send(embed=Embed(
         title="Economy commands", 
         color=self.color,
         ).add_field(
@@ -142,19 +126,15 @@ class HelpCog(commands.Cog):
         name=":thumbsup: | Fun commands",
         value="`w/daily` | `w/weekly` | `w/gamble` | `w/rep` | `w/repinfo` | `w/marry` | `w/divorce` | `w/rob` | `w/shootout` | `w/fish`",
         inline=False
-        )
-      await ctx.send(embed=em)
-   
+      ))
 
     @commands.command(help="Shows new commands.")
     async def new(self, ctx):
-      em = Embed(
+      await ctx.send(embed=Embed(
         title="New commands!", 
         color=self.color,
         description="`w/emotes` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur`\n\nTo see patches Join the support server! `w/invite`"
-        )
-      await ctx.send(embed=em)
-
+      ))
 
 def setup(bot):
     bot.add_cog(HelpCog(bot))

@@ -9,14 +9,14 @@ class ModCog(commands.Cog):
         self.snipeCache = {}
         self.editSnipeCache = {}
         self.color = 0x2F3136
+        self.badwords = ("nigger", "nig", "coon", "nigga", "retard", "rapist", "rape", "niggar", "faggot", "fag", "dyke", "whore", "nullisqt")
 
     @commands.command(help="Ban a specified Discord Member.")
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: Member, *, reason=None):
         try:
             await member.ban(reason=reason)
-            embed = Embed(title="Ban", description=f"Hey {ctx.author.mention} you have succsesfully banned {member}", color=self.color)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=Embed(title="Ban", description=f"Hey {ctx.author.mention} you have succsesfully banned {member}", color=self.color))
         except:
             return await ctx.send(f"Sorry {ctx.author.mention} That person has higher or the same permissions as me!")
 
@@ -32,8 +32,7 @@ class ModCog(commands.Cog):
     async def kick(self, ctx, member: Member, *, reason=None):
         try:
             await member.kick(reason=reason)
-            embed = Embed(title="Kick", description=f"Hey {ctx.author.mention} you have succsesfully kicked {member}", color=self.color)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=Embed(title="Kick", description=f"Hey {ctx.author.mention} you have succsesfully kicked {member}", color=self.color))
         except:
             return await ctx.send(f"Sorry {ctx.author.mention} That person has higher or the same permission as me!")
 
@@ -57,11 +56,9 @@ class ModCog(commands.Cog):
                 return await ctx.send(f"Sorry {ctx.author.mention} i don't have permissions to create a roll called `Muted`.")
         else:
             await user.add_roles(role)
-            embed = Embed(title="Muted", description=f"Hey {ctx.author.mention} you have succsesfully muted {user}", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Muted", description=f"Hey {ctx.author.mention} you have succsesfully muted {user}", color=self.color))
         await user.add_roles(createrole)
-        embed = Embed(title="Muted", description=f"Hey {ctx.author.mention} you have succsesfully muted {user}", color=self.color)
-        return await ctx.send(embed=embed)
+        return await ctx.send(embed=Embed(title="Muted", description=f"Hey {ctx.author.mention} you have succsesfully muted {user}", color=self.color))
 
     @mute.error
     async def mute_error(self, ctx, error):
@@ -97,8 +94,7 @@ class ModCog(commands.Cog):
             user = ban_entry.user
             if (user.name, user.discriminator) == (member_name, member_discriminator):
                 await ctx.guild.unban(user)
-                embed = Embed(title="Unban", description=f"Hey {ctx.author.mention} you have succsesfully unbanned {member}", color=self.color)
-                return await ctx.send(embed=embed)
+                return await ctx.send(embed=Embed(title="Unban", description=f"Hey {ctx.author.mention} you have succsesfully unbanned {member}", color=self.color))
 
     @unban.error
     async def unban_error(self, ctx, error):
@@ -109,10 +105,7 @@ class ModCog(commands.Cog):
 
     @commands.command(help="Start a poll and let users react!")
     async def poll(self, ctx, *, desc):
-        embed = Embed(title="Poll", description=f"{ctx.author.mention} Started a poll!", color=self.color)
-        embed.add_field(name="Please React", value=f"**{desc}**", inline=False)
-        embed.set_footer(text="👍 for Yes, 👎 for No.")
-        message = await ctx.send(embed=embed)
+        message = await ctx.send(embed=Embed(title="Poll", description=f"{ctx.author.mention} Started a poll!", color=self.color).add_field(name="Please React", value=f"**{desc}**", inline=False).set_footer(text="👍 for Yes, 👎 for No."))
         await message.add_reaction("👍")
         await message.add_reaction("👎")
 
@@ -121,31 +114,21 @@ class ModCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/poll <text>`")
 
-
     @commands.command(help="Lockdown the current channel.")
     @commands.has_permissions(manage_channels=True)
     async def lock(self, ctx):
         await ctx.message.channel.set_permissions(ctx.guild.default_role, read_messages=True, send_messages=False)
-        embed = Embed(title="Lockdown", description=f"{ctx.author.mention} has locked this channel.", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Lockdown", description=f"{ctx.author.mention} has locked this channel.", color=self.color))
 
     @commands.command(help="Nuke a specified channel.")
     @commands.has_permissions(manage_messages=True)
     async def nuke(self, ctx, channel=None):
         channel = channel or ctx.channel
-        nuke_ = Embed(
+        message = await ctx.send(embed=Embed(
             title="Nuke",
             description=f"Would you like to nuke `{channel}`?\nThis will delete the channel and remake it.",
             color=self.color
-            )
-
-        nuke_fail = Embed(
-            title="Nuke Failed",
-            description=f"You Chose not to nuke `{channel}`",
-            color=self.color
-            )
-
-        message = await ctx.send(embed=nuke_)
+        ))
 
         await message.add_reaction('✅')
         await message.add_reaction('❎')
@@ -161,17 +144,20 @@ class ModCog(commands.Cog):
                     await message_.send(f"{ctx.author.mention} <#{nuked_channel.id}> was nuked.\nhttps://tenor.com/view/explosion-explode-clouds-of-smoke-gif-17216934")
                     break
                 except Exception as e:
-                    embed = Embed(title="Error:", description=e, color=self.color)
-                    return await ctx.send(embed=embed)
+                    return await ctx.send(embed=Embed(title="Error:", description=e, color=self.color))
             elif emoji=='❎':
-                await message.edit(embed=nuke_fail)
+                await message.edit(embed=Embed(
+                    title="Nuke Failed",
+                    description=f"You Chose not to nuke `{channel}`",
+                    color=self.color
+                ))
                 break
 
             res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=15)
             if res==None:
                 break
-            if str(res[1])!='World#4520':
-                emoji=str(res[0].emoji)
+            if res[1].id != 700292147311542282:
+                emoji = str(res[0].emoji)
 
         await message.clear_reactions()
         
@@ -185,8 +171,7 @@ class ModCog(commands.Cog):
     @commands.has_permissions(manage_channels=True)
     async def unlock(self, ctx):
         await ctx.message.channel.set_permissions(ctx.guild.default_role, read_messages=True, send_messages=True)
-        embed = Embed(title="Lockdown over", description=f"{ctx.author.mention} has unlocked this channel!", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Lockdown over", description=f"{ctx.author.mention} has unlocked this channel!", color=self.color))
 
     @commands.command(help="Set the slowmode of the channel.")
     @commands.has_permissions(manage_messages=True)
@@ -194,8 +179,7 @@ class ModCog(commands.Cog):
         if seconds >= 21600:
             return await ctx.send(f"Sorry {ctx.author.mention} `21600` is max slowmode range.")
         await ctx.message.channel.edit(slowmode_delay=seconds)
-        embed = Embed(title="Slowmode", description=f"I have set the slowmode for <#{ctx.message.channel.id}> to `{seconds}`", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Slowmode", description=f"I have set the slowmode for <#{ctx.message.channel.id}> to `{seconds}`", color=self.color))
 
     @commands.command(help="Unmute a member")
     @commands.has_permissions(manage_messages=True)
@@ -208,8 +192,7 @@ class ModCog(commands.Cog):
         if not find(lambda role: role.name == "Muted", user.roles):
             return await ctx.send(f"Sorry {ctx.author.mention} that user is not muted?")
         await user.remove_roles(role)
-        embed = Embed(title="Unmute", description=f"Hey {ctx.author.mention} you have succsesfully unmuted {user}!", color=self.color)
-        return await ctx.send(embed=embed)
+        return await ctx.send(embed=Embed(title="Unmute", description=f"Hey {ctx.author.mention} you have succsesfully unmuted {user}!", color=self.color))
 
     @unmute.error
     async def unmute_error(self, ctx, error):
@@ -236,14 +219,12 @@ class ModCog(commands.Cog):
     @commands.command(help="Snipe a deleted message.")
     async def snipe(self, ctx):
         try:
-            badwords = ["nigger", "nig", "coon", "nigga", "retard", "rapist", "rape", "niggar", "faggot", "fag", "dyke", "whore"]
-            if self.snipeCache[ctx.channel.id]["content"] in badwords:
+            if self.snipeCache[ctx.channel.id]["content"] in self.badwords:
                 return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to snipe!")
-            embed = Embed(title="Snipe", color=self.color, timestamp=datetime.utcnow())
-            embed.add_field(name="User", value=self.snipeCache[ctx.channel.id]["user"])
-            embed.add_field(name="Content", value=self.snipeCache[ctx.channel.id]["content"])
-            embed.add_field(name="Channel", value=f"<#{self.snipeCache[ctx.channel.id]['channel']}>")
-            await ctx.send(embed=embed)
+            await ctx.send(embed=Embed(title="Snipe", color=self.color, timestamp=datetime.utcnow()
+            ).add_field(name="User", value=self.snipeCache[ctx.channel.id]["user"]
+            ).add_field(name="Content", value=self.snipeCache[ctx.channel.id]["content"]
+            ).add_field(name="Channel", value=f"<#{self.snipeCache[ctx.channel.id]['channel']}>"))
             del self.snipeCache[ctx.channel.id]
         except:
             return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to snipe!")
@@ -255,11 +236,10 @@ class ModCog(commands.Cog):
             badwords = ["nigger", "nig", "coon", "nigga", "retard", "rapist", "rape", "niggar", "faggot", "fag", "dyke", "whore"]
             if self.editSnipeCache[ctx.channel.id]["bcontent"] in badwords:
                 return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to snipe!")
-            embed = Embed(title="Edit Snipe", colour=self.color, timestamp=datetime.utcnow())
-            embed.add_field(name="User", value=self.editSnipeCache[ctx.channel.id]["user"])
-            embed.add_field(name="Content", value=self.editSnipeCache[ctx.channel.id]["bcontent"])
-            embed.add_field(name="Channel", value=f"<#{self.editSnipeCache[ctx.channel.id]['channel']}>")
-            await ctx.send(embed=embed)
+            await ctx.send(embed=Embed(title="Edit Snipe", colour=self.color, timestamp=datetime.utcnow()
+            ).add_field(name="User", value=self.editSnipeCache[ctx.channel.id]["user"]
+            ).add_field(name="Content", value=self.editSnipeCache[ctx.channel.id]["bcontent"]
+            ).add_field(name="Channel", value=f"<#{self.editSnipeCache[ctx.channel.id]['channel']}>"))
             del self.editSnipeCache[ctx.channel.id]
         except:
             return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to editsnipe!")
@@ -272,8 +252,7 @@ class ModCog(commands.Cog):
             "user": message.author,
             "content": message.content,
             "channel": message.channel.id
-            }})
-
+        }})
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
@@ -282,7 +261,7 @@ class ModCog(commands.Cog):
                 "user": before.author,
                 "bcontent": before.content,
                 "channel": before.channel.id
-            }})
+        }})
 
 def setup(bot):
     bot.add_cog(ModCog(bot))

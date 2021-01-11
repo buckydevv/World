@@ -10,7 +10,7 @@ class OwnerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True, help="Load a python file.")
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def load(self, ctx, module):
         """Loads a module."""
@@ -19,10 +19,9 @@ class OwnerCog(commands.Cog):
         except Exception as e:
             await ctx.send('{}: {}'.format(type(e).__name__, e))
         else:
-            embed = Embed(title='load!', description=f"I Have loaded `{module}`", colour=ctx.author.colour)
-            await ctx.send(content=None, embed=embed)  
+            await ctx.send(embed=Embed(title='load!', description=f"I Have loaded `{module}`", colour=ctx.author.colour))  
 
-    @commands.command(hidden=True, help="Unload a python file.")
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def unload(self, ctx, module):
         """Unloads a module."""
@@ -31,10 +30,9 @@ class OwnerCog(commands.Cog):
         except Exception as e:
             await ctx.send('{}: {}'.format(type(e).__name__, e))
         else:
-            embed = Embed(title='Unload!', description=f"I Have Unloaded `{module}`", colour=ctx.author.colour)
-            await ctx.send(content=None, embed=embed)
+            await ctx.send(content=None, embed=Embed(title='Unload!', description=f"I Have Unloaded `{module}`", colour=ctx.author.colour))
 
-    @commands.command(name='reload', hidden=True, help="Reload python file.")
+    @commands.command(name='reload', hidden=True)
     @commands.is_owner()
     async def _reload(self, ctx, module):
         """Reloads a module."""
@@ -44,21 +42,19 @@ class OwnerCog(commands.Cog):
         except Exception as e:
             await ctx.send('{}: {}'.format(type(e).__name__, e))
         else:
-            embed = Embed(title='Reload!', description=f"I Have Reloaded `{module}`", colour=ctx.author.colour)
-            await ctx.send(content=None, embed=embed)
+            await ctx.send(content=None, embed=Embed(title='Reload!', description=f"I Have Reloaded `{module}`", colour=ctx.author.colour))
 
-    @commands.command(hidden=True, help="Set patches")
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def update(self, ctx, *, desc):
     	channel = self.bot.get_channel(765632402680447006)
     	msg = await channel.fetch_message(765675535325069323)
-    	embed = Embed(
+    	await msg.edit(embed=Embed(
     		title="Latest update",
     		description=desc,
     		color=0x2F3136,
     		timestamp=datetime.utcnow()
-    		)
-    	await msg.edit(embed=embed)
+        ))
     	await ctx.send(f"Hey {ctx.author.mention} i have updated the message in <#765632402680447006>")
 
     @commands.command(name="eval")
@@ -78,14 +74,11 @@ class OwnerCog(commands.Cog):
 
             await locals()["__function"]()
         except Exception:
-            res = Embed(title="Error!", description=f"```{format_exc()}```", color=discord.Color.red())
-            res.set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png"))
-            await ctx.send(embed=res)
+            await ctx.send(embed=Embed(title="Error!", description=f"```{format_exc()}```", color=discord.Color.red()).set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png")))
+    
     @eval_.error
     async def eval__error(self, ctx, error):
-        embed = Embed(title="Error!", description=f"```{error}```", color=discord.Color.red())
-        embed.set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png"))
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Error!", description=f"```{error}```", color=discord.Color.red()).set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png")))
 
     @commands.command()
     @commands.is_owner()
@@ -93,31 +86,17 @@ class OwnerCog(commands.Cog):
     	def world(m):
     		return self.bot.user.id == m.author.id
     	await ctx.message.channel.purge(limit=amount, check=world, bulk=False)
-    	embed = Embed(title="Purged", description=f"{ctx.author.mention} i have successfully purged `{amount}` of messages in <#{ctx.message.channel.id}>", color=ctx.author.color)
-    	yes = await ctx.send(embed=embed)
+    	await ctx.send(embed=Embed(title="Purged", description=f"{ctx.author.mention} i have successfully purged `{amount}` of messages in <#{ctx.message.channel.id}>", color=ctx.author.color), delete_after=3)
     	await _sleep(3)
-    	await yes.delete()
     	await ctx.message.delete()
 
     @commands.command()
     @commands.is_owner()
     async def shutdown(self, ctx):
-    	page1 = Embed(
+    	message = await ctx.send(embed=Embed(
     		title="Shutdown World",
     		description="Would you like to shutdown World?",
-    		)
-
-    	page2 = Embed(
-    		title="Shudown Failed",
-    		description="You Chose not to shutdown World."
-    		)
-
-    	page3 = Embed(
-    		title="Shutting Down",
-    		description="I Have shut myself down."
-    		)
-
-    	message = await ctx.send(embed=page1)
+        ))
 
     	await message.add_reaction('✅')
     	await message.add_reaction('❎')
@@ -126,17 +105,23 @@ class OwnerCog(commands.Cog):
 
     	while True:
     		if emoji=='✅':
-    			await message.edit(embed=page3)
+    			await message.edit(embed=Embed(
+                    title="Shutting Down",
+                    description="I Have shut myself down."
+                ))
     			await self.bot.close()
     		if emoji=='❎':
-    			await message.edit(embed=page2)
+    			await message.edit(embed=Embed(
+                    title="Shudown Failed",
+                    description="You Chose not to shutdown World."
+                ))
     			break
 
     		res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=15)
     		if res==None:
     			break
-    		if str(res[1])!='World#4520':
-    			emoji=str(res[0].emoji)
+    		if res.id != 700292147311542282:
+    			emoji = str(res[0].emoji)
     			await message.remove_reaction(res[0].emoji,res[1])
 
     	await message.clear_reactions()

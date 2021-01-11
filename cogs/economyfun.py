@@ -148,11 +148,9 @@ class EconomyFunCog(commands.Cog):
         
         order, price, emoji, full_name = self.badges_ctx[item.lower()]
         if result["coins"] < price:
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World {full_name}`", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You dont have enough coins to buy `World {full_name}`", color=self.color))
         elif result["BadgeSlot1"] == emoji:
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World {full_name}`.", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You already have `World {full_name}`.", color=self.color))
         
         await ctx.send(embed=Embed(
             title="World Badge",
@@ -241,13 +239,11 @@ class EconomyFunCog(commands.Cog):
 
         if result["MarriedTo"] == "Nobody":
             ctx.command.reset_cooldown(ctx)
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You are not married yet!.", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You are not married yet!.", color=self.color))
 
         if not result["MarriedTo"] == str(user):
             ctx.command.reset_cooldown(ctx)
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're not married to {user}.", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You're not married to {user}.", color=self.color))
 
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$set": {"MarriedTo": "Nobody"}})
         Wealth.collection.update_one({"_id": user.id}, {"$set": {
@@ -286,15 +282,13 @@ class EconomyFunCog(commands.Cog):
 
         result = Wealth.collection.find_one({'_id': ctx.author.id})
         if result["Bank"] < amount:
-            embed = Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't withdraw because you don't have that much money in the bank.", color=self.color)
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't withdraw because you don't have that much money in the bank.", color=self.color))
 
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {
             "Bank": -amount,
             "coins": amount
         }})
-        embed = Embed(title="Withdraw", description=f"{ctx.author.mention} you have just withdrawn `{amount}` coins.", color=self.color)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=Embed(title="Withdraw", description=f"{ctx.author.mention} you have just withdrawn `{amount}` coins.", color=self.color))
 
     @deposit.error
     async def deposit_error(self, ctx, error):
@@ -313,11 +307,7 @@ class EconomyFunCog(commands.Cog):
     @require_account()
     async def shootout(self, ctx):
         random = Wealth.shootout_ran()
-
-        embed = Embed(title="Shootout", description="Is World a shooter?", color=self.color)
-        embed.set_image(url=random)
-        embed.set_footer(text="|✅ - shooter|❎ - innocent|🚫 - nothing")
-        message = await ctx.send(embed=embed)
+        message = await ctx.send(embed=Embed(title="Shootout", description="Is World a shooter?", color=self.color).set_image(url=random).set_footer(text="|✅ - shooter|❎ - innocent|🚫 - nothing"))
 
         for _emoji in self.shoot_ctx:
             await message.add_reaction(_emoji[0])
@@ -325,7 +315,7 @@ class EconomyFunCog(commands.Cog):
         emoji = ''
 
         while True: # sodaasdsaijdaubsjsdad
-            for _emoji, _image_url, _amount, _message in _ctx:
+            for _emoji, _image_url, _amount, _message in self.shoot_ctx:
                 if emoji == _emoji:
                     await message.delete()
                     if (random == _image_url):
@@ -370,16 +360,11 @@ class EconomyFunCog(commands.Cog):
         }        
 
         if not fishing_ctx[random]: # they didn't caught anything
-            embed = Embed(title="Fishing", description="There are no fish in the lake right now, come again soon!", color=self.color)
-            embed.set_image(url="https://im-a-dev.xyz/1kKJXQSr.png")
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=Embed(title="Fishing", description="There are no fish in the lake right now, come again soon!", color=self.color).set_image(url="https://im-a-dev.xyz/1kKJXQSr.png"))
         # otherwise, they caught something
         key_name, amount_added_to_db, message = fishing_ctx[random]
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {key_name: amount_added_to_db}})
-
-        embed = Embed(title="Fishing", description=message, color=self.color)
-        embed.set_image(url=random)
-        return await ctx.send(embed=embed)
+        return await ctx.send(embed=Embed(title="Fishing", description=message, color=self.color).set_image(url=Embed(title="Fishing", description=message, color=self.color)))
 
     @fishing.error
     async def fishing_error(self, ctx, error):

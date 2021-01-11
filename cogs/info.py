@@ -81,7 +81,7 @@ class InfoCog(commands.Cog):
         ).add_field(name="**Birate Limit**", value=f"{ctx.guild.bitrate_limit}"
         ).set_thumbnail(url=ctx.guild.icon_url))
     
-    @commands.command(aliases=["ri"], help="Role information")
+    @commands.command(aliases=["ri"])
     async def roleinfo(self, ctx, role: Role):
         await ctx.send(embed=Embed(
             title="Role Information",
@@ -96,7 +96,7 @@ class InfoCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/roleinfo <role>`")
 
-    @commands.command(aliases=["ci", "catinfo"], help="Category information")
+    @commands.command(aliases=["ci", "catinfo"])
     async def categoryinfo(self, ctx, *, category: CategoryChannel):
         await ctx.send(embed=Embed(
             title="Category Information",
@@ -124,8 +124,7 @@ class InfoCog(commands.Cog):
             prefixes = load(f)
         guild_prefix = "w/, world" if (str(ctx.guild.id) in prefixes) else prefixes[str(ctx.guild.id)]
         start = time()
-        loading = Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.color)
-        message = await ctx.send(embed=loading)
+        message = await ctx.send(embed=Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.color))
         end = time()
         await _sleep(1)
         await message.edit(embed=Embed(

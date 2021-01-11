@@ -60,12 +60,10 @@ async def changeprefix(ctx, prefix):
 
 	with open('prefixes.json', 'w') as f:
 		dump(prefixes, f, indent=4)
-
-	embed = Embed(
+	await ctx.send(embed=Embed(
 		title="Custom prefix",
 		description=f"Prefix for {ctx.guild} is now `{prefix}`.\nTry using the help command: `{prefix}help`"
-		)
-	await ctx.send(embed=embed)
+    ))
 
 
 @world.command()
