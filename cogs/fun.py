@@ -7,7 +7,6 @@ from datetime import datetime
 from typing import Optional
 from io import BytesIO
 from os import environ
-from asyncio import TimeoutError
 from pymongo import MongoClient
 from framework import Misc, Wealth
 from time import time
@@ -470,25 +469,18 @@ class FunCog(commands.Cog):
     async def fast(self, ctx, option: Optional[str], user: Optional[Member]=None):
         user = user or ctx.author
         if option in ["--rank", "rank"]:
-            if not (Misc._has_account(user.id)):
+            if not Wealth.collection.find_one({"_id": user.id}):
                 return await ctx.send(f"Sorry {ctx.author.mention} that user is not ranked yet.")
-                
+            
             img = Image.new('RGB', (1000, 300), color=(35, 39, 42))
-
             font = ImageFont.truetype("fonts/Whitney-Medium.ttf", 65, encoding="unic")
             fontsmall = ImageFont.truetype("fonts/Whitney-Medium.ttf", 49, encoding="unic")
-
             result = self.collection.find_one({"_id": user.id})
             user_points = result['points']
-
             rank = self.collection.find({"points":{"$gt":user_points}}).count() + 1
-
             CONVERT = await Misc.circle_pfp(user, 180, 180)
             color = (255, 255, 255) if (user.color.to_rgb() == (0, 0, 0)) else user.color.to_rgb()
-
             name = user.name if len(user.name) <= 16 else f'{user.name[:13]}...'
-
-            result = self.collection.find_one({"_id": user.id})
             user_points = result['points']
 
             parser = TwemojiParser(img)
@@ -519,18 +511,16 @@ class FunCog(commands.Cog):
                 resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content.lower() == word, timeout=18)
                 elapse = round(time() * 100) - start
                 if resp.content.lower() == word:
-                    if not (Misc._has_account(resp.author.id)):
-                        await Misc._insert_to_collection(resp.author.id)
-                    if elapse/1000 > 6:
-                        isfast = choice(self.badmessages)
-                        random_points = randint(10, 45)
-                        Misc.give_points(resp.author.id, random_points)
-                    else:
-                        isfast = choice(self.goodmessages)
-                        random_points = randint(5, 17)
-                        Misc.give_points(resp.author.id, random_points)
-                    embed = Embed(title="Fastest typer!",description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False)
-                    return await ctx.send(embed=embed)
+                    if not Wealth.collection.find_one({"_id": user.id}):
+                        Wealth.collection.insert_one({
+                            "_id": user.id,
+                            "points": 0
+                        })
+                    
+                    isfast = choice(self.badmessages) if (elapse/1000 > 6) else choice(self.goodmessages)
+                    random_points = randint(10, 45) if (elapse/1000 > 6) else randint(5, 17)
+                    Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": random_points}})
+                    return await ctx.send(embed=Embed(title="Fastest typer!", description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False))
             except:
                 await game.delete()
                 return await ctx.send(f"Sorry {ctx.author.mention} nobody took part! So i have ended the game.")
@@ -538,8 +528,7 @@ class FunCog(commands.Cog):
     @commands.command(help="Mock some text.")
     async def mock(self, ctx, *, text) -> None:
         if not text:
-            return await ctx.send(f"Sorry {ctx.author.mention} you forgot to add some text for me to mock.")
-        " ".join(text)
+            text = "shuana is qt"#return await ctx.send(f"Sorry {ctx.author.mention} you forgot to add some text for me to mock.")
         return await ctx.send("".join([choice([index.lower(), index.upper()]) for index in list(text)]))
 
     @fast.error
@@ -556,9 +545,7 @@ class FunCog(commands.Cog):
     		return await ctx.send(f"Sorry {ctx.author.mention} The api is down.")
     	req.close()
 
-    	embed = Embed(title="Guess the flag!", color=self.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png")
-    	FirstMessage = await ctx.send(embed=embed)
-
+    	FirstMessage = await ctx.send(embed=Embed(title="Guess the flag!", color=self.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png"))
 
     	while True:
     		try:
@@ -572,7 +559,7 @@ class FunCog(commands.Cog):
     				Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
     				embed = Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.color)
     				return await ctx.send(embed=embed)
-    		except TimeoutError:
+    		except:
     			await FirstMessage.delete()
     			return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
 def setup(bot):
