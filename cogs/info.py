@@ -97,8 +97,9 @@ class InfoCog(commands.Cog):
         ).set_thumbnail(url=ctx.guild.icon_url)
         await ctx.send(embed=server_information)
     
-    @commands.command(aliases=["ri"], help="Role information")
+    @commands.command(aliases=["ri"])
     async def roleinfo(self, ctx, role: Role):
+        """Fetches and Shows information about the specified Discord Role!"""
         embed = Embed(
             title="Role Information",
             color=self.color
@@ -113,8 +114,9 @@ class InfoCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/roleinfo <role>`")
 
-    @commands.command(aliases=["ci", "catinfo"], help="Category information")
+    @commands.command(aliases=["ci", "catinfo"])
     async def categoryinfo(self, ctx, *, category: CategoryChannel):
+        """Fetches and Shows information about the specified Discord category!"""
         embed = Embed(
             title="Category Information",
             color=self.color
@@ -245,8 +247,9 @@ class InfoCog(commands.Cog):
             )
         await ctx.send(embed=embed)
 
-    @commands.command(help="How to get World emotes!", aliases=["worldemotes", "worldemote", "emojis", "emoji"])
+    @commands.command(aliases=["worldemotes", "worldemote", "emojis", "emoji"])
     async def emotes(self, ctx, allemote: Optional[str]) -> None:
+        """Information on World emotes, You can see all the emotes by doing `w/emotes --all`"""
         allemotes = ["--all", "all", "allemotes"]
         if not allemote:
             embed = Embed(
@@ -257,6 +260,7 @@ class InfoCog(commands.Cog):
             return await ctx.send(embed=embed)
 
         if allemote in allemotes:
+
             server1 = self.bot.get_guild(738392767637487713)
             world1 = [f"`{emoji.name}` - {emoji}" for emoji in server1.emojis]
             server2 = self.bot.get_guild(774294150748831814)
