@@ -23,9 +23,10 @@ class ModCog(commands.Cog):
     @ban.error
     async def ban_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/ban <member> <reason>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/ban <member> <reason>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Kick a specified Discord member.")
     @commands.has_permissions(kick_members=True)
@@ -39,9 +40,10 @@ class ModCog(commands.Cog):
     @kick.error
     async def kick_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/kick <member> <reason>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/kick <member> <reason>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Mute a specified discord member")
     @commands.has_permissions(manage_messages=True)
@@ -63,9 +65,10 @@ class ModCog(commands.Cog):
     @mute.error
     async def mute_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/mute <member> <reason>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/mute <member> <reason>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Delete specified messages.")
     @commands.has_permissions(manage_messages=True)
@@ -80,10 +83,10 @@ class ModCog(commands.Cog):
     @purge.error
     async def purge_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f'Sorry {ctx.author.mention} Please Type `w/purge <amount>')
+            return await ctx.send(f'Sorry {ctx.author.mention} Please Type `w/purge <amount>')
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-        
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Unban a user.")
     @commands.has_permissions(ban_members=True)
@@ -99,9 +102,10 @@ class ModCog(commands.Cog):
     @unban.error
     async def unban_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!, Or that user is not banned!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!, Or that user is not banned!')
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/unban <member>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/unban <member>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Start a poll and let users react!")
     async def poll(self, ctx, *, desc):
@@ -112,7 +116,8 @@ class ModCog(commands.Cog):
     @poll.error
     async def poll_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/poll <text>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/poll <text>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Lockdown the current channel.")
     @commands.has_permissions(manage_channels=True)
@@ -164,8 +169,8 @@ class ModCog(commands.Cog):
     @nuke.error
     async def nuke_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
  
     @commands.command(help="Unlock the current channel.")
     @commands.has_permissions(manage_channels=True)
@@ -197,24 +202,28 @@ class ModCog(commands.Cog):
     @unmute.error
     async def unmute_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/unmute <member> <reason>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/unmute <member> <reason>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @slowmode.error
     async def slowmode_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
    
     @lock.error
     async def lock_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
         
     @unlock.error
     async def unlock_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Snipe a deleted message.")
     async def snipe(self, ctx):

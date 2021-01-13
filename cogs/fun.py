@@ -86,8 +86,8 @@ class FunCog(commands.Cog):
     @askali.error
     async def askali_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/askali <question>`")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/askali <question>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(name="f")
     async def f(self, ctx, *, text: commands.clean_content = None):
@@ -104,7 +104,8 @@ class FunCog(commands.Cog):
     @meme.error
     async def meme_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Enlarge a discord emoji!")
     async def enlarge(self, ctx, emoji: PartialEmoji):
@@ -113,10 +114,10 @@ class FunCog(commands.Cog):
     @enlarge.error
     async def enlarge_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/enlarge <emoji>`")
-        if isinstance(error, commands.PartialEmojiConversionFailure):
-            await ctx.send(f"Sorry {ctx.author.mention} that emoji was not found!")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/enlarge <emoji>`")
+        elif isinstance(error, commands.PartialEmojiConversionFailure):
+            return await ctx.send(f"Sorry {ctx.author.mention} that emoji was not found!")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(aliases=["pepe"])
     async def pp(self, ctx, *, user: Member = None):
@@ -143,7 +144,8 @@ class FunCog(commands.Cog):
     @tweet.error
     async def tweet_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/tweet <username> <message>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/tweet <username> <message>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Is that user gay?.")
     async def gay(self, ctx, *, user: Member=None):
@@ -154,7 +156,8 @@ class FunCog(commands.Cog):
     @gay.error
     async def gay_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f':regional_indicator_x: Sorry {ctx.author.mention} Please Mention A User')
+            return await ctx.send(f':regional_indicator_x: Sorry {ctx.author.mention} Please Mention A User')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(aliases=["aki"])
     async def akinator(self, ctx: commands.Context):
@@ -209,7 +212,8 @@ class FunCog(commands.Cog):
     @_8ball.error
     async def _8ball_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/8ball <question>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/8ball <question>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Turn text into emojis!.")
     async def emojify(self, ctx, *, stuff):
@@ -221,7 +225,8 @@ class FunCog(commands.Cog):
     @emojify.error
     async def emojify_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/emojify <text>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/emojify <text>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Kill a user")
     async def kill(self, ctx, user: Member):
@@ -247,6 +252,7 @@ class FunCog(commands.Cog):
     async def urban_error(self, ctx, error):
         if isinstance(error, commands.errors.NSFWChannelRequired):
             return await ctx.send(embed=Embed(title="NSFW", description=f"Sorry {ctx.author.mention} but this command is nsfw and this is not a nsfw channel.", color=self.color).set_image(url="https://media.discordapp.net/attachments/265156286406983680/728328135942340699/nsfw.gif"))
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Advice from world.")
     async def advice(self, ctx):
@@ -261,7 +267,8 @@ class FunCog(commands.Cog):
     @qr.error
     async def qr_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/qr <text>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/qr <text>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="This command will show you a cute duck", aliases=['quack', 'duk'])
     async def duck(self, ctx):
@@ -316,7 +323,8 @@ class FunCog(commands.Cog):
     @fakequote.error
     async def fakequote_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/fakequote <user> <text>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/fakequote <user> <text>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Write a top.gg Review", aliases=["tgg", "topggreview", "topggbotreview", "botreview"])
     async def topgg(self, ctx, user: Optional[Member], *, message):
@@ -347,7 +355,8 @@ class FunCog(commands.Cog):
     @topgg.error
     async def topgg_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/topgg <user> <text>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/topgg <user> <text>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Widen a discord avatar!", aliases=["widen", "putin", "wideputin"])
     async def wide(self, ctx, user: Member=None):
@@ -436,8 +445,8 @@ class FunCog(commands.Cog):
     @spotify.error
     async def spotify_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Are you a fast typer?!\nUse `w/fast --rank` to see rank.", aliases=["type", "typingtest"])
     @commands.cooldown(rate=3, per=8, type=commands.BucketType.member)
@@ -509,7 +518,8 @@ class FunCog(commands.Cog):
     @fast.error
     async def fast_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Guess the flag from the picture!!", aliases=["gtf"])
     async def guesstheflag(self, ctx):

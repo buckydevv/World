@@ -20,9 +20,8 @@ class PingCog(commands.Cog):
     @ping.error
     async def ping_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            a = round(error.retry_after)
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {a} seconds.")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
 def setup(bot):
     bot.add_cog(PingCog(bot))

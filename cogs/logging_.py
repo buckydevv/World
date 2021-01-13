@@ -36,7 +36,8 @@ class LoggingCog(commands.Cog):
     @create.error
     async def create_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @logging.command(name="shutdown", aliases=["delete"])
     @commands.has_permissions(administrator=True)
@@ -50,7 +51,8 @@ class LoggingCog(commands.Cog):
     @shutdown.error
     async def shutdown_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @logging.command(name="bans", aliases=["discordbans", "banlog"])
     @commands.has_permissions(administrator=True)
@@ -69,9 +71,10 @@ class LoggingCog(commands.Cog):
     @bans.error
     async def bans_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging bans <channel>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging bans <channel>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @logging.command(name="unban", aliases=["discordunban", "unbanlog", "unbanslog", "unbans"])
     @commands.has_permissions(administrator=True)
@@ -89,9 +92,10 @@ class LoggingCog(commands.Cog):
     @unban.error
     async def unban_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging unban <channel>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging unban <channel>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @logging.command(name="deleted", aliases=["discorddeleted", "delmsg"])
     @commands.has_permissions(administrator=True)
@@ -109,9 +113,10 @@ class LoggingCog(commands.Cog):
     @deleted.error
     async def deleted_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging deleted <channel>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging deleted <channel>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @logging.command(name="edited", aliases=["discordedited", "editmsg"])
     @commands.has_permissions(administrator=True)
@@ -129,9 +134,10 @@ class LoggingCog(commands.Cog):
     @edited.error
     async def edited_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging edited <channel>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging edited <channel>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @logging.command(name="welcomes", aliases=["joiner", "joins", "join", "welcomemessages", "welcomemsg", "welcome"])
     @commands.has_permissions(administrator=True)
@@ -149,9 +155,10 @@ class LoggingCog(commands.Cog):
     @welcomes.error
     async def welcomes_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging welcomes <channel>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging welcomes <channel>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @logging.command(name="goodbye", aliases=["memberleave", "bye", "leftserver", "leaving", "goodbyes"])
     @commands.has_permissions(administrator=True)
@@ -169,9 +176,10 @@ class LoggingCog(commands.Cog):
     @goodbye.error
     async def goodbye_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging goodbye <channel>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging goodbye <channel>`")
         elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+            return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):

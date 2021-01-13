@@ -230,9 +230,10 @@ class EconomyCog(commands.Cog):
         """Handles errors when buying something."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins) or isinstance(error, commands.errors.BadArgument):
-            await ctx.send(error)
+            return await ctx.send(error)
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} You missed the `item` or `amount` arguments.")
+            return await ctx.send(f"Sorry {ctx.author.mention} You missed the `item` or `amount` arguments.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(name="sell")
     @commands.cooldown(1, 60, BucketType.member)
@@ -279,15 +280,16 @@ class EconomyCog(commands.Cog):
         """Handles errors when running the rob command."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins):
-            await ctx.send(error)
+            return await ctx.send(error)
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Invalid argument please type `world rob <@user>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} Invalid argument please type `world rob <@user>`")
         elif isinstance(error, commands.errors.BadArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
+            return await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
         elif isinstance(error, UserNotFound):
-            await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
+            return await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @sell.error
     async def sell_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
@@ -299,6 +301,7 @@ class EconomyCog(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             return await ctx.send(f"Sorry {ctx.author.mention} You missed the `item` or `amount` arguments.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(name="delete")
     async def delete(self, ctx: commands.Context) -> None:
@@ -336,7 +339,8 @@ class EconomyCog(commands.Cog):
     async def status_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when running the status command."""
         if isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} You missed the `status` argument.")
+            return await ctx.send(f"Sorry {ctx.author.mention} You missed the `status` argument.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(name="gamble")
     @require_account()
@@ -453,24 +457,27 @@ class EconomyCog(commands.Cog):
         """Handles errors when running the gamble command."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins):
-            await ctx.send(error)
+            return await ctx.send(error)
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} You ran that command wrong, here's how you should run it: `w/roulette <amount> <choice>`")
+            return await ctx.send(f"Sorry {ctx.author.mention} You ran that command wrong, here's how you should run it: `w/roulette <amount> <choice>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @beg.error
     async def beg_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when running the beg command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:,} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:,} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @gamble.error
     async def gamble_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when running the gamble command."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins):
-            await ctx.send(error)
+            return await ctx.send(error)
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} You missed the `amount` argument.")
+            return await ctx.send(f"Sorry {ctx.author.mention} You missed the `amount` argument.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(name="daily")
     @commands.cooldown(1, 86400, BucketType.member)
@@ -493,7 +500,8 @@ class EconomyCog(commands.Cog):
     async def daily_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when running the daily command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:,} hours.")
+            return await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:,} hours.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(name="weekly")
     @commands.cooldown(1, 604800, BucketType.member)
@@ -516,7 +524,8 @@ class EconomyCog(commands.Cog):
     async def weekly_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
         """Handles errors when running the weekly command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:,} days.")
+            return await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:,} days.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(name="transfer")
     @require_account()
@@ -573,6 +582,7 @@ class EconomyCog(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
         elif isinstance(error, UserNotFound):
             return await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     def _get_user(self, user_id: int) -> User:
         """

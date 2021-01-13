@@ -51,9 +51,10 @@ class EconomyFunCog(commands.Cog):
     @reputation.error
     async def reputation_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/rep <@user>`")
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/rep <@user>`")
+        elif isinstance(error, commands.CommandOnCooldown):
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Info on your last given rep point.")
     @require_account()
@@ -163,8 +164,8 @@ class EconomyFunCog(commands.Cog):
     @buybadge.error
     async def buybadge_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/buybadge <BadgeName>`")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/buybadge <BadgeName>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Marry a specified user!")
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
@@ -221,9 +222,10 @@ class EconomyFunCog(commands.Cog):
     @marry.error
     async def marry_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/marry <@user>`")
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/marry <@user>`")
+        elif isinstance(error, commands.CommandOnCooldown):
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Divorce a specified user!")
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
@@ -257,10 +259,10 @@ class EconomyFunCog(commands.Cog):
     @divorce.error
     async def divorce_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/divorce <@user>`")
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/divorce <@user>`")
+        elif isinstance(error, commands.CommandOnCooldown):
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Deposit money into your World bank account", aliases=["dep"])
     @require_account()
@@ -293,14 +295,14 @@ class EconomyFunCog(commands.Cog):
     @deposit.error
     async def deposit_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/deposit <amount>`")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/deposit <amount>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @withdraw.error
     async def withdraw_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/withdraw <amount>`")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/withdraw <amount>`")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
     @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
@@ -342,8 +344,8 @@ class EconomyFunCog(commands.Cog):
     @shootout.error
     async def shootout_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
-
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="Fish for things in the lake", aliases=["fish", "worldfishing"])
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
@@ -369,7 +371,8 @@ class EconomyFunCog(commands.Cog):
     @fishing.error
     async def fishing_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+        await ctx.send(F"Sorry {ctx.author.mention} There was an error: `{type(error).__name__} {str(error)}`")
 
     @commands.command(help="What badges do you have?", aliases=["mybadges", "showbadges", "badge"])
     @require_account()
