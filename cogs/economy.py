@@ -207,7 +207,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(
             title=f"{ctx.author}'s balance",
             color=self.color,
-            description=f"Coins: `{author.coins:,}`\nBank: `{author.Bank}`"
+            description=f"Coins: `{author.coins:.0f}`\nBank: `{author.Bank}`"
         ))
 
     @commands.command(name="buy")
@@ -246,11 +246,10 @@ class EconomyCog(commands.Cog):
         coins_earned = await self._sell(item, amount, user)
         if not coins_earned:
             return await ctx.send(embed=Embed(title="Sorry", color=self.color, description=f"Sorry {ctx.author.mention} your items couldn't be sold because you got robbed. Good luck the next time!"))
-        return await ctx.send(embed=Embed(title="Congrats!", color=self.color, description=f"Hey {ctx.author.mention} You sold your items successfully! You earned `{coins_earned}` coins."))
+        return await ctx.send(embed=Embed(title="Congrats!", color=self.color, description=f"Hey {ctx.author.mention} You sold your items successfully! You earned `{coins_earned:.0f}` coins."))
 
     @commands.command(name="rob")
     @commands.cooldown(1, 1800, BucketType.member)
-    @require_account()
     @require_account()
     async def rob(self, ctx: commands.Context, user: Member) -> None:
         """Rob a user!"""
@@ -265,7 +264,7 @@ class EconomyCog(commands.Cog):
         if not target.coins:
             return await ctx.send(f"Sorry {ctx.author.mention} That user has no coins, try again next time!")
         robbed_amount = randint(1, round(target.coins))
-        Wealth.collection.update_one({"_id": user.id}, {"$inc": {"coins": -total_robbed}})
+        Wealth.collection.update_one({"_id": user.id}, {"$inc": {"coins": -robbed_amount}})
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": robbed_amount}})
 
         await ctx.send(embed=Embed(
