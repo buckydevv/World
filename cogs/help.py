@@ -101,7 +101,7 @@ class HelpCog(commands.Cog):
         value="`w/gay` | `w/askali` | `w/pp` | `w/8ball` | `w/f` | `w/joke` | `w/emojify` | `w/akinator` | `w/kill` | `w/fast` | `w/mock` | `w/gtf`"
         ).add_field(
         name=":frame_photo: | Image fun",
-        value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/tweet` | `w/blur` | `w/avatar` | `w/qr` | `w/flip` | `w/wide`",
+        value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/tweet` | `w/blur` | `w/avatar` | `w/qr` | `w/flip` | `w/wide` | `w/steam`",
         inline=False
       ))
 
@@ -120,7 +120,7 @@ class HelpCog(commands.Cog):
         inline=False
         ).add_field(
         name=":thumbsup: | Fun commands",
-        value="`w/daily` | `w/weekly` | `w/gamble` | `w/rep` | `w/repinfo` | `w/marry` | `w/divorce` | `w/rob` | `w/shootout` | `w/fish`",
+        value="`w/daily` | `w/weekly` | `w/gamble` | `w/rep` | `w/repinfo` | `w/marry` | `w/divorce` | `w/rob` | `w/shootout` | `w/fish` | `w/trash`",
         inline=False
       ))
 
@@ -129,7 +129,7 @@ class HelpCog(commands.Cog):
       await ctx.send(embed=Embed(
         title="New commands!", 
         color=self.color,
-        description="`w/emotes` | `w/rob` | `w/fish` | `w/shootout` | `w/duck` | `w/flip` | `w/blur`\n\nTo see patches Join the support server! `w/invite`"
+        description="`w/trash` | `w/steam`, Also fixed alot of bugs."
       ))
 
 def setup(bot):
