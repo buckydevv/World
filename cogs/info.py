@@ -114,23 +114,27 @@ class InfoCog(commands.Cog):
     @commands.command(name="botinfo", aliases=("bot", "about"))
     async def botinfo(self, ctx: commands.Context) -> None:
         """Shows info about World."""
-        req = await self.session.get("https://api.statcord.com/v3/700292147311542282")
-        if req.status != 200:
-            return await ctx.send(f"Sorry {ctx.author.mention} a error has occured and will be fixed soon!")
-        r = await req.json()
-        p = dumps(r)
-        y = loads(p)
-        with open('prefixes.json', 'r') as f: # wow nice
-            prefixes = load(f)
-        guild_prefix = "w/, world" if (str(ctx.guild.id) in prefixes) else prefixes[str(ctx.guild.id)]
-        start = time()
-        message = await ctx.send(embed=Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.color))
-        end = time()
-        await _sleep(1)
-        await message.edit(embed=Embed(
-            title="World's info!",
-            color=self.color,
-            description=dedent(f"""
+        try:
+            req = await self.session.get("https://api.statcord.com/v3/700292147311542282")
+            if req.status != 200:
+                return await ctx.send(f"Sorry {ctx.author.mention} a error has occured and will be fixed soon!")
+            r = await req.json()
+            p = dumps(r)
+            y = loads(p)
+            with open('prefixes.json', 'r') as f:
+                prefixes = load(f)
+            if not (str(ctx.guild.id) in prefixes):
+                guild_prefix = "w/, World"
+            else:
+                guild_prefix = prefixes[str(ctx.guild.id)]
+            start = time()
+            message = await ctx.send(embed=Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.color))
+            end = time()
+            await _sleep(1)
+            await message.edit(embed=Embed(
+                title="World's info!",
+                color=self.color,
+                description=dedent(f"""
                 > <:Worldhappy:768145777985454131> Bot Information
                 Version: `discord.py {__version__}`
                 CPU Load: `{psutil.cpu_percent()}%`
@@ -146,8 +150,10 @@ class InfoCog(commands.Cog):
                 Total commands: `{len(self.bot.commands)}`
                 Commands used today: `{y['data'][0]['commands']}`
                 Popular commands: `w/{y['data'][0]['popular'][0]['name']}`, `w/{y['data'][0]['popular'][1]['name']}`, `w/{y['data'][0]['popular'][2]['name']}`,\n`w/{y['data'][0]['popular'][3]['name']}`, `w/{y['data'][0]['popular'][4]['name']}`
-            """)
-        ))
+                """)
+                ))
+        except Exception as e:
+            return await ctx.send(e)
 
     @commands.command(name="vote")
     async def vote(self, ctx: commands.Context) -> None:
@@ -169,12 +175,13 @@ class InfoCog(commands.Cog):
                 title="Done!",
                 description=f"I have sent the following to World developers: `{suggestion}`",
                 color=self.color
-            ).set_footer(
-                text=f"WARNING: Bad usage of this command may lead to a bot ban."
-            )
-        )
+            ).set_thumbnail(
+                url=ctx.author.avatar_url
+                ).set_footer(
+                    text=f"WARNING: Bad usage of this command may lead to a bot ban."
+                    )
+                    )
         suggestion_channel = await self.bot.fetch_channel(763110868791459860)
-        suggestion_embed.set_thumbnail(url=ctx.author.avatar_url)
         await suggestion_channel.send(embed=Embed(
             title=f"Suggestion from {ctx.author}",
             description=suggestion,
@@ -185,7 +192,8 @@ class InfoCog(commands.Cog):
                 ID: {ctx.author.id}
             """),
             inline=False
-        ))
+        ).set_thumbnail(url=ctx.author.avatar_url)
+        )
 
     @suggest.error
     async def suggest_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
