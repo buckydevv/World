@@ -71,3 +71,13 @@ class Wealth:
             "https://im-a-dev.xyz/BvdekLII.png",
             "https://im-a-dev.xyz/MfSnYYAa.png"
         ])
+
+
+    def trash_ran():
+        """Pick a random photo for the `Trash` command."""
+        return choice([
+            "https://im-a-dev.xyz/om3vsD0s.png", # coins
+            "https://im-a-dev.xyz/zqyCJ9sH.png", # cookie
+            "https://im-a-dev.xyz/ogWxLI7K.png", # reputation
+            "https://im-a-dev.xyz/i8HiGmwU.png"  # Nothing
+        ])
