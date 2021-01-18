@@ -1,3 +1,4 @@
+import discord
 from discord import Embed
 from datetime import datetime
 from asyncio import sleep as _sleep
