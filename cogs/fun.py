@@ -503,7 +503,7 @@ class FunCog(commands.Cog):
     @commands.command(help="Mock some text.")
     async def mock(self, ctx, *, text) -> None:
         if not text:
-            text = "shuana is qt"#return await ctx.send(f"Sorry {ctx.author.mention} you forgot to add some text for me to mock.")
+            return await ctx.send(f"Sorry {ctx.author.mention} you forgot to add some text for me to mock.")
         return await ctx.send("".join([choice([index.lower(), index.upper()]) for index in list(text)]))
 
     @fast.error
@@ -536,5 +536,33 @@ class FunCog(commands.Cog):
     		except:
     			await FirstMessage.delete()
     			return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
+    
+    @commands.command()
+    async def steam(self, ctx, user: Optional[Member], *, message=None) -> None:
+    	"""Returns a Image of a Steam notifaction!"""
+    	if message == None: message = "Nothing"
+    	user = user or ctx.author
+    	image = Image.open("images/steam.png")
+    	font = ImageFont.truetype("fonts/Arial.ttf", 46, encoding="unic") # Steam's notifaction font.
+
+    	pfp = await Misc.fetch_pfp(user)
+    	CONVERT = pfp.resize((140,140)) # Resize the Members Avatar.
+
+    	KKS_MESSAGE_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(message)) # Transliteration if the text is CJK
+    	KKS_NAME_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(user.name)) # Transliteration if the text is CJK
+
+    	MSG_CHECK = KKS_MESSAGE_CONVERT if len(KKS_MESSAGE_CONVERT) <= 25 else f'{KKS_MESSAGE_CONVERT[:22]}'
+    	NAME_CHECK = KKS_NAME_CONVERT if len(KKS_NAME_CONVERT) <= 25 else f'{KKS_NAME_CONVERT[:22]}...'
+
+    	parser = TwemojiParser(image)
+    	await parser.draw_text((262, 77), NAME_CHECK, font=font, fill=(139,195,21)) # Name of discord.Member
+    	await parser.draw_text((264, 132), "is now playing", font=font, fill="grey")
+    	await parser.draw_text((263, 188), MSG_CHECK, font=font, fill=(139,195,21)) # Message/Game name (message)
+    	await parser.close() # Close the session
+
+    	image.paste(CONVERT, (92, 92), CONVERT)
+    	return await ctx.send(file=Misc.save_image(image))
+
+
 def setup(bot):
     bot.add_cog(FunCog(bot))
