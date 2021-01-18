@@ -364,7 +364,7 @@ class EconomyFunCog(commands.Cog):
         # otherwise, they caught something
         key_name, amount_added_to_db, message = fishing_ctx[random]
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {key_name: amount_added_to_db}})
-        return await ctx.send(embed=Embed(title="Fishing", description=message, color=self.color).set_image(url=Embed(title="Fishing", description=message, color=self.color)))
+        return await ctx.send(embed=Embed(title="Fishing", description=message, color=self.color).set_image(url=random))
 
     @fishing.error
     async def fishing_error(self, ctx, error):
@@ -387,5 +387,31 @@ class EconomyFunCog(commands.Cog):
     async def mystatus(self, ctx):
         await ctx.send(embed=Embed(title="Your Status", description=f"World status: `{Wealth.collection.find_one({'_id': ctx.author.id})['afk']}`", color=self.color))
 
+    @commands.command(help="Find things in the Trash!", aliases=["trashbin", "bin"])
+    @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
+    @require_account()
+    async def trash(self, ctx):
+        random = Wealth.trash_ran()
+        doc = Wealth.collection.find_one({'_id': ctx.author.id})
+        random_coins = randint(1, 18)
+        random_cookies = randint(1, 21)
+        trash_ctx = {
+            "https://im-a-dev.xyz/i8HiGmwU.png": None, # key_name, amount_added_to_db, message
+            "https://im-a-dev.xyz/ogWxLI7K.png": ("Reputation", 1, f"Wow, You found some Reputation in the trash! Good job, You now have a total of `{(doc['Reputation'] + 1)}` Rep points!"),
+            "https://im-a-dev.xyz/zqyCJ9sH.png": ("cookie", random_cookies, f"Amazing, You found `{random_cookies}` cookies in the trash bin, You now have `{(doc['cookie'] + random_cookies):,}` Cookies!"),
+            "https://im-a-dev.xyz/om3vsD0s.png": ("coins", random_coins, f"Nice you found a bag of coins in the trash bin!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{(doc['coins'] + random_coins):,}` Coins!")
+        }        
+
+        if not trash_ctx[random]: # they didn't caught anything
+            return await ctx.send(embed=Embed(title="Trash Search", description="Nothing found in this bin, Try again soon!", color=self.color).set_image(url="https://im-a-dev.xyz/i8HiGmwU.png"))
+        # otherwise, they caught something
+        key_name, amount_added_to_db, message = trash_ctx[random]
+        Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {key_name: amount_added_to_db}})
+        return await ctx.send(embed=Embed(title="Trash Search", description=message, color=self.color).set_image(url=random))
+
+    @trash.error
+    async def trash_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 def setup(bot):
     bot.add_cog(EconomyFunCog(bot))
