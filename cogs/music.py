@@ -28,7 +28,7 @@ class MusicController:
     async def controller_loop(self):
         await self.bot.wait_until_ready()
 
-        player: Player = self.bot.wavelink.get_player(guild_id=self.guild_id, cls=Player)
+        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player)
         await player.set_volume(self.volume)
 
         while True:
@@ -63,7 +63,7 @@ class Music(commands.Cog):
 
     async def start_nodes(self):
         await self.bot.wait_until_ready() # Wait until bot is ready to make a connection!
-        node = await self.bot.wavelink.initiate_node(host='127.0.0.1',port=2333, rest_uri='http://127.0.0.1:2333', password='Worldbot77', identifier='TEST', region='us_central')
+        node = await self.bot.wavelink.initiate_node(host='127.0.0.1',port=2333, rest_uri='http://127.0.0.1:2333', password='.', identifier='TEST', region='us_central')
         node.set_hook(self.on_event_hook)
 
 
@@ -115,7 +115,6 @@ class Music(commands.Cog):
     def is_privileged(self, ctx: commands.Context):
         """Check whether the user is an Administrator or DJ."""
         player: Player = self.bot.wavelink.get_player(ctx.guild.id, cls=Player, context=ctx)
-
         return player.dj == ctx.author or ctx.author.guild_permissions.ban_members
 
 
@@ -128,7 +127,7 @@ class Music(commands.Cog):
             except AttributeError:
                 await ctx.send(f"Sorry {ctx.author.mention} no channel to join, As you are not connected to one. Please connect to a voice channel!")
 
-        player = self.bot.wavelink.get_player(ctx.guild.id)
+        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         await player.connect(channel.id)
         await ctx.send(f"Connected to `{channel.name}`", delete_after=3)
 
