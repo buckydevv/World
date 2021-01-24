@@ -8,9 +8,9 @@
 <h3>Nice Design:</h3>
 <img src="https://im-a-dev.xyz/Y7PZNwAv.png">
 <br>
-<h3>Easy moderation system:</h3>
+<h3>Easy Music system:</h3>
 <br>
-<img src="https://im-a-dev.xyz/pZKQirgx.png">
+<img src="https://im-a-dev.xyz/9lTRZrnb.png">
 <br>
 <h3>Easy logging system</h3>
 <br>
