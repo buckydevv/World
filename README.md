@@ -1,29 +1,18 @@
-<!DOCTYPE html>
-<html>
-<body>
-<h3>Easy navigation:</h3>
-<br>
-<img src="https://im-a-dev.xyz/EZL7KKwb.png">
-<br>
-<h3>Nice Design:</h3>
-<img src="https://im-a-dev.xyz/Y7PZNwAv.png">
-<br>
-<h3>Easy Music system:</h3>
-<br>
-<img src="https://im-a-dev.xyz/9lTRZrnb.png">
-<br>
-<h3>Easy logging system</h3>
-<br>
-<img src="https://im-a-dev.xyz/pcSTIGdv.png">
-<h3>Fun economy system</h3>
-<br>
-<img src="https://im-a-dev.xyz/JfkZnrD2.png">
-<br>
-<h3>Some epic fun commands:</h3>
-<br>
-<img src="https://im-a-dev.xyz/aOMs8Sz2.png">
-<br>
-<h3>Join support server</h3>
-<a href="https://discord.gg/AyWjtRncHA"><img src="https://im-a-dev.xyz/lq9uDO23.png">
-</body>
-</html>
+## World, A Discord bot created using [discord.py](https://github.com/Rapptz/discord.py)
+![MainImage](https://im-a-dev.xyz/wxFZOZhD.png)
+
+[![DISCORDSUPPORT](https://img.shields.io/discord/738392767637487713?color=blue&label=Discord%20Support)](https://discord.gg/AyWjtRncHA) [![InviteWorld](https://img.shields.io/badge/Invite%20World-Click%20here-blue)](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)
+
+## Information
+### World is a Disord bot that has many features and it's own framework!
+### World contains cool categories such as:
+* Music
+* Fun
+* Logging
+* Moderation
+* Economy
+* Other
+
+## Pull requests
+### I would greatly appreaciate for people to contribute to World...
+#### You can make a pull request by forking the bot and editing the files [Here](https://github.com/shuanaongithub/World/fork)
