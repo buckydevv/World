@@ -13,37 +13,44 @@ class OwnerCog(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def load(self, ctx, module):
+    async def load(self, ctx, *module):
         """Loads a module."""
-        try:
-            self.bot.load_extension(module)
-        except Exception as e:
-            await ctx.send('{}: {}'.format(type(e).__name__, e))
-        else:
-            await ctx.send(embed=Embed(title='load!', description=f"I Have loaded `{module}`", colour=ctx.author.colour))  
+        results = []
+        for m in module:
+            try:
+                self.bot.load_extension(module)
+                results.append(f":+1: {m}")
+            except Exception as e:
+                results.append(f":-1: {e.__class__.__name__}: {e}")
+        await ctx.send(embed=Embed(title='Load!', description="\n".join(results), colour=ctx.author.colour)) 
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def unload(self, ctx, module):
+    async def unload(self, ctx, *module):
         """Unloads a module."""
-        try:
-            self.bot.unload_extension(module)
-        except Exception as e:
-            await ctx.send('{}: {}'.format(type(e).__name__, e))
-        else:
-            await ctx.send(content=None, embed=Embed(title='Unload!', description=f"I Have Unloaded `{module}`", colour=ctx.author.colour))
+        results = []
+        for m in module:
+            try:
+                self.bot.unload_extension(module)
+                results.append(f":+1: {m}")
+            except Exception as e:
+                results.append(f":-1: {e.__class__.__name__}: {e}")
+            
+        await ctx.send(embed=Embed(title='Unload!', description="\n".join(results), colour=ctx.author.colour))
 
     @commands.command(name='reload', hidden=True)
     @commands.is_owner()
-    async def _reload(self, ctx, module):
+    async def _reload(self, ctx, *module):
         """Reloads a module."""
-        try:
-            self.bot.unload_extension(module)
-            self.bot.load_extension(module)
-        except Exception as e:
-            await ctx.send('{}: {}'.format(type(e).__name__, e))
-        else:
-            await ctx.send(content=None, embed=Embed(title='Reload!', description=f"I Have Reloaded `{module}`", colour=ctx.author.colour))
+        results = []
+        for m in module:
+          try:
+              self.bot.reload_extension(m)
+              results.append(f":+1: {m}")
+          except Exception as e:
+              results.append(f":-1: {e.__class__.__name__}: {e}")
+          
+        await ctx.send(embed=Embed(title='Reload!', description=f"\n".join(results), colour=ctx.author.colour))
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -56,7 +63,7 @@ class OwnerCog(commands.Cog):
     		color=0x2F3136,
     		timestamp=datetime.utcnow()
         ))
-    	await ctx.send(f"Hey {ctx.author.mention} i have updated the message in <#765632402680447006>")
+    	await ctx.send(embed=Embed(title="Updated!", description=f"I have updated the message! Go [check it out]({msg.jump_url})", colour=ctx.author.colour))
 
     @commands.command(name="eval")
     @commands.is_owner()
@@ -130,3 +137,4 @@ class OwnerCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(OwnerCog(bot))
+    print("COG: owner.py Has been loaded!")

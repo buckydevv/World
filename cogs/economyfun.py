@@ -415,3 +415,4 @@ class EconomyFunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 def setup(bot):
     bot.add_cog(EconomyFunCog(bot))
+    print("COG: economyfun.py Has been loaded!")

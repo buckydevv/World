@@ -1,7 +1,7 @@
 from discord import Embed
 from asyncio import sleep as _sleep
 from time import time
-from ext import commands
+from discord.ext import commands
 
 class PingCog(commands.Cog):
     def __init__(self, bot):
@@ -26,3 +26,4 @@ class PingCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(PingCog(bot))
+    print("COG: ping.py Has been loaded!")

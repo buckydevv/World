@@ -248,5 +248,5 @@ class InfoCog(commands.Cog):
             return await paginator.execute()
         
 def setup(bot: commands.Bot) -> None:
-    """Adds the cog into the bot."""
     bot.add_cog(InfoCog(bot))
+    print("COG: info.py Has been loaded!")

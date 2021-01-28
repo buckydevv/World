@@ -8,7 +8,7 @@ class Guild:
 
     def _create_guild_account(guild_id: int) -> None:
         """Create a World guild account."""
-        self.collection.insert_one({
+        collection.insert_one({
             "_id": guild_id,
             "Bans": 0,
             "Kicks": 0,
