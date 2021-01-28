@@ -566,3 +566,4 @@ class FunCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(FunCog(bot))
+    print("COG: fun.py Has been loaded!")

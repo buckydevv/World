@@ -40,3 +40,4 @@ class PingCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(PingCog(bot))
+    print("COG: ping.py Has been loaded!")
