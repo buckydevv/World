@@ -17,7 +17,7 @@ collection = db["UserCoins"]
 
 class Premium:
     def __init__(self):
-        self.color = 0x2F3136
+        pass
 
     def has_premium(user: int):
     	"""Check if the given user has World Premium."""
@@ -28,7 +28,7 @@ class Premium:
     			return False
 
 
-    def give_premium(user_id: int) -> None:
+    def give_premium(user_id: int):
         """Give World Premium to given user."""
         result = collection.find_one(
             {"_id": user_id}
@@ -37,7 +37,7 @@ class Premium:
         collection.update_one({"_id": user_id}, {"$set": {"Premium": "Yes"}})
 
 
-    def remove_premium(user_id: int) -> None:
+    def remove_premium(user_id: int):
         """Remove World Premium from the given user."""
         result = collection.find_one(
             {"_id": user_id}

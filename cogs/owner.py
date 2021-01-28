@@ -137,4 +137,3 @@ class OwnerCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(OwnerCog(bot))
-    print("COG: owner.py Has been loaded!")

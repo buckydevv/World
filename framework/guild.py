@@ -6,7 +6,7 @@ __import__("dotenv").load_dotenv()
 class Guild:
     collection = MongoClient(environ["MONGODB_URL"])["Logging"]["Guilds"]
 
-    def _create_guild_account(guild_id: int) -> None:
+    def _create_guild_account(guild_id: int):
         """Create a World guild account."""
         collection.insert_one({
             "_id": guild_id,

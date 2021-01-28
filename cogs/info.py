@@ -12,15 +12,14 @@ from aiohttp import ClientSession
 class InfoCog(commands.Cog):
     """Contains commands that provide useful information."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: commands.Bot):
         """Sets up the cog."""
         self.bot = bot
         self.init_time = time()
         self.session = ClientSession()
-        self.color = 0x2F3136
 
     @commands.command(name="userinfo", aliases=("ui", "user"))
-    async def userinfo(self, ctx: commands.Context, member: Optional[Member]) -> None:
+    async def userinfo(self, ctx: commands.Context, member: Optional[Member]):
         """
         Returns information about a member.
         If the `member` parameter is not specified, the info will be from the author.
@@ -28,7 +27,7 @@ class InfoCog(commands.Cog):
         user = member or ctx.author
         await ctx.send(embed=Embed(
             title=f"Information about {user} {f'({user.nick})' if user.nick else ''}",
-            color=self.color
+            color=self.bot.color
         ).add_field(
             name="General information",
             value=dedent(f"""
@@ -53,17 +52,17 @@ class InfoCog(commands.Cog):
         ).set_thumbnail(url=user.avatar_url))
 
     @userinfo.error
-    async def userinfo_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def userinfo_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors while running the userinfo command."""
         if isinstance(error, commands.errors.BadArgument):
             await ctx.send(f"Sorry {ctx.author.mention} That member doesn't exist.")
 
     @commands.command(name="serverinfo", aliases=("server", "guild"))
-    async def serverinfo(self, ctx: commands.Context) -> None:
+    async def serverinfo(self, ctx: commands.Context):
         """Shows information about the server."""
         await ctx.send(embed=Embed(
             title=f"Information about {ctx.guild.name}",
-            color=self.color
+            color=self.bot.color
         ).add_field(name="**Name**", value=ctx.guild.name
         ).add_field(name="**Owner**", value=f"{ctx.guild.owner}"
         ).add_field(name="**Region**", value=f"{ctx.guild.region}"
@@ -85,7 +84,7 @@ class InfoCog(commands.Cog):
     async def roleinfo(self, ctx, role: Role):
         await ctx.send(embed=Embed(
             title="Role Information",
-            color=self.color
+            color=self.bot.color
             ).add_field(
             name=f"{role.name} - Info",
             value=f"{role.mention}\nUsers: `{len(role.members)}`\nColor: `{role.color}`\nMentionable: `{role.mentionable}`\nDisplayed: `{role.hoist}`"
@@ -100,7 +99,7 @@ class InfoCog(commands.Cog):
     async def categoryinfo(self, ctx, *, category: CategoryChannel):
         await ctx.send(embed=Embed(
             title="Category Information",
-            color=self.color
+            color=self.bot.color
             ).add_field(
             name=f"{category.name} - Info",
             value=f"Type: `{category.type}`\nText channels: `{len(category.text_channels)}`\nVoice channels: `{len(category.voice_channels)}`\nNsfw: `{category.is_nsfw()}`"
@@ -112,7 +111,7 @@ class InfoCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/categoryinfo <category>`")
 
     @commands.command(name="botinfo", aliases=("bot", "about"))
-    async def botinfo(self, ctx: commands.Context) -> None:
+    async def botinfo(self, ctx: commands.Context):
         """Shows info about World."""
         try:
             req = await self.session.get("https://api.statcord.com/v3/700292147311542282")
@@ -128,12 +127,12 @@ class InfoCog(commands.Cog):
             else:
                 guild_prefix = prefixes[str(ctx.guild.id)]
             start = time()
-            message = await ctx.send(embed=Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.color))
+            message = await ctx.send(embed=Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.bot.color))
             end = time()
             await _sleep(1)
             await message.edit(embed=Embed(
                 title="World's info!",
-                color=self.color,
+                color=self.bot.color,
                 description=dedent(f"""
                 > <:Worldhappy:768145777985454131> Bot Information
                 Version: `discord.py {__version__}`
@@ -156,16 +155,16 @@ class InfoCog(commands.Cog):
             return await ctx.send(e)
 
     @commands.command(name="vote")
-    async def vote(self, ctx: commands.Context) -> None:
+    async def vote(self, ctx: commands.Context):
         """Sends a link where you can vote for World."""
         await ctx.send(embed=Embed(
             title="Vote for World!",
             description="You can vote for World [Here](https://top.gg/bot/700292147311542282/vote)",
-            color=self.color
+            color=self.bot.color
         ))
 
     @commands.command(name="suggest")
-    async def suggest(self, ctx: commands.Context, *, suggestion: str) -> None:
+    async def suggest(self, ctx: commands.Context, *, suggestion: str):
         """
         Suggest something for World.
         **WARNING:** Bad usage of this command may lead from a bot ban.
@@ -174,7 +173,7 @@ class InfoCog(commands.Cog):
             embed=Embed(
                 title="Done!",
                 description=f"I have sent the following to World developers: `{suggestion}`",
-                color=self.color
+                color=self.bot.color
             ).set_thumbnail(
                 url=ctx.author.avatar_url
                 ).set_footer(
@@ -185,7 +184,7 @@ class InfoCog(commands.Cog):
         await suggestion_channel.send(embed=Embed(
             title=f"Suggestion from {ctx.author}",
             description=suggestion,
-            color=self.color
+            color=self.bot.color
         ).add_field(name="Information about the suggester",
             value=dedent(f"""
                 Name: {ctx.author}
@@ -196,13 +195,13 @@ class InfoCog(commands.Cog):
         )
 
     @suggest.error
-    async def suggest_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def suggest_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors while running suggest command."""
         if isinstance(error, commands.errors.MissingRequiredArgument):
             await ctx.send(f"Hey {ctx.author.mention} You missed the `suggestion` parameter.")
 
     @commands.command(name="uptime")
-    async def uptime(self, ctx: commands.Context) -> None:
+    async def uptime(self, ctx: commands.Context):
         """Returns the bot's uptime."""
         seconds = time() - self.init_time
         minutes, seconds = divmod(seconds, 60)
@@ -211,26 +210,26 @@ class InfoCog(commands.Cog):
         await ctx.send(embed=Embed(
             title="Uptime",
             description=f"`{days:.2f} days {hours:.2f} hours {minutes:.2f} minutes {seconds:.2f} seconds`",
-            color=self.color
+            color=self.bot.color
         ))
 
     @commands.command(name="invite")
-    async def invite(self, ctx: commands.Context) -> None:
+    async def invite(self, ctx: commands.Context):
         """Gives a World invite link to the user."""
         await ctx.send(embed=Embed(
             title="Invite world",
             description=f"[Invite - Admin perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=8&scope=bot)\n[Invite - No perms](https://discord.com/api/oauth2/authorize?client_id={self.bot.user.id}&permissions=0&scope=bot)\n[Support server](https://discord.gg/AyWjtRncHA)",
-            color=self.color
+            color=self.bot.color
         ))
 
     @commands.command(help="How to get World emotes!", aliases=["worldemotes", "worldemote", "emojis", "emoji"])
-    async def emotes(self, ctx, allemote: Optional[str]) -> None:
+    async def emotes(self, ctx, allemote: Optional[str]):
         allemotes = ("--all", "all", "allemotes")
         if not allemote:
             return await ctx.send(embed=Embed(
                 title="World emotes",
                 description="`Support server:` [<:Worldhappy:768145777985454131> Join](https://discord.gg/gQSHvKCV)\n`World Emotes1:` [<:Worldhappy:768145777985454131> Join](https://discord.gg/TEfM7hEBpz)",
-                color=self.color
+                color=self.bot.color
             ).set_footer(text="To see all emotes run `w/emotes --all`"))
 
         if allemote in allemotes:
@@ -240,13 +239,12 @@ class InfoCog(commands.Cog):
             world2 = [f"`{emoji.name}` - {emoji}" for emoji in server2.emojis]
 
             paginator = Paginator(ctx, [
-                Embed(title="`Page 1` - World Emotes", description = "\n".join(world1[:18]), color=self.color),
-                Embed(title="`Page 2` - World Emotes", description="\n".join(world1[19:34]), color=self.color),
-                Embed(title="`Page 3` - World Emotes", description="\n".join(world1[35:51]), color=self.color),
-                Embed(title="`Page 4` - World Emotes", description="\n".join(world2[:25]), color=self.color),
+                Embed(title="`Page 1` - World Emotes", description = "\n".join(world1[:18]), color=self.bot.color),
+                Embed(title="`Page 2` - World Emotes", description="\n".join(world1[19:34]), color=self.bot.color),
+                Embed(title="`Page 3` - World Emotes", description="\n".join(world1[35:51]), color=self.bot.color),
+                Embed(title="`Page 4` - World Emotes", description="\n".join(world2[:25]), color=self.bot.color),
             ])
             return await paginator.execute()
         
-def setup(bot: commands.Bot) -> None:
+def setup(bot: commands.Bot):
     bot.add_cog(InfoCog(bot))
-    print("COG: info.py Has been loaded!")

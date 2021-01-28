@@ -8,7 +8,7 @@ __import__("dotenv").load_dotenv()
 class Wealth:
     collection = MongoClient(environ["MONGODB_URL"])["Coins"]["UserCoins"]
 
-    def _create_account(user_id: int) -> None:
+    def _create_account(user_id: int):
         """Create a World account."""
         now = datetime.now()
         _created_at = now.strftime("%m/%d/%Y at %H:%M:%S")

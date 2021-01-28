@@ -28,7 +28,6 @@ class FunCog(commands.Cog):
         self.Country = [{"name":"Afghanistan","code":"AF"},{"name":"Aland Islands","code":"AX"},{"name":"Albania","code":"AL"},{"name":"Algeria","code":"DZ"},{"name":"American Samoa","code":"AS"},{"name":"AndorrA","code":"AD"},{"name":"Angola","code":"AO"},{"name":"Anguilla","code":"AI"},{"name":"Antarctica","code":"AQ"},{"name":"Antigua and Barbuda","code":"AG"},{"name":"Argentina","code":"AR"},{"name":"Armenia","code":"AM"},{"name":"Aruba","code":"AW"},{"name":"Australia","code":"AU"},{"name":"Austria","code":"AT"},{"name":"Azerbaijan","code":"AZ"},{"name":"Bahamas","code":"BS"},{"name":"Bahrain","code":"BH"},{"name":"Bangladesh","code":"BD"},{"name":"Barbados","code":"BB"},{"name":"Belarus","code":"BY"},{"name":"Belgium","code":"BE"},{"name":"Belize","code":"BZ"},{"name":"Benin","code":"BJ"},{"name":"Bermuda","code":"BM"},{"name":"Bhutan","code":"BT"},{"name":"Bolivia","code":"BO"},{"name":"Bosnia and Herzegovina","code":"BA"},{"name":"Botswana","code":"BW"},{"name":"Bouvet Island","code":"BV"},{"name":"Brazil","code":"BR"},{"name":"British Indian Ocean Territory","code":"IO"},{"name":"Brunei Darussalam","code":"BN"},{"name":"Bulgaria","code":"BG"},{"name":"Burkina Faso","code":"BF"},{"name":"Burundi","code":"BI"},{"name":"Cambodia","code":"KH"},{"name":"Cameroon","code":"CM"},{"name":"Canada","code":"CA"},{"name":"Cape Verde","code":"CV"},{"name":"Cayman Islands","code":"KY"},{"name":"Central African Republic","code":"CF"},{"name":"Chad","code":"TD"},{"name":"Chile","code":"CL"},{"name":"China","code":"CN"},{"name":"Christmas Island","code":"CX"},{"name":"Cocos (Keeling) Islands","code":"CC"},{"name":"Colombia","code":"CO"},{"name":"Comoros","code":"KM"},{"name":"Congo","code":"CG"},{"name":"Congo, The Democratic Republic of the","code":"CD"},{"name":"Cook Islands","code":"CK"},{"name":"Costa Rica","code":"CR"},{"name":"Cote D'Ivoire","code":"CI"},{"name":"Croatia","code":"HR"},{"name":"Cuba","code":"CU"},{"name":"Cyprus","code":"CY"},{"name":"Czech Republic","code":"CZ"},{"name":"Denmark","code":"DK"},{"name":"Djibouti","code":"DJ"},{"name":"Dominica","code":"DM"},{"name":"Dominican Republic","code":"DO"},{"name":"Ecuador","code":"EC"},{"name":"Egypt","code":"EG"},{"name":"El Salvador","code":"SV"},{"name":"Equatorial Guinea","code":"GQ"},{"name":"Eritrea","code":"ER"},{"name":"Estonia","code":"EE"},{"name":"Ethiopia","code":"ET"},{"name":"Falkland Islands (Malvinas)","code":"FK"},{"name":"Faroe Islands","code":"FO"},{"name":"Fiji","code":"FJ"},{"name":"Finland","code":"FI"},{"name":"France","code":"FR"},{"name":"French Guiana","code":"GF"},{"name":"French Polynesia","code":"PF"},{"name":"French Southern Territories","code":"TF"},{"name":"Gabon","code":"GA"},{"name":"Gambia","code":"GM"},{"name":"Georgia","code":"GE"},{"name":"Germany","code":"DE"},{"name":"Ghana","code":"GH"},{"name":"Gibraltar","code":"GI"},{"name":"Greece","code":"GR"},{"name":"Greenland","code":"GL"},{"name":"Grenada","code":"GD"},{"name":"Guadeloupe","code":"GP"},{"name":"Guam","code":"GU"},{"name":"Guatemala","code":"GT"},{"name":"Guernsey","code":"GG"},{"name":"Guinea","code":"GN"},{"name":"Guinea-Bissau","code":"GW"},{"name":"Guyana","code":"GY"},{"name":"Haiti","code":"HT"},{"name":"Heard Island and Mcdonald Islands","code":"HM"},{"name":"Holy See (Vatican City State)","code":"VA"},{"name":"Honduras","code":"HN"},{"name":"Hong Kong","code":"HK"},{"name":"Hungary","code":"HU"},{"name":"Iceland","code":"IS"},{"name":"India","code":"IN"},{"name":"Indonesia","code":"ID"},{"name":"Iran, Islamic Republic Of","code":"IR"},{"name":"Iraq","code":"IQ"},{"name":"Ireland","code":"IE"},{"name":"Isle of Man","code":"IM"},{"name":"Israel","code":"IL"},{"name":"Italy","code":"IT"},{"name":"Jamaica","code":"JM"},{"name":"Japan","code":"JP"},{"name":"Jersey","code":"JE"},{"name":"Jordan","code":"JO"},{"name":"Kazakhstan","code":"KZ"},{"name":"Kenya","code":"KE"},{"name":"Kiribati","code":"KI"},{"name":"Korea, Democratic People'S Republic of","code":"KP"},{"name":"Korea, Republic of","code":"KR"},{"name":"Kuwait","code":"KW"},{"name":"Kyrgyzstan","code":"KG"},{"name":"Lao People'S Democratic Republic","code":"LA"},{"name":"Latvia","code":"LV"},{"name":"Lebanon","code":"LB"},{"name":"Lesotho","code":"LS"},{"name":"Liberia","code":"LR"},{"name":"Libyan Arab Jamahiriya","code":"LY"},{"name":"Liechtenstein","code":"LI"},{"name":"Lithuania","code":"LT"},{"name":"Luxembourg","code":"LU"},{"name":"Macao","code":"MO"},{"name":"Macedonia, The Former Yugoslav Republic of","code":"MK"},{"name":"Madagascar","code":"MG"},{"name":"Malawi","code":"MW"},{"name":"Malaysia","code":"MY"},{"name":"Maldives","code":"MV"},{"name":"Mali","code":"ML"},{"name":"Malta","code":"MT"},{"name":"Marshall Islands","code":"MH"},{"name":"Martinique","code":"MQ"},{"name":"Mauritania","code":"MR"},{"name":"Mauritius","code":"MU"},{"name":"Mayotte","code":"YT"},{"name":"Mexico","code":"MX"},{"name":"Micronesia, Federated States of","code":"FM"},{"name":"Moldova, Republic of","code":"MD"},{"name":"Monaco","code":"MC"},{"name":"Mongolia","code":"MN"},{"name":"Montserrat","code":"MS"},{"name":"Morocco","code":"MA"},{"name":"Mozambique","code":"MZ"},{"name":"Myanmar","code":"MM"},{"name":"Namibia","code":"NA"},{"name":"Nauru","code":"NR"},{"name":"Nepal","code":"NP"},{"name":"Netherlands","code":"NL"},{"name":"Netherlands Antilles","code":"AN"},{"name":"New Caledonia","code":"NC"},{"name":"New Zealand","code":"NZ"},{"name":"Nicaragua","code":"NI"},{"name":"Niger","code":"NE"},{"name":"Nigeria","code":"NG"},{"name":"Niue","code":"NU"},{"name":"Norfolk Island","code":"NF"},{"name":"Northern Mariana Islands","code":"MP"},{"name":"Norway","code":"NO"},{"name":"Oman","code":"OM"},{"name":"Pakistan","code":"PK"},{"name":"Palau","code":"PW"},{"name":"Palestinian Territory, Occupied","code":"PS"},{"name":"Panama","code":"PA"},{"name":"Papua New Guinea","code":"PG"},{"name":"Paraguay","code":"PY"},{"name":"Peru","code":"PE"},{"name":"Philippines","code":"PH"},{"name":"Pitcairn","code":"PN"},{"name":"Poland","code":"PL"},{"name":"Portugal","code":"PT"},{"name":"Puerto Rico","code":"PR"},{"name":"Qatar","code":"QA"},{"name":"Reunion","code":"RE"},{"name":"Romania","code":"RO"},{"name":"Russian Federation","code":"RU"},{"name":"RWANDA","code":"RW"},{"name":"Saint Helena","code":"SH"},{"name":"Saint Kitts and Nevis","code":"KN"},{"name":"Saint Lucia","code":"LC"},{"name":"Saint Pierre and Miquelon","code":"PM"},{"name":"Saint Vincent and the Grenadines","code":"VC"},{"name":"Samoa","code":"WS"},{"name":"San Marino","code":"SM"},{"name":"Sao Tome and Principe","code":"ST"},{"name":"Saudi Arabia","code":"SA"},{"name":"Senegal","code":"SN"},{"name":"Serbia and Montenegro","code":"CS"},{"name":"Seychelles","code":"SC"},{"name":"Sierra Leone","code":"SL"},{"name":"Singapore","code":"SG"},{"name":"Slovakia","code":"SK"},{"name":"Slovenia","code":"SI"},{"name":"Solomon Islands","code":"SB"},{"name":"Somalia","code":"SO"},{"name":"South Africa","code":"ZA"},{"name":"South Georgia and the South Sandwich Islands","code":"GS"},{"name":"Spain","code":"ES"},{"name":"Sri Lanka","code":"LK"},{"name":"Sudan","code":"SD"},{"name":"Suriname","code":"SR"},{"name":"Svalbard and Jan Mayen","code":"SJ"},{"name":"Swaziland","code":"SZ"},{"name":"Sweden","code":"SE"},{"name":"Switzerland","code":"CH"},{"name":"Syrian Arab Republic","code":"SY"},{"name":"Taiwan, Province of China","code":"TW"},{"name":"Tajikistan","code":"TJ"},{"name":"Tanzania, United Republic of","code":"TZ"},{"name":"Thailand","code":"TH"},{"name":"Timor-Leste","code":"TL"},{"name":"Togo","code":"TG"},{"name":"Tokelau","code":"TK"},{"name":"Tonga","code":"TO"},{"name":"Trinidad and Tobago","code":"TT"},{"name":"Tunisia","code":"TN"},{"name":"Turkey","code":"TR"},{"name":"Turkmenistan","code":"TM"},{"name":"Turks and Caicos Islands","code":"TC"},{"name":"Tuvalu","code":"TV"},{"name":"Uganda","code":"UG"},{"name":"Ukraine","code":"UA"},{"name":"United Arab Emirates","code":"AE"},{"name":"United Kingdom","code":"GB"},{"name":"United States","code":"US"},{"name":"United States Minor Outlying Islands","code":"UM"},{"name":"Uruguay","code":"UY"},{"name":"Uzbekistan","code":"UZ"},{"name":"Vanuatu","code":"VU"},{"name":"Venezuela","code":"VE"},{"name":"Viet Nam","code":"VN"},{"name":"Virgin Islands, British","code":"VG"},{"name":"Virgin Islands, U.S.","code":"VI"},{"name":"Wallis and Futuna","code":"WF"},{"name":"Western Sahara","code":"EH"},{"name":"Yemen","code":"YE"},{"name":"Zambia","code":"ZM"},{"name":"Zimbabwe","code":"ZW"}]
         self.akiObj = Akinator()
         self.gameCache = {}
-        self.color = 0x2F3136
         self.session = ClientSession()
         self.sp = _Spotify(auth_manager=SpotifyClientCredentials(client_id=environ["SP_ID"], client_secret=environ["SP_SECRET"]))
         self.collection = MongoClient(environ["MONGODB_URL"])["Coins"]["Points/others"]
@@ -77,11 +76,11 @@ class FunCog(commands.Cog):
     async def joke(self, ctx):
         req = await self.session.get("https://icanhazdadjoke.com", headers={"Accept": "application/json"})
         r = await req.json()
-        await ctx.send(embed=Embed(title="Epic joke!",description=r["joke"], color=self.color))
+        await ctx.send(embed=Embed(title="Epic joke!",description=r["joke"], color=self.bot.color))
 
     @commands.command(help="Ask Alister-A a question!")
     async def askali(self, ctx, *, question):
-        await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - {choice(self.aliaresponses)}", color=self.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
+        await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - {choice(self.aliaresponses)}", color=self.bot.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
 
     @askali.error
     async def askali_error(self, ctx, error):
@@ -92,14 +91,14 @@ class FunCog(commands.Cog):
     @commands.command(name="f")
     async def f(self, ctx, *, text: commands.clean_content = None):
         reason = f"for **{text}** " if text else ""
-        await ctx.send(embed=Embed(title = f"**{ctx.author.name}** has paid their respect {reason}{choice(self.hearts)}", color=self.color))
+        await ctx.send(embed=Embed(title = f"**{ctx.author.name}** has paid their respect {reason}{choice(self.hearts)}", color=self.bot.color))
 
     @commands.command(help="Shows a meme from random subreddits.")
     @commands.cooldown(rate=4, per=7, type=commands.BucketType.member)
     async def meme(self, ctx):
         r = await self.session.get(f"https://memes.blademaker.tv/api?lang=en")
         res = await r.json()
-        await ctx.send(embed=Embed(title=f"Title: {res['title']}\nSubreddit: r/{res['subreddit']}", color=self.color).set_image(url=res["image"]).set_footer(text=f"👍Ups:{res['ups']}"))
+        await ctx.send(embed=Embed(title=f"Title: {res['title']}\nSubreddit: r/{res['subreddit']}", color=self.bot.color).set_image(url=res["image"]).set_footer(text=f"👍Ups:{res['ups']}"))
 
     @meme.error
     async def meme_error(self, ctx, error):
@@ -108,7 +107,7 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Enlarge a discord emoji!")
     async def enlarge(self, ctx, emoji: PartialEmoji):
-    	await ctx.send(embed=Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=self.color).set_image(url=emoji.url))
+    	await ctx.send(embed=Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=self.bot.color).set_image(url=emoji.url))
 
     @enlarge.error
     async def enlarge_error(self, ctx, error):
@@ -122,7 +121,7 @@ class FunCog(commands.Cog):
     async def pp(self, ctx, *, user: Member = None):
         user = user if user else ctx.author
         dong = "=" * randint(1, 15)
-        await ctx.send(embed=Embed(title=f"{user.display_name}'s pepe size", description=f"8{dong}D", color=self.color))
+        await ctx.send(embed=Embed(title=f"{user.display_name}'s pepe size", description=f"8{dong}D", color=self.bot.color))
 
     @commands.command(help="Steal a users avatar.", aliases=["av"])
     async def avatar(self, ctx, *, user: Member=None):
@@ -137,7 +136,7 @@ class FunCog(commands.Cog):
     async def tweet(self, ctx, username: str, *, message: str):
         r = await self.session.get(f"https://nekobot.xyz/api/imagegen?type=tweet&username={username}&text={message[:50]}") # [:50] trims the string to the first 50 characters (if it's longer than 50 characters)
         res = await r.json()
-        await ctx.send(embed=Embed(color=self.color).set_image(url=res["message"]))
+        await ctx.send(embed=Embed(color=self.bot.color).set_image(url=res["message"]))
         await r.close(close_session=False)
 
     @tweet.error
@@ -149,7 +148,7 @@ class FunCog(commands.Cog):
     async def gay(self, ctx, *, user: Member=None):
         user = user or ctx.author
         randomPercentage = randint(1, 100)
-        await ctx.send(embed=Embed(title="Gayrate!", description=f"**{user.display_name}** is {randomPercentage}% gay", color=self.color).set_thumbnail(url=user.avatar_url))
+        await ctx.send(embed=Embed(title="Gayrate!", description=f"**{user.display_name}** is {randomPercentage}% gay", color=self.bot.color).set_thumbnail(url=user.avatar_url))
 
     @gay.error
     async def gay_error(self, ctx, error):
@@ -175,19 +174,19 @@ class FunCog(commands.Cog):
 
         while self.akiObj.progression <= 80:
             try:
-                message1 = await ctx.send(embed=Embed(title="Question", description=gameObj, color=self.color))
+                message1 = await ctx.send(embed=Embed(title="Question", description=gameObj, color=self.bot.color))
                 resp = await ctx.bot.wait_for("message", check=lambda message: message.author == ctx.author and message.channel == ctx.channel and message.guild == ctx.guild and message.content.lower(), timeout=15)
             except:
-                await ctx.send(embed=Embed(title="Hurry next time!", description=f"{ctx.author.mention} took too long to respond so we ended the game\nCurrent timeout: `15` Seconds.", color=self.color))
+                await ctx.send(embed=Embed(title="Hurry next time!", description=f"{ctx.author.mention} took too long to respond so we ended the game\nCurrent timeout: `15` Seconds.", color=self.bot.color))
                 del self.gameCache[ctx.channel.id]
                 return await message1.delete(delay=None)
             if resp.content == "b":
                 try:
                     gameObj = await self.akiObj.back()
                 except:
-                    await ctx.send(embed=Embed(title="Cannot go back any further :(",description="Continue playing anyway", color=self.color))
+                    await ctx.send(embed=Embed(title="Cannot go back any further :(",description="Continue playing anyway", color=self.bot.color))
             elif resp.content == "q" or resp.content == "quit":
-                await ctx.send(embed=Embed(title="Game over", description="You have left the game.", color=self.color))
+                await ctx.send(embed=Embed(title="Game over", description="You have left the game.", color=self.bot.color))
                 del self.gameCache[ctx.channel.id]
                 break
             else:
@@ -195,16 +194,16 @@ class FunCog(commands.Cog):
                     gameObj = await self.akiObj.answer(resp.content)
                 except:
                     del self.gameCache[ctx.channel.id]
-                    return await ctx.send(embed=Embed(title="Invalid Answer", description="You typed a invalid answer the only answer options are:\n`y` OR `yes` for yes\n`n` OR `no` for no\n`i` OR `idk` for i dont know\n`p` OR `probably` for probably\n`pn` OR `probably not` for probably not\n`b` for back\n`q` or `quit` for stop the game", color=self.color))
+                    return await ctx.send(embed=Embed(title="Invalid Answer", description="You typed a invalid answer the only answer options are:\n`y` OR `yes` for yes\n`n` OR `no` for no\n`i` OR `idk` for i dont know\n`p` OR `probably` for probably\n`pn` OR `probably not` for probably not\n`b` for back\n`q` or `quit` for stop the game", color=self.bot.color))
 
         await self.akiObj.win()
         del self.gameCache[ctx.channel.id]
-        await ctx.send(embed=Embed(title="I have outsmarted your outsmarting", color=self.color).add_field(name="I think...", value="it is {0.first_guess[name]} {0.first_guess[description]}?\n\nSorry if im wrong, Akinator has tried.".format(akiObj)).set_image(url=self.akiObj.first_guess['absolute_picture_path']))
+        await ctx.send(embed=Embed(title="I have outsmarted your outsmarting", color=self.bot.color).add_field(name="I think...", value="it is {0.first_guess[name]} {0.first_guess[description]}?\n\nSorry if im wrong, Akinator has tried.".format(akiObj)).set_image(url=self.akiObj.first_guess['absolute_picture_path']))
 
 
     @commands.command(aliases=["8ball"])
     async def _8ball(self, ctx, *, question):
-        await ctx.send(embed=Embed(title=":8ball: The Almighty 8ball :8ball:", description=f"Question = `{question}`\n **Answer**: :8ball: {choice(self._8ball_responses)} :8ball:", color=self.color))
+        await ctx.send(embed=Embed(title=":8ball: The Almighty 8ball :8ball:", description=f"Question = `{question}`\n **Answer**: :8ball: {choice(self._8ball_responses)} :8ball:", color=self.bot.color))
 
     @_8ball.error
     async def _8ball_error(self, ctx, error):
@@ -216,7 +215,7 @@ class FunCog(commands.Cog):
         if len(stuff) > 20:
             return await ctx.send(f"Sorry {ctx.author.mention} a limit of `20` chars please!")
         emj = ("".join([":regional_indicator_"+l+":"  if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in stuff.lower()]))
-        await ctx.send(embed=Embed(title='Emojify', description=f'{emj}', color=self.color))
+        await ctx.send(embed=Embed(title='Emojify', description=f'{emj}', color=self.bot.color))
 
     @emojify.error
     async def emojify_error(self, ctx, error):
@@ -226,7 +225,7 @@ class FunCog(commands.Cog):
     @commands.command(help="Kill a user")
     async def kill(self, ctx, user: Member):
         user = user or (ctx.author)
-        await ctx.send(embed=Embed(title="Murder", description=f"{ctx.author.mention} you killed {user.mention} because {choice(self.kills)}", color=self.color))
+        await ctx.send(embed=Embed(title="Murder", description=f"{ctx.author.mention} you killed {user.mention} because {choice(self.kills)}", color=self.bot.color))
 
     @commands.command(help="Urban Dictionary")
     @commands.is_nsfw()
@@ -241,22 +240,22 @@ class FunCog(commands.Cog):
             if not list1:
                 return await ctx.send(f"Sorry {ctx.author.mention} This word was not found in Urban.")
             res = list1[0]
-            await ctx.send(embed=Embed(title=res['word'], description=res['definition'], color=self.color).add_field(name="Example", value=res['example']).set_footer(text=f"👍 {res['thumbs_up']} | 👎{res['thumbs_down']}"))
+            await ctx.send(embed=Embed(title=res['word'], description=res['definition'], color=self.bot.color).add_field(name="Example", value=res['example']).set_footer(text=f"👍 {res['thumbs_up']} | 👎{res['thumbs_down']}"))
 
     @urban.error
     async def urban_error(self, ctx, error):
         if isinstance(error, commands.errors.NSFWChannelRequired):
-            return await ctx.send(embed=Embed(title="NSFW", description=f"Sorry {ctx.author.mention} but this command is nsfw and this is not a nsfw channel.", color=self.color).set_image(url="https://media.discordapp.net/attachments/265156286406983680/728328135942340699/nsfw.gif"))
+            return await ctx.send(embed=Embed(title="NSFW", description=f"Sorry {ctx.author.mention} but this command is nsfw and this is not a nsfw channel.", color=self.bot.color).set_image(url="https://media.discordapp.net/attachments/265156286406983680/728328135942340699/nsfw.gif"))
 
     @commands.command(help="Advice from world.")
     async def advice(self, ctx):
         r = await self.session.get(f"https://api.adviceslip.com/advice", headers={"Accept": "application/json"})
         res = await r.json(content_type="text/html")
-        await ctx.send(embed=Embed(title="Advice", description=f"{res['slip']['advice']}", color=self.color))
+        await ctx.send(embed=Embed(title="Advice", description=f"{res['slip']['advice']}", color=self.bot.color))
 
     @commands.command(help="Generate qr code")
     async def qr(self, ctx, *, text):
-        await ctx.send(embed=Embed(title="Qr code", description=f"Generated `{text}`", color=self.color).set_image(url=f"http://api.qrserver.com/v1/create-qr-code/?data={quote(text)}&margin=25"))
+        await ctx.send(embed=Embed(title="Qr code", description=f"Generated `{text}`", color=self.bot.color).set_image(url=f"http://api.qrserver.com/v1/create-qr-code/?data={quote(text)}&margin=25"))
 
     @qr.error
     async def qr_error(self, ctx, error):
@@ -267,7 +266,7 @@ class FunCog(commands.Cog):
     async def duck(self, ctx):
         r = await self.session.get('https://random-d.uk/api/v2/random')
         res = await r.json()
-        await ctx.send(embed=Embed(title='Quack!', color=self.color).set_image(url=res['url']))
+        await ctx.send(embed=Embed(title='Quack!', color=self.bot.color).set_image(url=res['url']))
 
     @commands.command(help="Flip a users avatar!", aliases=["flipav", "avflip"])
     async def flip(self, ctx, user: Member=None):
@@ -287,7 +286,7 @@ class FunCog(commands.Cog):
         await ctx.send(file=Misc.save_image(done))
 
     @commands.command(hlep="Generate a fake discord message!", aliases=["fq", "fakeq", "fakemessage", "fakemsg"])
-    async def fakequote(self, ctx, user: Optional[Member], *, message) -> None:
+    async def fakequote(self, ctx, user: Optional[Member], *, message):
         now = datetime.now()
         user = user or ctx.author
 
@@ -370,7 +369,7 @@ class FunCog(commands.Cog):
         			artist = items[0]
         		except IndexError:
         			return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
-        		return await ctx.send(embed=Embed(title=artist['name'], color=self.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
+        		return await ctx.send(embed=Embed(title=artist['name'], color=self.bot.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
 
         if option == "--song":
         	if not song:
@@ -386,7 +385,7 @@ class FunCog(commands.Cog):
         			name = ', '.join([artist['name'] for artist in spotify['artists']])
         		except IndexError:
         			return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
-        		return await ctx.send(embed=Embed(title=song['name'], color=self.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{song['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nSong Link: [`{song['name']}`](https://open.spotify.com/track/{song['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
+        		return await ctx.send(embed=Embed(title=song['name'], color=self.bot.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{song['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nSong Link: [`{song['name']}`](https://open.spotify.com/track/{song['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
         try:
         	user = user or ctx.author
         	spotify_activity = next((activity for activity in user.activities if isinstance(activity, Spotify)), None)
@@ -495,13 +494,13 @@ class FunCog(commands.Cog):
                     isfast = choice(self.badmessages) if (elapse/1000 > 6) else choice(self.goodmessages)
                     random_points = randint(10, 45) if (elapse/1000 > 6) else randint(5, 17)
                     Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": random_points}})
-                    return await ctx.send(embed=Embed(title="Fastest typer!", description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False))
+                    return await ctx.send(embed=Embed(title="Fastest typer!", description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.bot.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False))
             except:
                 await game.delete()
                 return await ctx.send(f"Sorry {ctx.author.mention} nobody took part! So i have ended the game.")
 
     @commands.command(help="Mock some text.")
-    async def mock(self, ctx, *, text) -> None:
+    async def mock(self, ctx, *, text):
         if not text:
             return await ctx.send(f"Sorry {ctx.author.mention} you forgot to add some text for me to mock.")
         return await ctx.send("".join([choice([index.lower(), index.upper()]) for index in list(text)]))
@@ -520,7 +519,7 @@ class FunCog(commands.Cog):
     		return await ctx.send(f"Sorry {ctx.author.mention} The api is down.")
     	req.close()
 
-    	FirstMessage = await ctx.send(embed=Embed(title="Guess the flag!", color=self.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png"))
+    	FirstMessage = await ctx.send(embed=Embed(title="Guess the flag!", color=self.bot.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png"))
 
     	while True:
     		try:
@@ -532,13 +531,13 @@ class FunCog(commands.Cog):
     					Wealth._create_account(resp.author.id)
     				RandomCoins = randint(15, 60)
     				Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
-    				return await ctx.send(embed=Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.color))
+    				return await ctx.send(embed=Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.bot.color))
     		except:
     			await FirstMessage.delete()
     			return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
     
     @commands.command()
-    async def steam(self, ctx, user: Optional[Member], *, message=None) -> None:
+    async def steam(self, ctx, user: Optional[Member], *, message=None):
     	"""Returns a Image of a Steam notifaction!"""
     	if message == None: message = "Nothing"
     	user = user or ctx.author
@@ -566,4 +565,3 @@ class FunCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(FunCog(bot))
-    print("COG: fun.py Has been loaded!")
