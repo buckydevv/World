@@ -30,8 +30,8 @@ class HelpCog(commands.Cog):
         return await ctx.send(embed=Embed(color=self.color
         ).set_author(name='World - Help', icon_url="https://im-a-dev.xyz/1678m0pc.png"
         ).add_field(name="Shows multiple categories.", value="w/categories"
-        ).add_field(name="Invite", value="[Invite World](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)"
-        ).add_field(name="Vote", value="[Vote For World](https://top.gg/bot/700292147311542282/vote)"
+        ).add_field(name="Invite", value="[**Invite World**](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)"
+        ).add_field(name="Vote", value="[**Vote For World**](https://top.gg/bot/700292147311542282/vote)"
         ).set_image(url="https://im-a-dev.xyz/Yr0rRrcP.png"
         ).set_footer(text="Use \"w/help <command>\" For more info"))
       if (command := get(self.bot.commands, name=cmd)):
@@ -44,7 +44,7 @@ class HelpCog(commands.Cog):
 
     @commands.command(help="Shows categories")
     async def categories(self, ctx):
-      await ctx.send(embed=Embed(color=self.color).add_field(name="‎‎World", value=f"New\n`w/new`\nFun\n`w/fun`\nOther\n`w/other`").add_field(name=f"Categories", value=f"Logging\n`w/logs`\nEconomy\n`w/economy`\nModeration\n`w/mod`"))
+      await ctx.send(embed=Embed(color=self.color).add_field(name="‎‎World", value=f"Music\n`w/music`\nFun\n`w/fun`\nOther\n`w/other`").add_field(name=f"Categories", value=f"Logging\n`w/logs`\nEconomy\n`w/economy`\nModeration\n`w/mod`"))
 
     @commands.command(help="Shows other category.")
     async def other(self, ctx):
@@ -124,13 +124,19 @@ class HelpCog(commands.Cog):
         inline=False
       ))
 
-    @commands.command(help="Shows new commands.")
-    async def new(self, ctx):
+    @commands.command(help="Shows Music commands.")
+    async def music(self, ctx):
       await ctx.send(embed=Embed(
-        title="New commands!", 
-        color=self.color,
-        description="`w/trash` | `w/steam`, Also fixed alot of bugs."
-      ))
+        title="Music commands!",
+        color=self.color
+        ).add_field(
+          name="<:WorldMusic:769916606489821264> | Music commands",
+          value="`w/connect` | `w/play` | `w/stop` | `w/pause` | `w/unpause` | `w/skip` | `w/volume` | `w/np` | `w/queue` | `w/swapdj`"
+        ).add_field(
+          name="<:Worldeq:802323153061281840> | Equalizer commands",
+          value="`w/filter boost` | `w/filter metal` | `w/filter piano` | `w/filter revert` | "
+        ))
 
 def setup(bot):
     bot.add_cog(HelpCog(bot))
+    print("COG: help.py Has been loaded!")

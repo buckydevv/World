@@ -657,5 +657,5 @@ class EconomyCog(commands.Cog):
         return coins_earned
 
 def setup(bot: commands.Bot) -> None:
-    """Adds the EconomyBot into the bot."""
     bot.add_cog(EconomyCog())
+    print("COG: economy.py Has been loaded!")

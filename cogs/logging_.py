@@ -252,3 +252,4 @@ class LoggingCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(LoggingCog(bot))
+    print("COG: logging_.py Has been loaded!")

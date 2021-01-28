@@ -265,3 +265,4 @@ class ModCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(ModCog(bot))
+    print("COG: mod.py Has been loaded!")
