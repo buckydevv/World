@@ -131,10 +131,12 @@ class HelpCog(commands.Cog):
         color=self.color
         ).add_field(
           name="<:WorldMusic:769916606489821264> | Music commands",
-          value="`w/connect` | `w/play` | `w/stop` | `w/pause` | `w/unpause` | `w/skip` | `w/volume` | `w/np` | `w/queue` | `w/swapdj` | `w/djinfo` |"
+          value="`w/connect` | `w/play` | `w/stop` | `w/pause` | `w/unpause` | `w/skip` | `w/volume` | `w/np` | `w/queue` | `w/swapdj` | `w/djinfo` |",
+          inline=False
         ).add_field(
           name="<:Worldeq:802323153061281840> | Equalizer commands",
-          value="`w/filter boost` | `w/filter metal` | `w/filter piano` | `w/filter revert` | `w/filter pop` | `w/filter jazz` | "
+          value="`w/filter boost` | `w/filter metal` | `w/filter piano` | `w/filter revert` | `w/filter pop` | `w/filter jazz` | ",
+          inline=False
         ))
 
 def setup(bot):
