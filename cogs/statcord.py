@@ -6,7 +6,7 @@ import statcord
 class StatcordPost(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.key = "statcord.com-eGth0d6HOMTr9iYPx4QO"
+        self.key = "statkey"
         self.api = statcord.Client(self.bot,self.key)
         self.api.start_loop()
 
