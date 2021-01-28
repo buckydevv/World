@@ -40,7 +40,7 @@ DateTime==4.3
 dblpy==0.3.4
 dill==0.3.3
 discord==1.0.1
-discord-ext-menus==1.0.0a27+g6f2b873
+git+https://github.com/Rapptz/discord-ext-menus
 discord-pretty-help==1.1.2
 discord-webhook==0.8.0
 Discord-Webhooks==1.0.4
@@ -56,7 +56,6 @@ ffmpeg==1.4
 filelock==3.0.12
 Flask==1.1.2
 fs==2.4.11
-get==0.0.0
 googletrans==3.0.0
 gTTS==2.1.1
 gTTS-token==1.1.3
@@ -139,7 +138,6 @@ python-vlc==3.0.9113
 PythonGists==1.1.3
 pytz==2019.3
 PyYAML==5.3.1
-query-string==0.0.0
 ratelimiter==1.2.0.post0
 regex==2020.4.4
 requests==2.21.0

@@ -7,10 +7,10 @@ from typing import Union
 from discord import Embed, Member, VoiceChannel, VoiceState
 from datetime import timedelta
 
-RURL = re.compile('https?:\/\/(?:www\.)?.+')
+RURL = re.compile("https?:\/\/(?:www\.)?.+")
+
 
 class MusicController:
-
     def __init__(self, bot, guild_id):
         self.bot = bot
         self.guild_id = guild_id
@@ -39,7 +39,9 @@ class MusicController:
 
             song = await self.queue.get()
             await player.play(song)
-            embed = Embed(title=f"Now playing `{song}`", color=self.color).set_thumbnail(url=song.thumb)
+            embed = Embed(
+                title=f"Now playing `{song}`", color=self.color
+            ).set_thumbnail(url=song.thumb)
             self.now_playing = await self.channel.send(embed=embed)
             await self.next.wait()
 
@@ -48,24 +50,32 @@ class Player(wavelink.Player):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.context: commands.Context = kwargs.get('context', None)
+        self.context: commands.Context = kwargs.get("context", None)
         self.dj = None
         if self.context:
             self.dj: Member = self.context.author
+
 
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.controllers = {}
         self.color = 0x2F3136
-        if not hasattr(bot, 'wavelink'): self.bot.wavelink = wavelink.Client(bot=self.bot)
+        if not hasattr(bot, "wavelink"):
+            self.bot.wavelink = wavelink.Client(bot=self.bot)
         self.bot.loop.create_task(self.start_nodes())
 
     async def start_nodes(self):
-        await self.bot.wait_until_ready() # Wait until bot is ready to make a connection!
-        node = await self.bot.wavelink.initiate_node(host='127.0.0.1',port=2333, rest_uri='http://127.0.0.1:2333', password='.', identifier='TEST', region='us_central')
+        await self.bot.wait_until_ready()  # Wait until bot is ready to make a connection!
+        node = await self.bot.wavelink.initiate_node(
+            host="127.0.0.1",
+            port=2333,
+            rest_uri="http://127.0.0.1:2333",
+            password="youshallnotpass",
+            identifier="TEST",
+            region="us_central",
+        )
         node.set_hook(self.on_event_hook)
-
 
     async def on_event_hook(self, event):
         if isinstance(event, (wavelink.TrackEnd, wavelink.TrackException)):
@@ -86,13 +96,16 @@ class Music(commands.Cog):
 
         return controller
 
-
     @commands.Cog.listener()
-    async def on_voice_state_update(self, member: Member, before: VoiceState, after: VoiceState):
+    async def on_voice_state_update(
+        self, member: Member, before: VoiceState, after: VoiceState
+    ):
         if member.bot:
             return
 
-        player: Player = self.bot.wavelink.get_player(guild_id=member.guild.id, cls=Player)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=member.guild.id, cls=Player
+        )
 
         if not player.channel_id or not player.context:
             player.node.players.pop(member.guild.id)
@@ -111,23 +124,27 @@ class Music(commands.Cog):
         elif after.channel == channel and player.dj not in channel.members:
             player.dj = member
 
-
     def is_privileged(self, ctx: commands.Context):
         """Check whether the user is an Administrator or DJ."""
-        player: Player = self.bot.wavelink.get_player(ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            ctx.guild.id, cls=Player, context=ctx
+        )
         return player.dj == ctx.author or ctx.author.guild_permissions.ban_members
 
-
-    @commands.command(name='connect')
-    async def connect_(self, ctx, *, channel: VoiceChannel=None):
+    @commands.command(name="connect")
+    async def connect_(self, ctx, *, channel: VoiceChannel = None):
         """Get World to connect to the authors Voicechannel."""
         if not channel:
             try:
                 channel = ctx.author.voice.channel
             except AttributeError:
-                await ctx.send(f"Sorry {ctx.author.mention} no channel to join, As you are not connected to one. Please connect to a voice channel!")
+                await ctx.send(
+                    f"Sorry {ctx.author.mention} no channel to join, As you are not connected to one. Please connect to a voice channel!"
+                )
 
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
         await player.connect(channel.id)
         await ctx.send(f"Connected to `{channel.name}`", delete_after=3)
 
@@ -143,9 +160,13 @@ class Music(commands.Cog):
         tracks = await self.bot.wavelink.get_tracks(query)
 
         if not tracks:
-            return await ctx.send(f"Sorry {ctx.author.mention} That track was not found!")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} That track was not found!"
+            )
 
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
         if not player.is_connected:
             await ctx.invoke(self.connect_)
 
@@ -153,58 +174,83 @@ class Music(commands.Cog):
 
         controller = self.get_controller(ctx)
         await controller.queue.put(track)
-        embed = Embed(title="World music", description=f"Added `{str(track)}` to the queue.", color=self.color).set_thumbnail(url=track.thumb)
+        embed = Embed(
+            title="World music",
+            description=f"Added `{str(track)}` to the queue.",
+            color=self.color,
+        ).set_thumbnail(url=track.thumb)
         await ctx.send(embed=embed)
 
     @commands.command()
     async def pause(self, ctx):
         """Pause the current playing song."""
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
         if not player.is_playing:
-            return await ctx.send(f"Sorry {ctx.author.mention} There is not a song currently playing.")
-            
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} There is not a song currently playing."
+            )
+
         if self.is_privileged(ctx):
             await ctx.send(f"Paused the song: {player.current}")
             await player.set_pause(True)
         else:
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
 
     @commands.command(aliases=["resume"])
     async def unpause(self, ctx):
         """Resume the song that was playing."""
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
         if not player.paused:
-            return await ctx.send(f"Sorry {ctx.author.mention} The song currently playing is not paused!")
-        
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} The song currently playing is not paused!"
+            )
+
         if self.is_privileged(ctx):
             await ctx.send(f"Unpaused the song: {player.current}")
             await player.set_pause(False)
         else:
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
-
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
 
     @commands.command()
     async def skip(self, ctx):
         """Skip the song that is currently playing!"""
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
-        
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
+
         if not player.is_playing:
-            return await ctx.send(f"Sorry {ctx.author.mention} i am not currently playing a song!")
-        
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} i am not currently playing a song!"
+            )
+
         if self.is_privileged:
             await player.stop()
             await ctx.send(f"Hey {ctx.author.mention}, The song has been skipped")
         else:
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
 
     @commands.command(aliases=["vol"])
     async def volume(self, ctx, *, vol: int):
         """Change the volume of the sound coming out from World."""
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
         controller = self.get_controller(ctx)
 
         if vol > 100:
-            return await ctx.send(f"Sorry {ctx.author.mention} `100%` is the max volume.")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} `100%` is the max volume."
+            )
 
         vol = max(min(vol, 100), 0)
         controller.volume = vol
@@ -213,74 +259,107 @@ class Music(commands.Cog):
             await ctx.send(f"Hey {ctx.author.mention} Volume has been set to `{vol}%`")
             await player.set_volume(vol)
         else:
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
 
-    @commands.command(aliases=['np', 'current'])
+    @commands.command(aliases=["np", "current"])
     async def nowplaying(self, ctx):
         """Show the current song playing within the voice channel."""
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
 
         if not player.current:
-            return await ctx.send(f"Sorry {ctx.author.mention} there is not a song currently playing!")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} there is not a song currently playing!"
+            )
 
         controller = self.get_controller(ctx)
 
-        embed = Embed(title="Playing", description=f"Now playing: `{player.current}` | Filter: {player.eq}", color=self.color).set_thumbnail(url=player.current.thumb)
+        embed = Embed(
+            title="Playing",
+            description=f"Now playing: `{player.current}` | Filter: {player.eq}",
+            color=self.color,
+        ).set_thumbnail(url=player.current.thumb)
         controller.now_playing = await ctx.send(embed=embed)
 
-
-    @commands.command(aliases=['q'])
+    @commands.command(aliases=["q"])
     async def queue(self, ctx):
         """Return the next upcoming 5 songs."""
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
         controller = self.get_controller(ctx)
 
         if not player.current or not controller.queue._queue:
-            return await ctx.send('There are no songs currently in the queue.')
+            return await ctx.send("There are no songs currently in the queue.")
 
         upcoming = list(itertools.islice(controller.queue._queue, 0, 5))
 
-        fqueue = ''.join(f'```{str(song)} | {timedelta(milliseconds=song.duration)}\n```' for song in upcoming)
-        embed = Embed(title=f'Upcoming songs: {len(upcoming)}', description=fqueue, color=self.color)
+        fqueue = "".join(
+            f"```{str(song)} | {timedelta(milliseconds=song.duration)}\n```"
+            for song in upcoming
+        )
+        embed = Embed(
+            title=f"Upcoming songs: {len(upcoming)}",
+            description=fqueue,
+            color=self.color,
+        )
         await ctx.send(embed=embed)
 
-
-    @commands.command(aliases=['disconnect', 'dc', "leave"])
+    @commands.command(aliases=["disconnect", "dc", "leave"])
     async def stop(self, ctx):
         """Remove World from the voice channel."""
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
 
         try:
             del self.controllers[ctx.guild.id]
         except KeyError:
             await player.disconnect()
-            return await ctx.send(f"Sorry {ctx.author.mention} i am currently not in a voice channel.")
-        
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} i am currently not in a voice channel."
+            )
+
         if self.is_privileged:
             await player.disconnect()
             await ctx.send("I left the voice channel, Bye!")
         else:
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
 
-    @commands.command(aliases=['swap', "givedj", "sdj"])
+    @commands.command(aliases=["swap", "givedj", "sdj"])
     async def swapdj(self, ctx: commands.Context, *, member: Member = None):
         """Give DJ position to another person in the Voice chat."""
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
 
         if not player.is_connected:
             return
 
         if not self.is_privileged(ctx):
-            return await ctx.send(f"Sorry {ctx.author.mention} but only admins or the DJ may use this command.")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} but only admins or the DJ may use this command."
+            )
 
         members = self.bot.get_channel(int(player.channel_id)).members
 
         if member and member not in members:
-            return await ctx.send(f"{member} isn't in the voice chat! They cannot be DJ.")
+            return await ctx.send(
+                f"{member} isn't in the voice chat! They cannot be DJ."
+            )
         if member and member == player.dj:
-            return await ctx.send(f"I can't change the DJ to someone who is already the DJ...")
+            return await ctx.send(
+                f"I can't change the DJ to someone who is already the DJ..."
+            )
         if len(members) <= 2:
-            return await ctx.send(f"Sorry {ctx.author.mention} There are no other members in this VC to swap DJ with.")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} There are no other members in this VC to swap DJ with."
+            )
         if member:
             player.dj = member
             return await ctx.send(f"{member.mention} is now the DJ.")
@@ -290,73 +369,96 @@ class Music(commands.Cog):
             else:
                 player.dj = m
                 return await ctx.send(f"{member.mention} is now the DJ.")
-                
+
     @commands.group(name="filter")
     async def filter(self, ctx):
         if not ctx.invoked_subcommand:
-            return await ctx.send(f"Sorry {ctx.author.mention} please type `w/filter <FILTER>`")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} please type `w/filter <FILTER>`"
+            )
 
     @filter.command()
     async def boost(self, ctx):
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
 
         if not player.is_connected:
             return
 
         if not self.is_privileged(ctx):
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
-        
-        boostEQ = {'boost': wavelink.Equalizer.boost()}
-        eq = boostEQ.get('boost', None)
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
+
+        boostEQ = {"boost": wavelink.Equalizer.boost()}
+        eq = boostEQ.get("boost", None)
         await player.set_eq(eq)
         return await ctx.send(f"Hey {ctx.author.mention} I have boosted your sound!")
 
-
     @filter.command(aliases=["normal", "flat"])
     async def revert(self, ctx):
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
 
         if not player.is_connected:
             return
 
         if not self.is_privileged(ctx):
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
-        
-        flatEQ = {'flat': wavelink.Equalizer.flat()}
-        eq = flatEQ.get('flat', None)
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
+
+        flatEQ = {"flat": wavelink.Equalizer.flat()}
+        eq = flatEQ.get("flat", None)
         await player.set_eq(eq)
-        return await ctx.send(f"Hey {ctx.author.mention} I have reverted your equilizer to flat!")
+        return await ctx.send(
+            f"Hey {ctx.author.mention} I have reverted your equilizer to flat!"
+        )
 
     @filter.command()
     async def metal(self, ctx):
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
 
         if not player.is_connected:
             return
 
         if not self.is_privileged(ctx):
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
-        
-        metalEQ = {'metal': wavelink.Equalizer.metal()}
-        eq = metalEQ.get('metal', None)
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
+
+        metalEQ = {"metal": wavelink.Equalizer.metal()}
+        eq = metalEQ.get("metal", None)
         await player.set_eq(eq)
-        return await ctx.send(f"Hey {ctx.author.mention} I have turned the sound into metal!")
+        return await ctx.send(
+            f"Hey {ctx.author.mention} I have turned the sound into metal!"
+        )
 
     @filter.command()
     async def piano(self, ctx):
-        player: Player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+        player: Player = self.bot.wavelink.get_player(
+            guild_id=ctx.guild.id, cls=Player, context=ctx
+        )
 
         if not player.is_connected:
             return
 
         if not self.is_privileged(ctx):
-            return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
-        
-        pianoEQ = {'piano': wavelink.Equalizer.piano()}
-        eq = pianoEQ.get('piano', None)
-        await player.set_eq(eq)
-        return await ctx.send(f"Hey {ctx.author.mention} I have turned the sound into piano!")
+            return await ctx.send(
+                f"Sorry {ctx.author.mention} you are not a Admin or DJ."
+            )
 
-            
+        pianoEQ = {"piano": wavelink.Equalizer.piano()}
+        eq = pianoEQ.get("piano", None)
+        await player.set_eq(eq)
+        return await ctx.send(
+            f"Hey {ctx.author.mention} I have turned the sound into piano!"
+        )
+
+
 def setup(bot):
-    bot.add_cog(Music(bot))  
+    bot.add_cog(Music(bot))

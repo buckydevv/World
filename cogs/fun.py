@@ -81,7 +81,7 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Ask Alister-A a question!")
     async def askali(self, ctx, *, question):
-        await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - {choice(self.aliaresponses)}", color=self.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
+        await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - {choice(self.aliaresponses)}", color=self.color).set_thumbnail(url="https://media1.tenor.com/images/edb4e2c6b53a16782651e417b2f529fd/tenor.gif"))
 
     @askali.error
     async def askali_error(self, ctx, error):
