@@ -16,3 +16,46 @@
 ## Pull requests
 ### I would greatly appreaciate for people to contribute to World...
 #### You can make a pull request by forking the bot and editing the files [Here](https://github.com/shuanaongithub/World/fork)
+
+## Installation
+
+You will need to install the packages listed in the requirements.txt, you can do so by running `pip install -r requirements.txt`
+
+After doing so, download a LavaLink binary at their Github releases, you will need to have java installed in order to run the .jar file that you will have in the same directory as the bot.
+
+# Linux / Mac OSX
+
+```
+sudo apt-get install java python3 python3-venv
+
+python3 -m venv env
+
+source ./env/bin/activate
+
+python3 -m pip install -r requirements.txt
+
+java -jar Lavalink.jar # Run this in another terminal
+
+python3 bot.py # Run this in the current terminal
+```
+
+# Windows
+
+```
+# Ensure Java and Python are installed by running
+java --version
+
+python3 --version
+
+python3 -m pip install virtualenv
+
+python3 -m venv env
+
+env\bin\activate
+
+python3 -m pip install -r requirements.txt
+
+java -jar Lavalink.jar # Run this in another terminal
+
+python3 bot.py # Run this in the current terminal
+```

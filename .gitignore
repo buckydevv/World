@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,python,linux,windows,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,python,linux,windows,dotenv
 
+### Weird Files ###
+gmon.out
+
 ### dotenv ###
 .env
 
