@@ -16,7 +16,7 @@ cluster = MongoClient(os.environ["MONGODB_URL"])
 
 class Devs:
     def __init__(self):
-        self.color = 0x2F3136
+        pass
 
     async def GetUser(userid: int, options):
     	if options == "UserCollection":

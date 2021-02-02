@@ -1,17 +1,8 @@
 import discord
-
 from os import environ, listdir
-
 from json import load, dump
-from discord import (
-    Activity,
-    ActivityType,
-    Embed,
-    Intents,
-    Status
-)
+from discord import Activity, Embed, Intents
 from discord.ext import commands
-from discord.ext.commands import has_permissions
 
 __import__("dotenv").load_dotenv()
 
@@ -19,16 +10,14 @@ __import__("dotenv").load_dotenv()
 # prefix area
 
 defaultprefixes = ["World ", "w/", "world "]
-
 ownerprefix = ["w/", "world ", "World "]
 
 async def get_prefix(world, message):
 	if await world.is_owner(message.author):
 		return commands.when_mentioned_or(*ownerprefix)(world, message)
-	with open('prefixes.json', 'r') as f:
-		prefixes = load(f)
-		if not str(message.guild.id) in prefixes:
-			return commands.when_mentioned_or(*defaultprefixes)(world, message)
+	prefixes = load(open('prefixes.json', 'r'))
+	if not str(message.guild.id) in prefixes:
+		return commands.when_mentioned_or(*defaultprefixes)(world, message)
 	return commands.when_mentioned_or(prefixes[str(message.guild.id)])(world, message)
 
 # -------
@@ -40,6 +29,7 @@ world = commands.Bot(
     case_insensitive=True,
     intents=Intents.all()
 )
+setattr(world, "color", 0x2F3136)
 world.remove_command("help")
 
 # -------
@@ -49,9 +39,9 @@ world.remove_command("help")
 # Command area 
 
 @world.command(help="Change the prefix for your discord guild")
-@has_permissions(administrator=True)
+@commands.has_permissions(administrator=True)
 async def changeprefix(ctx, prefix):
-	if len(prefix) >7:
+	if len(prefix) > 7:
 		return await ctx.send(f"Sorry {ctx.author.mention} a limit of `7` letters please.")
 	with open('prefixes.json', 'r') as f:
 		prefixes = load(f)
@@ -71,45 +61,35 @@ async def enablenoprefix(ctx):
 	if await world.is_owner(ctx.author):
 		ownerprefix.append("")
 		await ctx.send(f"Hey {ctx.author.mention} i have enabled `No Prefix mode`.")
-	else:
-		return
 
 @world.command()
 async def disablenoprefix(ctx):
 	if await world.is_owner(ctx.author):
 		ownerprefix.remove("")
 		await ctx.send(f"Hey {ctx.author.mention} i have disabled `No Prefix mode`.")
-	else:
-		return
 
 @changeprefix.error
 async def changeprefix_error(ctx, error):
-   if isinstance(error, discord.ext.commands.errors.CheckFailure):
+   if isinstance(error, commands.errors.CheckFailure):
        await ctx.send(f"Sorry {ctx.author.mention} you don't have permissions to change the prefix!")
 
 # -------
 
 # -------
 # Cogs area
-cogs = [
-    f[:-3] for f in listdir("cogs/")
-    if f.endswith(".py")
-]
-
-for cog in cogs:
-    world.load_extension(f"cogs.{cog}")
-
+for cog in filter(lambda x: x.endswith(".py"), listdir("cogs/")):
+    world.load_extension(f"cogs.{cog[:-3]}")
+    print(f"COG: {cog} is loaded.")
 
 # -------
 # Blacklist area
 with open("blacklisted.json") as f:
     blacklisted_people = load(f)
 
-
 # -------
 # Message received area
 @world.event
-async def on_message(message) -> None:
+async def on_message(message):
     """
     Dispatched every time a message is sent.
     Checks if the message wasn't send by a bot, the message wasn't send
@@ -132,21 +112,14 @@ async def on_message(message) -> None:
 # -------
 # Event area
 @world.event
-async def on_ready() -> None:
+async def on_ready():
     """Dispatched when the bot has successfully connected into Discord."""
-    await world.change_presence(
-        status=Status.dnd,
-        activity=Activity(
-            type=ActivityType.listening,
-            name="w/help"
-        )
-    )
+    await world.change_presence(status="dnd", activity=Activity(type=2, name="w/help"))
     print("World connected successfully into Discord!")
 
 @world.event
 async def on_guild_remove(guild):
-    with open('prefixes.json', 'r') as f:
-        prefixes = load(f)
+    prefixes = load(open('prefixes.json', 'r'))
     prefixes.pop(str(guild.id))
 
     with open('prefixes.json', 'w') as f:

@@ -151,12 +151,12 @@ class UserNotFound(EconomyError):
 class EconomyCog(commands.Cog):
     """Cog for World's economy system."""
 
-    def __init__(self) -> None:
+    def __init__(self, color):
         """Sets up the cog."""
-        self.color = 0x2F3136
+        self.color = color
 
     @commands.command(name="shop", aliases=("items",))
-    async def shop(self, ctx: commands.Context) -> None:
+    async def shop(self, ctx: commands.Context):
         """Returns all items you can buy or sell."""
         await ctx.send(embed=Embed(
             title="Shop",
@@ -183,7 +183,7 @@ class EconomyCog(commands.Cog):
 
     @commands.command(name="inventory", aliases=("inv",))
     @require_account()
-    async def inventory(self, ctx: commands.Context) -> None:
+    async def inventory(self, ctx: commands.Context):
         """Returns the current items from the user inventory."""
 
         author = self._get_user(ctx.author.id)
@@ -201,7 +201,7 @@ class EconomyCog(commands.Cog):
 
     @commands.command(name="balance", aliases=("bal",))
     @require_account()
-    async def balance(self, ctx: commands.Context) -> None:
+    async def balance(self, ctx: commands.Context):
         """Returns the current balance of the user."""
         author = self._get_user(ctx.author.id)
         await ctx.send(embed=Embed(
@@ -212,7 +212,7 @@ class EconomyCog(commands.Cog):
 
     @commands.command(name="buy")
     @require_account()
-    async def buy(self, ctx: commands.Context, item: ItemConverter, amount: UnsignedIntegerConverter) -> None:
+    async def buy(self, ctx: commands.Context, item: ItemConverter, amount: UnsignedIntegerConverter):
         """
         Buys items.
         Run `w/shop` for a list of items.
@@ -226,7 +226,7 @@ class EconomyCog(commands.Cog):
         ))
 
     @buy.error
-    async def buy_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def buy_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when buying something."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins) or isinstance(error, commands.errors.BadArgument):
@@ -237,7 +237,7 @@ class EconomyCog(commands.Cog):
     @commands.command(name="sell")
     @commands.cooldown(1, 60, BucketType.member)
     @require_account()
-    async def sell(self, ctx: commands.Context, item: ItemConverter, amount: UnsignedIntegerConverter) -> None:
+    async def sell(self, ctx: commands.Context, item: ItemConverter, amount: UnsignedIntegerConverter):
         """
         Sells items.
         Run `w/shop` for a list of items.
@@ -251,7 +251,7 @@ class EconomyCog(commands.Cog):
     @commands.command(name="rob")
     @commands.cooldown(1, 1800, BucketType.member)
     @require_account()
-    async def rob(self, ctx: commands.Context, user: Member) -> None:
+    async def rob(self, ctx: commands.Context, user: Member):
         """Rob a user!"""
         if user.id == ctx.author.id:
             ctx.command.reset_cooldown(ctx)
@@ -274,7 +274,7 @@ class EconomyCog(commands.Cog):
         ))
 
     @rob.error
-    async def rob_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def rob_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the rob command."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins):
@@ -289,7 +289,7 @@ class EconomyCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
 
     @sell.error
-    async def sell_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def sell_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when buying something."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughItems) or isinstance(error, commands.errors.BadArgument):
@@ -300,7 +300,7 @@ class EconomyCog(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention} You missed the `item` or `amount` arguments.")
 
     @commands.command(name="delete")
-    async def delete(self, ctx: commands.Context) -> None:
+    async def delete(self, ctx: commands.Context):
         """Deletes the economy account associated to the user."""
         if not Wealth.collection.find_one({"_id": ctx.author.id}):
             return await ctx.send(embed=Embed(title="Uh oh!", color=self.color, description=f"Hey {ctx.author.mention} You dont have a World account, Run the following command `w/create`"))
@@ -308,7 +308,7 @@ class EconomyCog(commands.Cog):
         return await ctx.send(embed=Embed(title="Goodbye", color=self.color, description=f"Hey {ctx.author.mention} I have successfully removed your World account."))
 
     @commands.command(name="create")
-    async def create(self, ctx: commands.Context) -> None:
+    async def create(self, ctx: commands.Context):
         """Creates a World account."""
         if not Wealth.collection.find_one({"_id": ctx.author.id}):
             return await ctx.send(embed=Embed(title="Uh oh!", color=self.color, description=f"Hey {ctx.author.mention} You already have a World account."))
@@ -317,7 +317,7 @@ class EconomyCog(commands.Cog):
 
     @commands.command(name="status")
     @require_account()
-    async def status(self, ctx: commands.Context, *, status: str) -> None:
+    async def status(self, ctx: commands.Context, *, status: str):
         """Sets a custom status for the user."""
         Wealth.collection.update_one(
             {
@@ -332,14 +332,14 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(title="Status", color=self.color, description=f"Hey {ctx.author.mention} I have set your current status to `{status[:80]}`."))
 
     @status.error
-    async def status_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def status_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the status command."""
         if isinstance(error, commands.errors.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} You missed the `status` argument.")
 
     @commands.command(name="gamble")
     @require_account()
-    async def gamble(self, ctx: commands.Context, amount: UnsignedIntegerConverter) -> None:
+    async def gamble(self, ctx: commands.Context, amount: UnsignedIntegerConverter):
         """
         Gambles your amount money.
         If you win, you get your money back but doubled, Otherwise, you lose it.
@@ -382,7 +382,7 @@ class EconomyCog(commands.Cog):
 
     @commands.command(name="roulette")
     @require_account()
-    async def roulette(self, ctx: commands.Context, amount: UnsignedIntegerConverter, choice: UnsignedIntegerConverter) -> None:
+    async def roulette(self, ctx: commands.Context, amount: UnsignedIntegerConverter, choice: UnsignedIntegerConverter):
         """
         Roulette.
         If you win, you get triple the money, Otherwise, if you loose
@@ -426,7 +426,7 @@ class EconomyCog(commands.Cog):
     @commands.command(name="beg")
     @commands.cooldown(1, 45, BucketType.member)
     @require_account()
-    async def beg(self, ctx: commands.Context) -> None:
+    async def beg(self, ctx: commands.Context):
         """User can beg for coins, and World will generate a random number between 10 and 300."""
         seed(datetime.now().timestamp())
         amount_of_coins = randint(0, 300)
@@ -448,7 +448,7 @@ class EconomyCog(commands.Cog):
         ))
 
     @roulette.error
-    async def roulette_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def roulette_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the gamble command."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins):
@@ -457,13 +457,13 @@ class EconomyCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} You ran that command wrong, here's how you should run it: `w/roulette <amount> <choice>`")
 
     @beg.error
-    async def beg_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def beg_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the beg command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:,} seconds.")
 
     @gamble.error
-    async def gamble_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def gamble_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the gamble command."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins):
@@ -474,7 +474,7 @@ class EconomyCog(commands.Cog):
     @commands.command(name="daily")
     @commands.cooldown(1, 86400, BucketType.member)
     @require_account()
-    async def daily(self, ctx: commands.Context) -> None:
+    async def daily(self, ctx: commands.Context):
         """Gives to the user a daily account of money."""
         Wealth.collection.update_one(
             {
@@ -489,7 +489,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(title="Daily", color=self.color, description=f"Hey {ctx.author.mention} You successfully received your daily amount of `200` coins."))
 
     @daily.error
-    async def daily_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def daily_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the daily command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:,} hours.")
@@ -497,7 +497,7 @@ class EconomyCog(commands.Cog):
     @commands.command(name="weekly")
     @commands.cooldown(1, 604800, BucketType.member)
     @require_account()
-    async def weekly(self, ctx: commands.Context) -> None:
+    async def weekly(self, ctx: commands.Context):
         """Gives to the user a weekly account of money."""
         Wealth.collection.update_one(
             {
@@ -512,14 +512,14 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(title="Weekly", color=self.color, description=f"Hey {ctx.author.mention} You successfully received your weekly amount of `800` coins."))
 
     @weekly.error
-    async def weekly_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def weekly_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the weekly command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:,} days.")
 
     @commands.command(name="transfer")
     @require_account()
-    async def transfer(self, ctx: commands.Context, target: Member, amount: UnsignedIntegerConverter) -> None:
+    async def transfer(self, ctx: commands.Context, target: Member, amount: UnsignedIntegerConverter):
         """
         Transfers an amount of money to the target specified.
         The target is a member from your Discord server.
@@ -561,7 +561,7 @@ class EconomyCog(commands.Cog):
         ))
 
     @transfer.error
-    async def tranfer_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError) -> None:
+    async def tranfer_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the tranfer command."""
         error = getattr(error, "original", error)
         if isinstance(error, NotEnoughCoins):
@@ -592,7 +592,7 @@ class EconomyCog(commands.Cog):
             user_data["LastTransfer"]
         )
 
-    def _buy(self, item: Item, amount: int, user: User) -> None:
+    def _buy(self, item: Item, amount: int, user: User):
         """
         The core of the `buy` command.
         This performs the buy operation. This will check if the user has enough coins,
@@ -656,6 +656,5 @@ class EconomyCog(commands.Cog):
 
         return coins_earned
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(EconomyCog())
-    print("COG: economy.py Has been loaded!")
+def setup(bot):
+    bot.add_cog(EconomyCog(bot.color))
