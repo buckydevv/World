@@ -310,19 +310,19 @@ class EconomyCog(commands.Cog):
     @commands.command(name="leaderboard", aliases=("lb",))
     @commands.cooldown(1, 10, BucketType.member) # better have cooldown
     async def leaderboard(self, ctx: commands.Context):
-        """ Fetches the global leaderboard. """
-        
-        # this code is copied from my bot's code lulw
+        """Fetches the global leaderboard."""
+        wait = await ctx.send(f"Hey {ctx.author.mention} Please hang on while i fetch the leaderboard!")
         data = list(Wealth.collection.find())
-        sorted_bal = sorted(map(lambda x: x["coins"], data))[::-1][:10]
+        sorted_bal = sorted(map(lambda x: x.get('coins', 0), data))[::-1][:10]
         ids = []
         description = ""
         
         for i, bal in enumerate(sorted_bal):
-            _data = list(filter(lambda x: x["coins"] == bal and x["_id"] not in ids, data))[0]
+            _data = list(filter(lambda x: x.get('coins', 0) == bal and x["_id"] not in ids, data))[0]
             ids.append(_data["_id"])
             user = ctx.bot.get_user(_data["_id"])
-            description += f"{i + 1}. **{user.name if user else '`???`'}** {_data['coins']:,} :moneybag:" + "\n"
+            description += f"{i + 1}. **{user.name if user else '`Unknown`'}** {_data['coins']:,.0f} :moneybag:" + "\n"
+        await wait.delete()
         return await ctx.send(embed=Embed(title="World Leaderboard", color=self.color, description=description))
 
     @leaderboard.error
