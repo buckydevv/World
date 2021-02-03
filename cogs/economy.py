@@ -307,6 +307,31 @@ class EconomyCog(commands.Cog):
         Wealth.collection.delete_one({"_id": ctx.author.id})
         return await ctx.send(embed=Embed(title="Goodbye", color=self.color, description=f"Hey {ctx.author.mention} I have successfully removed your World account."))
 
+    @commands.command(name="leaderboard")
+    @commands.cooldown(1, 10, BucketType.member) # better have cooldown
+    async def leaderboard(self, ctx: commands.Context):
+        """ Fetches the global leaderboard. """
+        
+        # this code is copied from my bot's code lulw
+        data = list(Wealth.collection.find())
+        sorted_bal = sorted(map(lambda x: x["coins"], data))[::-1][:10]
+        ids = []
+        description = ""
+        
+        for i, bal in enumerate(sorted_bal):
+            _data = list(filter(lambda x: x["coins"] == bal and x["_id"] not in ids, data))[0]
+            ids.append(_data["_id"])
+            user = ctx.bot.get_user(_data["_id"])
+            description += f"{i + 1}. **{user.name if user else '`???`'}** {_data['coins']:,} :moneybag:" + "\n"
+        return await ctx.send(embed=Embed(title="World Leaderboard", color=self.color, description=description))
+
+    @leaderboard.error
+    async def leaderboard_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
+        """Handles errors when running the rob command."""
+        error = getattr(error, "original", error)
+        if isinstance(error, commands.errors.CommandOnCooldown):
+            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
+
     @commands.command(name="create")
     async def create(self, ctx: commands.Context):
         """Creates a World account."""

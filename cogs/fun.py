@@ -11,7 +11,7 @@ from pymongo import MongoClient
 from framework import Misc, Wealth
 from time import time
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from twemoji_parser import TwemojiParser
+from twemoji_parser import TwemojiParser, emoji_to_url
 from colorthief import ColorThief
 
 from urllib.parse import quote
@@ -87,7 +87,6 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/askali <question>`")
 
-
     @commands.command(name="f")
     async def f(self, ctx, *, text: commands.clean_content = None):
         reason = f"for **{text}** " if text else ""
@@ -107,15 +106,24 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Enlarge a discord emoji!")
     async def enlarge(self, ctx, emoji: PartialEmoji):
-    	await ctx.send(embed=Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=self.bot.color).set_image(url=emoji.url))
+        await ctx.send(embed=Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=self.bot.color).set_image(url=emoji.url))
 
     @enlarge.error
     async def enlarge_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/enlarge <emoji>`")
-        if isinstance(error, commands.PartialEmojiConversionFailure):
+            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/enlarge <emoji>`")
+        try:
+            assert isinstance(error, commands.PartialEmojiConversionFailure)
+            
+            message_content = ctx.message.content.split()[1].lower()
+            if "pp" in message_content:
+                return await ctx.send(f"{ctx.author.mention}, go to horny jail.")
+            
+            emoji_url = await emoji_to_url(message_content, session=self.session)
+            assert emoji_url != message_content
+            await ctx.send(embed=Embed(title="Enlarge", description=f"{message_content} was enlarged.", color=self.bot.color).set_image(url=emoji_url))
+        except:
             await ctx.send(f"Sorry {ctx.author.mention} that emoji was not found!")
-
 
     @commands.command(aliases=["pepe"])
     async def pp(self, ctx, *, user: Member = None):
