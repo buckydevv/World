@@ -307,7 +307,7 @@ class EconomyCog(commands.Cog):
         Wealth.collection.delete_one({"_id": ctx.author.id})
         return await ctx.send(embed=Embed(title="Goodbye", color=self.color, description=f"Hey {ctx.author.mention} I have successfully removed your World account."))
 
-    @commands.command(name="leaderboard")
+    @commands.command(name="leaderboard", aliases=("lb",))
     @commands.cooldown(1, 10, BucketType.member) # better have cooldown
     async def leaderboard(self, ctx: commands.Context):
         """ Fetches the global leaderboard. """
