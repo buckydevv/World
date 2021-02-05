@@ -3,9 +3,9 @@
 
 [![DISCORDSUPPORT](https://img.shields.io/discord/738392767637487713?color=blue&label=Discord%20Support)](https://discord.gg/AyWjtRncHA) [![InviteWorld](https://img.shields.io/badge/Invite%20World-Click%20here-blue)](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)
 
-## Navigation
+## Table of Content
 - [World, A Discord bot created using discord.py](#world-a-discord-bot-created-using-discordpy)
-- [Navigation](#navigation)
+- [Table of Content](#table-of-content)
 - [Information](#information)
 - [Pull Requests](#pull-requests)
 - [Installation](#installation)
