@@ -81,7 +81,7 @@ class OwnerCog(commands.Cog):
             )
 
             await locals()["__function"]()
-        except Exception:
+        except:
             await ctx.send(embed=Embed(title="Error!", description=f"```{format_exc()}```", color=discord.Color.red()).set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png")))
     
     @eval_.error

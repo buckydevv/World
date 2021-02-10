@@ -59,8 +59,7 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        
-        if result["Bans"] == channel.id:
+        elif result["Bans"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Ban Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"Bans": channel.id}})
         return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Ban Log` to the channel: <#{channel.id}>", color=self.bot.color))
@@ -80,7 +79,7 @@ class LoggingCog(commands.Cog):
         result = self.collection.find({"_id": ctx.guild.id})
         if not result:
             return
-        if result["Unbanned"] == channel.id:
+        elif result["Unbanned"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Unban Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"Unbanned": channel.id}})
         await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Unban Log` to the channel: <#{channel.id}>", color=self.bot.color))
@@ -100,7 +99,7 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["DeletedMessage"] == channel.id:
+        elif result["DeletedMessage"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Deleted messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"DeletedMessage": channel.id}})
         return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Deleted messages Log` to the channel: <#{channel.id}>", color=self.bot.color))
@@ -120,7 +119,7 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["EditedMessage"] == channel.id:
+        elif result["EditedMessage"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Edited messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"EditedMessage": channel.id}})
         await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Edited messages Log` to the channel: <#{channel.id}>", color=self.bot.color))
@@ -140,7 +139,7 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["JoinedServer"] == channel.id:
+        elif result["JoinedServer"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Welcome messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"JoinedServer": channel.id}})
         await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Welcome messsages Log` to the channel: <#{channel.id}>", color=self.bot.color))
@@ -160,7 +159,7 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["LeftServer"] == channel.id:
+        elif result["LeftServer"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Goodbye messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"LeftServer": channel.id}})
         return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Goodbye messsages Log` to the channel: <#{channel.id}>", color=self.bot.color))

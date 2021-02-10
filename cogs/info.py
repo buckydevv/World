@@ -41,7 +41,7 @@ class InfoCog(commands.Cog):
         ).add_field(
             name="Server related information",
             value=dedent(f"""
-                Nick: `{user.nick if user.nick else 'None'}`
+                Nick: `{user.nick or 'None'}`
                 Joined at: `{user.joined_at.strftime('%m/%d/%Y')}`
                 Join position: `{sorted(ctx.guild.members, key=lambda m: m.joined_at).index(user) + 1}`
                 Booster since: `{user.premium_since}`

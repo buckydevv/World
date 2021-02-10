@@ -21,7 +21,6 @@ class Track(wavelink.Track):
 
         self.requester = kwargs.get('requester')
 
-
 class Player(wavelink.Player):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,7 +30,6 @@ class Player(wavelink.Player):
 
         self.queue = asyncio.Queue()
         self.controller = None
-
         self.waiting = False
 
     async def invoke_next(self):
@@ -147,22 +145,19 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not ctx.author.voice:
             return await ctx.send(f"Sorry {ctx.author.mention} Please connect to the channel in order to play a song.")
-
-        if not tracks:
+        elif not tracks:
             return await ctx.send(f"Sorry {ctx.author.mention} That track was not found!")
-
-        if not player.is_connected:
+        elif not player.is_connected:
             await ctx.invoke(self.connect)
 
         if isinstance(tracks, wavelink.TrackPlaylist):
             for track in tracks.tracks:
                 track = Track(track.id, track.info, requester=ctx.author)
                 await player.queue.put(track)
-            await ctx.send(embed=Embed(title="World music", description=f"Added the playlist `{tracks.data['playlistInfo']['name']}` to the queue, With `{len(tracks.tracks)}` songs added to the queue.", color=self.bot.color).set_thumbnail(url=track.thumb))
-        else:
-            track = Track(tracks[0].id, tracks[0].info, requester=ctx.author)
-            await ctx.send(embed=Embed(title="World music", description=f"Added {track.title} to the queue!", color=self.bot.color).set_thumbnail(url=track.thumb))
-            await player.queue.put(track)
+            return await ctx.send(embed=Embed(title="World music", description=f"Added the playlist `{tracks.data['playlistInfo']['name']}` to the queue, With `{len(tracks.tracks)}` songs added to the queue.", color=self.bot.color).set_thumbnail(url=track.thumb))
+        track = Track(tracks[0].id, tracks[0].info, requester=ctx.author)
+        await ctx.send(embed=Embed(title="World music", description=f"Added {track.title} to the queue!", color=self.bot.color).set_thumbnail(url=track.thumb))
+        await player.queue.put(track)
 
         if not player.is_playing:
             await player.invoke_next()
@@ -173,12 +168,11 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         if not player.is_playing:
             return await ctx.send(f"Sorry {ctx.author.mention} There is not a song currently playing.")
-        
-        if not self.is_privileged:
+        elif not self.is_privileged:
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.set_pause(True)
-        await ctx.send(f"Paused the song: {player.current}")
+        await ctx.message.add_reaction("⏸️")
 
 
     @commands.command(aliases=["resume"])
@@ -187,14 +181,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         if not player.paused:
             return await ctx.send(f"Sorry {ctx.author.mention} The song currently playing is not paused!")
-    
-        if not self.is_privileged:
+        elif not self.is_privileged:
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
 
         await player.set_pause(False)
-        await ctx.send(f"Unpaused the song: {player.current}")
-
-
+        await ctx.message.add_reaction("▶️")
+    
 
     @commands.command(aliases=["s"])
     async def skip(self, ctx):
@@ -203,21 +195,18 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         
         if not player.is_playing:
             return await ctx.send(f"Sorry {ctx.author.mention} i am not currently playing a song!")
-
-        if not self.is_privileged:
+        elif not self.is_privileged:
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.stop()
-        await ctx.send(f"Hey {ctx.author.mention}, The song has been skipped")
+        await ctx.message.add_reaction("⏯️")
 
     @commands.command(aliases=["vol"])
     async def volume(self, ctx, *, vol: int):
         """Change the volume of the sound coming out from World."""
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
 
-        if vol > 100:
-            return await ctx.send(f"Sorry {ctx.author.mention} `100%` is the max volume.")
-
+        vol = 100 if (vol > 100) else vol
         vol = max(min(vol, 100), 0)
         player.volume = vol
 
@@ -225,7 +214,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.set_volume(vol)
-        await ctx.send(f"Hey {ctx.author.mention} Volume has been set to `{vol}%`")
+        await ctx.message.add_reaction("✅")
+
 
     @commands.command(aliases=['np', 'current'])
     async def nowplaying(self, ctx):
@@ -240,7 +230,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(aliases=['q'])
     async def queue(self, ctx):
-        """Return the next upcoming 5 songs."""
+        """Returns the next upcoming 5 songs."""
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
 
         if not player.current or not player.queue._queue:
@@ -263,8 +253,11 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         try:
             await player.destroy() # Send a destroy node
-        except Exception:
+        except:
             return await ctx.send(f"Sorry {ctx.author.mention} i am currently not in a voice channel.")
+        else:
+            return await ctx.message.add_reaction("👋")
+
 
     @commands.command(aliases=['swap', "givedj", "sdj"])
     async def swapdj(self, ctx: commands.Context, *, member = None):
@@ -273,30 +266,26 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             return
-
-        if member.bot:
+        elif member.bot:
             return await ctx.send(f"Sorry {ctx.author.mention} but that's a bot, Please give DJ to a human!")
-
-        if not self.is_privileged(ctx):
+        elif not self.is_privileged(ctx):
             return await ctx.send(f"Sorry {ctx.author.mention} but only admins or the DJ may use this command.")
 
         members = self.bot.get_channel(int(player.channel_id)).members
-
-        if member and member not in members:
-            return await ctx.send(f"{member} isn't in the voice chat! They cannot be DJ.")
-        if member and member == player.dj:
-            return await ctx.send(f"I can't change the DJ to someone who is already the DJ...")
         if len(members) <= 2:
             return await ctx.send(f"Sorry {ctx.author.mention} There are no other members in this VC to swap DJ with.")
-        if member:
-            player.dj = member
-            return await ctx.send(f"{member.mention} is now the DJ.")
-        for m in members:
-            if m == player.dj or m.bot:
-                continue
-            else:
+        elif not member:
+            for m in members:
+                if m == player.dj or m.bot:
+                    continue
                 player.dj = m
                 return await ctx.send(f"{member.mention} is now the DJ.")
+        if member not in members:
+            return await ctx.send(f"{member} isn't in the voice chat! They cannot be DJ.")
+        elif member == player.dj:
+            return await ctx.send(f"I can't change the DJ to someone who is already the DJ...")
+        player.dj = member
+        return await ctx.send(f"{member.mention} is now the DJ.")
                 
     @commands.group(name="filter")
     async def filter(self, ctx):
@@ -309,8 +298,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             return await ctx.send(f"Sorry {ctx.author.mention} I am not connected to a voice channel!.")
-
-        if not self.is_privileged(ctx):
+        elif not self.is_privileged(ctx):
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.set_eq(wavelink.Equalizer.boost())
@@ -323,8 +311,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             return await ctx.send(f"Sorry {ctx.author.mention} I am not connected to a voice channel!.")
-
-        if not self.is_privileged(ctx):
+        elif not self.is_privileged(ctx):
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.set_eq(wavelink.Equalizer.flat())
@@ -336,8 +323,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             return await ctx.send(f"Sorry {ctx.author.mention} I am not connected to a voice channel!.")
-
-        if not self.is_privileged(ctx):
+        elif not self.is_privileged(ctx):
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.set_eq(wavelink.Equalizer.metal())
@@ -349,8 +335,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             return await ctx.send(f"Sorry {ctx.author.mention} I am not connected to a voice channel!.")
-
-        if not self.is_privileged(ctx):
+        elif not self.is_privileged(ctx):
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.set_eq(wavelink.Equalizer.piano())
@@ -362,8 +347,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             return await ctx.send(f"Sorry {ctx.author.mention} I am not connected to a voice channel!.")
-
-        if not self.is_privileged(ctx):
+        elif not self.is_privileged(ctx):
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.set_eq(wavelink.Equalizer.build(levels=[(0, -0.13), (1, -0.11), (2, 0.1), (3, -0.1), (4, 0.14), (5, 0.2), (6, -0.18), (7, 0.0), (8, 0.24), (9, 0.22), (10, 0.2), (11, 0.0), (12, 0.0), (13, 0.0), (14, 0.0)], name="jazz"))
@@ -375,8 +359,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_connected:
             return await ctx.send(f"Sorry {ctx.author.mention} I am not connected to a voice channel!.")
-
-        if not self.is_privileged(ctx):
+        elif not self.is_privileged(ctx):
             return await ctx.send(f"Sorry {ctx.author.mention} you are not a Admin or DJ.")
         
         await player.set_eq(wavelink.Equalizer.build(levels=[(0, -0.02), (1, -0.01), (2, 0.08), (3, 0.1), (4, 0.15), (5, 0.1), (6, 0.03), (7, -0.02), (8, -0.035), (9, -0.05), (10, -0.05), (11, -0.05), (12, -0.05), (13, -0.05), (14, -0.05)], name="pop"))
