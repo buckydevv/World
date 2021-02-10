@@ -326,9 +326,6 @@ class FunCog(commands.Cog):
     @commands.command(help="Write a top.gg Review", aliases=["tgg", "topggreview", "topggbotreview", "botreview"])
     async def topgg(self, ctx, user: Optional[Member], *, message):
         user = user or ctx.author
-        if len(message) > 30:
-            return await ctx.send(f"Sorry {ctx.author.mention} there is a limit of `30` chars.")
-
         ran_days = randint(2, 30)
 
         font = ImageFont.truetype("fonts/karla1.ttf", 19, encoding="unic")
@@ -342,7 +339,7 @@ class FunCog(commands.Cog):
         parser = TwemojiParser(mainimage, parse_discord_emoji=True)
         await parser.draw_text((126, 43), user.name, font=font, fill='black')
         await parser.draw_text((134 + userchars, 47), f"{ran_days} days ago", font=fontsmall, fill='grey')
-        await parser.draw_text((129, 84), message, font=font, fill='black')
+        await parser.draw_text((129, 84), message[:30], font=font, fill='black')
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(user, 41, 41)

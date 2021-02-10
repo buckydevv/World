@@ -69,20 +69,17 @@ class ModCog(commands.Cog):
     @commands.command(help="Delete specified messages.")
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, amount: int):
-        if amount >= 100:
-            return await ctx.send(f"Sorry {ctx.author.mention} `100` is max limit.")
         if amount <= 1:
             return await ctx.send(f"Sorry {ctx.author.mention} Please purge more than `1` message")
-        else:
-            await ctx.channel.purge(limit=amount)
+        amount = 100 if (amount >= 100) else amount
+        await ctx.channel.purge(limit=amount)
+        await ctx.send(f"{ctx.author.mention},  Purged {amount} messages.")
 
     @purge.error
     async def purge_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f'Sorry {ctx.author.mention} Please Type `w/purge <amount>')
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-        
+            return await ctx.send(f'Sorry {ctx.author.mention} Please Type `w/purge <amount>')
+        return await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
 
     @commands.command(help="Unban a user.")
     @commands.has_permissions(ban_members=True)
