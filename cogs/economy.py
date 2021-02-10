@@ -258,7 +258,7 @@ class EconomyCog(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention} you can't rob yourself silly <:Worldkek:768145777926078474>")
         elif user.bot:
             ctx.command.reset_cooldown(ctx)
-            return await ctx.send(f"Sorry {ctx.author.mention} you can't a bot silly <:Worldkek:768145777926078474>")
+            return await ctx.send(f"Sorry {ctx.author.mention} you can't rob a bot silly <:Worldkek:768145777926078474>")
         
         target = self._get_user(user.id)
         if not target.coins:
@@ -311,8 +311,13 @@ class EconomyCog(commands.Cog):
     @commands.cooldown(1, 10, BucketType.member) # better have cooldown
     async def leaderboard(self, ctx: commands.Context):
         """Fetches the global leaderboard."""
-        wait = await ctx.send(f"Hey {ctx.author.mention} Please hang on while i fetch the leaderboard!")
+        await ctx.trigger_typing()
         data = list(Wealth.collection.find())
+        
+        if 'server' in ctx.message.content.lower():
+            _map = map(lambda x: x.id, ctx.guild.members)
+            data = list(filter(lambda x: x.get('_id', 0) in _map, data))
+        
         sorted_bal = sorted(map(lambda x: x.get('coins', 0), data))[::-1][:10]
         ids = []
         description = ""
@@ -322,7 +327,7 @@ class EconomyCog(commands.Cog):
             ids.append(_data["_id"])
             user = ctx.bot.get_user(_data["_id"])
             description += f"{i + 1}. **{user.name if user else '`Unknown`'}** {_data['coins']:,.0f} :moneybag:" + "\n"
-        await wait.delete()
+        
         return await ctx.send(embed=Embed(title="World Leaderboard", color=self.color, description=description))
 
     @leaderboard.error
@@ -550,9 +555,9 @@ class EconomyCog(commands.Cog):
         The target is a member from your Discord server.
         """
         if target.id == ctx.author.id:
-            return await ctx.send(f"Sorry {ctx.author.mention} but you cant transfer money to yourself dummy!")
+            return await ctx.send(f"Sorry {ctx.author.mention} but you can\'t transfer money to yourself dummy!")
         elif target.bot:
-            return await ctx.send(f"Sorry {ctx.author.mention} but you cant transfer money to a bot dummy!")
+            return await ctx.send(f"Sorry {ctx.author.mention} but you can\'t transfer money to a bot dummy!")
         now = datetime.now()
         user = self._get_user(ctx.author.id)
         if amount > user.coins:

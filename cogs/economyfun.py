@@ -35,7 +35,7 @@ class EconomyFunCog(commands.Cog):
 
         if user.id == ctx.author.id:
             ctx.command.reset_cooldown(ctx)
-            return await ctx.send(f"Sorry {ctx.author.mention} You cant give yourself a reputation point.")
+            return await ctx.send(f"Sorry {ctx.author.mention} You can\'t give yourself a reputation point.")
             
         last_used = now.strftime("%m/%d/%Y, %H:%M:%S")
 
@@ -343,7 +343,6 @@ class EconomyFunCog(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
-
     @commands.command(help="Fish for things in the lake", aliases=["fish", "worldfishing"])
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     @require_account()
@@ -412,5 +411,6 @@ class EconomyFunCog(commands.Cog):
     async def trash_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
+
 def setup(bot):
     bot.add_cog(EconomyFunCog(bot))
