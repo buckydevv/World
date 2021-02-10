@@ -76,7 +76,7 @@ class LoggingCog(commands.Cog):
     async def unban(self, ctx, channel: TextChannel):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
             Guild._create_guild_account(ctx.guild.id)
-        result = self.collection.find({"_id": ctx.guild.id})
+        result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
         elif result["Unbanned"] == channel.id:
