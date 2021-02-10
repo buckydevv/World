@@ -72,7 +72,7 @@ class ModCog(commands.Cog):
         if amount <= 1:
             return await ctx.send(f"Sorry {ctx.author.mention} Please purge more than `1` message")
         amount = 100 if (amount >= 100) else amount
-        await ctx.channel.purge(limit=amount)
+        await ctx.channel.purge(limit=amount + 1) # this includes the invoked message
         await ctx.send(f"{ctx.author.mention},  Purged {amount} messages.")
 
     @purge.error
