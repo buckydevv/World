@@ -3,6 +3,15 @@
 
 [![DISCORDSUPPORT](https://img.shields.io/discord/738392767637487713?color=blue&label=Discord%20Support)](https://discord.gg/AyWjtRncHA) [![InviteWorld](https://img.shields.io/badge/Invite%20World-Click%20here-blue)](https://discord.com/oauth2/authorize?client_id=700292147311542282&permissions=8&scope=bot)
 
+## Table of Content
+- [World, A Discord bot created using discord.py](#world-a-discord-bot-created-using-discordpy)
+- [Table of Content](#table-of-content)
+- [Information](#information)
+- [Pull Requests](#pull-requests)
+- [Installation](#installation)
+  - [Linux / Mac OSX](#linux--mac-osx)
+  - [Windows](#windows)
+
 ## Information
 ### World is a Disord bot that has many features and it's own framework!
 ### World contains cool categories such as:
