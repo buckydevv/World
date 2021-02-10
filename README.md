@@ -13,7 +13,7 @@
   - [Windows](#windows)
 
 ## Information
-### World is a Disord bot that has many features and it's own framework!
+### World is a Discord bot that has many features and it's own "framework"!
 ### World contains cool categories such as:
 * Music
 * Fun
