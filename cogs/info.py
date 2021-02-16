@@ -1,5 +1,4 @@
 import psutil
-from asyncio import sleep as _sleep
 from json import dumps, loads, load
 from typing import Optional
 from time import time
@@ -42,7 +41,7 @@ class InfoCog(commands.Cog):
         ).add_field(
             name="Server related information",
             value=dedent(f"""
-                Nick: `{user.nick if user.nick else 'None'}`
+                Nick: `{user.nick or 'None'}`
                 Joined at: `{user.joined_at.strftime('%m/%d/%Y')}`
                 Join position: `{sorted(ctx.guild.members, key=lambda m: m.joined_at).index(user) + 1}`
                 Booster since: `{user.premium_since}`
@@ -64,20 +63,20 @@ class InfoCog(commands.Cog):
             title=f"Information about {ctx.guild.name}",
             color=self.bot.color
         ).add_field(name="**Name**", value=ctx.guild.name
-        ).add_field(name="**Owner**", value=f"{ctx.guild.owner}"
-        ).add_field(name="**Region**", value=f"{ctx.guild.region}"
-        ).add_field(name="**Boosts**", value=f"{ctx.guild.premium_subscription_count}"
-        ).add_field(name="**Boost Tier**", value=f"{ctx.guild.premium_tier}"
-        ).add_field(name="**Locale**", value=f"{ctx.guild.preferred_locale}"
-        ).add_field(name="**Members**", value=f"{len(ctx.guild.members)}"
-        ).add_field(name="**Roles**", value=f"{len(ctx.guild.roles)}"
-        ).add_field(name="**Channels**", value=f"{len(ctx.guild.channels)}"
-        ).add_field(name="**Emojis**", value=f"{len(ctx.guild.emojis)}"
-        ).add_field(name="**2FA**", value=f"{ctx.guild.mfa_level}"
-        ).add_field(name="**Emoji limit**", value=f"{ctx.guild.emoji_limit}"
-        ).add_field(name="**Verify Level**", value=f"{ctx.guild.verification_level}"
-        ).add_field(name="**File Size limit**", value=f"{ctx.guild.filesize_limit}"
-        ).add_field(name="**Birate Limit**", value=f"{ctx.guild.bitrate_limit}"
+        ).add_field(name="**Owner**", value=str(ctx.guild.owner)
+        ).add_field(name="**Region**", value=str(ctx.guild.region)
+        ).add_field(name="**Boosts**", value=str(ctx.guild.premium_subscription_count)
+        ).add_field(name="**Boost Tier**", value=str(ctx.guild.premium_tier)
+        ).add_field(name="**Locale**", value=str(ctx.guild.preferred_locale)
+        ).add_field(name="**Members**", value=str(len(ctx.guild.members))
+        ).add_field(name="**Roles**", value=str(len(ctx.guild.roles))
+        ).add_field(name="**Channels**", value=str(len(ctx.guild.channels))
+        ).add_field(name="**Emojis**", value=str(len(ctx.guild.emojis))
+        ).add_field(name="**2FA**", value=str(ctx.guild.mfa_level)
+        ).add_field(name="**Emoji limit**", value=str(ctx.guild.emoji_limit)
+        ).add_field(name="**Verify Level**", value=str(ctx.guild.verification_level)
+        ).add_field(name="**File Size limit**", value=str(ctx.guild.filesize_limit)
+        ).add_field(name="**Birate Limit**", value=str(ctx.guild.bitrate_limit)
         ).set_thumbnail(url=ctx.guild.icon_url))
     
     @commands.command(aliases=["ri"])
@@ -113,24 +112,16 @@ class InfoCog(commands.Cog):
     @commands.command(name="botinfo", aliases=("bot", "about"))
     async def botinfo(self, ctx: commands.Context):
         """Shows info about World."""
+        await ctx.trigger_typing()
+        
         try:
             req = await self.session.get("https://api.statcord.com/v3/700292147311542282")
-            if req.status != 200:
-                return await ctx.send(f"Sorry {ctx.author.mention} a error has occured and will be fixed soon!")
-            r = await req.json()
-            p = dumps(r)
-            y = loads(p)
+            assert req.status == 200
+            y = await req.json()
             with open('prefixes.json', 'r') as f:
                 prefixes = load(f)
-            if not (str(ctx.guild.id) in prefixes):
-                guild_prefix = "w/, World"
-            else:
-                guild_prefix = prefixes[str(ctx.guild.id)]
-            start = time()
-            message = await ctx.send(embed=Embed(title="Bot information", description="Loading... <a:loading1:772860591190048768>", color=self.bot.color))
-            end = time()
-            await _sleep(1)
-            await message.edit(embed=Embed(
+            
+            await ctx.send(embed=Embed(
                 title="World's info!",
                 color=self.bot.color,
                 description=dedent(f"""
@@ -142,17 +133,17 @@ class InfoCog(commands.Cog):
                 Servers: `{len(self.bot.guilds)}`
                 Users: `{len(set(self.bot.get_all_members()))}`
                 > <:Worldsmile:768145778493227058> Guild info
-                Prefix: `{guild_prefix}`
+                Prefix: `{prefixes.get(str(ctx.guild.id), 'w/, World')}`
                 Latency: `{round(self.bot.latency * 1000)}ms`
-                Response Time: `{(end-start)*1000:,.0f}ms`
+                Response Time: `{(time() - ctx.message.created_at.timestamp())*1000:,.0f}ms`
                 > <:Worldsipjuice:768201555811631134> Command info
                 Total commands: `{len(self.bot.commands)}`
                 Commands used today: `{y['data'][0]['commands']}`
                 Popular commands: `w/{y['data'][0]['popular'][0]['name']}`, `w/{y['data'][0]['popular'][1]['name']}`, `w/{y['data'][0]['popular'][2]['name']}`,\n`w/{y['data'][0]['popular'][3]['name']}`, `w/{y['data'][0]['popular'][4]['name']}`
                 """)
-                ))
-        except Exception as e:
-            return await ctx.send(e)
+            ))
+        except:
+            return await ctx.send(f"Sorry {ctx.author.mention} a error has occured and will be fixed soon!")
 
     @commands.command(name="vote")
     async def vote(self, ctx: commands.Context):
@@ -176,12 +167,11 @@ class InfoCog(commands.Cog):
                 color=self.bot.color
             ).set_thumbnail(
                 url=ctx.author.avatar_url
-                ).set_footer(
-                    text=f"WARNING: Bad usage of this command may lead to a bot ban."
-                    )
-                    )
-        suggestion_channel = await self.bot.fetch_channel(763110868791459860)
-        await suggestion_channel.send(embed=Embed(
+            ).set_footer(
+                text=f"WARNING: Bad usage of this command may lead to a bot ban."
+            )
+        )
+        await self.bot.get_channel(763110868791459860).send(embed=Embed(
             title=f"Suggestion from {ctx.author}",
             description=suggestion,
             color=self.bot.color
@@ -191,8 +181,7 @@ class InfoCog(commands.Cog):
                 ID: {ctx.author.id}
             """),
             inline=False
-        ).set_thumbnail(url=ctx.author.avatar_url)
-        )
+        ).set_thumbnail(url=ctx.author.avatar_url))
 
     @suggest.error
     async def suggest_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
@@ -224,7 +213,6 @@ class InfoCog(commands.Cog):
 
     @commands.command(help="How to get World emotes!", aliases=["worldemotes", "worldemote", "emojis", "emoji"])
     async def emotes(self, ctx, allemote: Optional[str]):
-        allemotes = ("--all", "all", "allemotes")
         if not allemote:
             return await ctx.send(embed=Embed(
                 title="World emotes",
@@ -232,7 +220,7 @@ class InfoCog(commands.Cog):
                 color=self.bot.color
             ).set_footer(text="To see all emotes run `w/emotes --all`"))
 
-        if allemote in allemotes:
+        if allemote in ("--all", "all", "allemotes"):
             server1 = self.bot.get_guild(738392767637487713)
             world1 = [f"`{emoji.name}` - {emoji}" for emoji in server1.emojis]
             server2 = self.bot.get_guild(774294150748831814)

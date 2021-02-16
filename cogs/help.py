@@ -22,7 +22,7 @@ class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @command(name="help")
+    @command(name="help", aliases=['h', 'commands'])
     async def show_help(self, ctx, cmd: Optional[str]):
       """Shows this message."""
       if not cmd:

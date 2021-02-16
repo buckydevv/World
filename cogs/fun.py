@@ -127,7 +127,7 @@ class FunCog(commands.Cog):
 
     @commands.command(aliases=["pepe"])
     async def pp(self, ctx, *, user: Member = None):
-        user = user if user else ctx.author
+        user = user or ctx.author
         dong = "=" * randint(1, 15)
         await ctx.send(embed=Embed(title=f"{user.display_name}'s pepe size", description=f"8{dong}D", color=self.bot.color))
 
@@ -220,9 +220,7 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Turn text into emojis!.")
     async def emojify(self, ctx, *, stuff):
-        if len(stuff) > 20:
-            return await ctx.send(f"Sorry {ctx.author.mention} a limit of `20` chars please!")
-        emj = ("".join([":regional_indicator_"+l+":"  if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in stuff.lower()]))
+        emj = ("".join([":regional_indicator_"+l+":" if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in stuff[:20].lower()]))
         await ctx.send(embed=Embed(title='Emojify', description=f'{emj}', color=self.bot.color))
 
     @emojify.error
@@ -328,9 +326,6 @@ class FunCog(commands.Cog):
     @commands.command(help="Write a top.gg Review", aliases=["tgg", "topggreview", "topggbotreview", "botreview"])
     async def topgg(self, ctx, user: Optional[Member], *, message):
         user = user or ctx.author
-        if len(message) > 30:
-            return await ctx.send(f"Sorry {ctx.author.mention} there is a limit of `30` chars.")
-
         ran_days = randint(2, 30)
 
         font = ImageFont.truetype("fonts/karla1.ttf", 19, encoding="unic")
@@ -344,7 +339,7 @@ class FunCog(commands.Cog):
         parser = TwemojiParser(mainimage, parse_discord_emoji=True)
         await parser.draw_text((126, 43), user.name, font=font, fill='black')
         await parser.draw_text((134 + userchars, 47), f"{ran_days} days ago", font=fontsmall, fill='grey')
-        await parser.draw_text((129, 84), message, font=font, fill='black')
+        await parser.draw_text((129, 84), message[:30], font=font, fill='black')
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(user, 41, 41)
@@ -394,6 +389,7 @@ class FunCog(commands.Cog):
         		except IndexError:
         			return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
         		return await ctx.send(embed=Embed(title=song['name'], color=self.bot.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{song['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nSong Link: [`{song['name']}`](https://open.spotify.com/track/{song['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
+        
         try:
         	user = user or ctx.author
         	spotify_activity = next((activity for activity in user.activities if isinstance(activity, Spotify)), None)
@@ -450,7 +446,7 @@ class FunCog(commands.Cog):
     @commands.cooldown(rate=3, per=8, type=commands.BucketType.member)
     async def fast(self, ctx, option: Optional[str], user: Optional[Member]=None):
         user = user or ctx.author
-        if option in ["--rank", "rank"]:
+        if option in ("--rank", "rank"):
             if not Wealth.collection.find_one({"_id": user.id}):
                 return await ctx.send(f"Sorry {ctx.author.mention} that user is not ranked yet.")
             
@@ -545,9 +541,9 @@ class FunCog(commands.Cog):
     			return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
     
     @commands.command()
-    async def steam(self, ctx, user: Optional[Member], *, message=None):
+    async def steam(self, ctx, user: Optional[Member], *, message = None):
     	"""Returns a Image of a Steam notifaction!"""
-    	if message == None: message = "Nothing"
+    	message = message or "Nothing"
     	user = user or ctx.author
     	image = Image.open("images/steam.png")
     	font = ImageFont.truetype("fonts/Arial.ttf", 46, encoding="unic") # Steam's notifaction font.

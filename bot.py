@@ -24,7 +24,7 @@ async def get_prefix(world, message):
 # Main bot area
 
 world = commands.Bot(
-    command_prefix=(get_prefix),
+    command_prefix=get_prefix,
     description="Discord Bot Made For All",
     case_insensitive=True,
     intents=Intents.all()
@@ -97,7 +97,7 @@ async def on_message(message):
     """
     if message.author.bot:
         return
-    if not message.guild:
+    elif not message.guild:
         return await message.channel.send((
             "You can't use commands on DMs, invite the bot your server: "
             f"<https://discord.com/oauth2/authorize?client_id={world.user.id}&permissions=8&scope=bot>"
