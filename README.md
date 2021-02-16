@@ -9,7 +9,7 @@
 - [Information](#information)
 - [Pull Requests](#pull-requests)
 - [Installation](#installation)
-  - [Linux / Mac OSX](#linux-mac-os)
+  - [Linux / Mac OSX](#Linux(Debian Based) / Mac OSX)
   - [Windows](#windows)
 
 ## Information
