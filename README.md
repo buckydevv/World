@@ -9,7 +9,7 @@
 - [Information](#information)
 - [Pull Requests](#pull-requests)
 - [Installation](#installation)
-  - [Linux / Mac OSX](#Linux-/-Mac-OSX)
+  - [Linux / Mac OSX](#Linux-or-mac-osx)
   - [Windows](#windows)
 
 ## Information
@@ -32,7 +32,7 @@ You will need to install the packages listed in the requirements.txt, you can do
 
 After doing so, download a LavaLink binary at their Github releases, you will need to have java installed in order to run the .jar file that you will have in the same directory as the bot.
 
-# Linux / Mac OSX
+# Linux or Mac OSX
 
 ```
 sudo apt-get install default-jdk python3 python3-venv
