@@ -361,77 +361,77 @@ class FunCog(commands.Cog):
     @commands.cooldown(rate=2, per=8, type=commands.BucketType.member)
     async def spotify(self, ctx, user: Optional[Member], option: Optional[str], *, song: Optional[str]):
         if option == "--artist":
-        	if not song:
-        		return await ctx.send(f"Sorry {ctx.author.mention} please specify a artist's name!")
+            if not song:
+                return await ctx.send(f"Sorry {ctx.author.mention} please specify a artist's name!")
 
             try:
                 results = self.sp.search(q=song, limit=1, type='artist')['artists']['items']
-        		assert results and results[0]
-        		artist = results[0]
-        	except (KeyError, AssertionError):
-        		return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
-        	return await ctx.send(embed=Embed(title=artist['name'], color=self.bot.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
+                assert results and results[0]
+                artist = results[0]
+            except (KeyError, AssertionError):
+                return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
+            return await ctx.send(embed=Embed(title=artist['name'], color=self.bot.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
 
         if option == "--song":
-        	if not song:
-        		return await ctx.send(f"Sorry {ctx.author.mention} Please specify a song name!")
+            if not song:
+                return await ctx.send(f"Sorry {ctx.author.mention} Please specify a song name!")
 
             try:
                 spotify = self.sp.search(q=song, limit=1, type='track')['tracks']['items']
                 assert spotify and spotify[0]
             except (KeyError, AssertionError):
                 return await ctx.send(f"Sorry {ctx.author.mention} but that song does not exist!")
-        	
+            
             spotify = spotify[0]
             name = ', '.join([f"[{artist['name']}]({artist['external_urls'].get('spotify', 'https://youtube.com/watch?v=dQw4w9WgXcQ')})" for artist in spotify['artists']])
             duration = time.strftime("%M:%S", time.gmtime(spotify['duration_ms'] // 1000))
             return await ctx.send(embed=Embed(title=song, color=self.bot.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{spotify['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nDuration: `{duration}`\nSong Link: [`{spotify['name']}`](https://open.spotify.com/track/{spotify['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
         
         try:
-        	user = user or ctx.author
-        	spotify_activity = next((activity for activity in user.activities if isinstance(activity, Spotify)), None)
+            user = user or ctx.author
+            spotify_activity = next((activity for activity in user.activities if isinstance(activity, Spotify)), None)
 
-        	if not spotify_activity:
-        		return await ctx.send(f"Sorry {ctx.author.mention} {user.name} is not currently listening to Spotify.")
+            if not spotify_activity:
+                return await ctx.send(f"Sorry {ctx.author.mention} {user.name} is not currently listening to Spotify.")
 
-        	r = await self.session.get(str(spotify_activity.album_cover_url))
-        	res = BytesIO(await r.read())
-        	r.close()
+            r = await self.session.get(str(spotify_activity.album_cover_url))
+            res = BytesIO(await r.read())
+            r.close()
 
-        	color_thief = ColorThief(res)
-        	dominant_color = color_thief.get_color(quality=40)
+            color_thief = ColorThief(res)
+            dominant_color = color_thief.get_color(quality=40)
 
-        	font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
-        	fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
+            font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
+            fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
 
-        	title = self.kks.convert(spotify_activity.title)
-        	album = self.kks.convert(spotify_activity.album)
-        	artists = self.kks.convert(spotify_activity.artists)
+            title = self.kks.convert(spotify_activity.title)
+            album = self.kks.convert(spotify_activity.album)
+            artists = self.kks.convert(spotify_activity.artists)
 
-        	title_new = ''.join(item['hepburn'] for item in title)
-        	album_new = ''.join(item['hepburn'] for item in album)
-        	transliterated_artists = [self.kks.convert(artist) for artist in spotify_activity.artists]
-        	artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
+            title_new = ''.join(item['hepburn'] for item in title)
+            album_new = ''.join(item['hepburn'] for item in album)
+            transliterated_artists = [self.kks.convert(artist) for artist in spotify_activity.artists]
+            artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
 
-        	abridged = album_new if len(album_new) <= 30 else f'{album_new[:27]}...'
-        	cbridged = title_new if len(title_new) <= 20 else f'{title_new[:17]}...'
-        	dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[:27]}...'
-        	text_colour = 'black' if Misc.relative_luminance(dominant_color) > 0.5 else 'white'
+            abridged = album_new if len(album_new) <= 30 else f'{album_new[:27]}...'
+            cbridged = title_new if len(title_new) <= 20 else f'{title_new[:17]}...'
+            dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[:27]}...'
+            text_colour = 'black' if Misc.relative_luminance(dominant_color) > 0.5 else 'white'
 
-        	img = Image.new('RGB', (999, 395), color=dominant_color)
+            img = Image.new('RGB', (999, 395), color=dominant_color)
 
-        	album = Image.open(res)
-        	resized_album = album.resize((245, 245))
-        	img.paste(resized_album, (41, 76))
+            album = Image.open(res)
+            resized_album = album.resize((245, 245))
+            img.paste(resized_album, (41, 76))
 
-        	parser = TwemojiParser(img, parse_discord_emoji=False)
-        	await parser.draw_text((300, 90), cbridged, font=fontbold, fill=text_colour) # Top section - Song name
-        	await parser.draw_text((303, 170), dbridged, font=font, fill=text_colour) # Middle secion - Artists of the song
-        	await parser.draw_text((303, 228), abridged, font=font, fill=text_colour) # Album name - Bottom section
-        	await parser.close()
-        	await ctx.send(file=Misc.save_image(Misc.add_corners(img, 42)))
+            parser = TwemojiParser(img, parse_discord_emoji=False)
+            await parser.draw_text((300, 90), cbridged, font=fontbold, fill=text_colour) # Top section - Song name
+            await parser.draw_text((303, 170), dbridged, font=font, fill=text_colour) # Middle secion - Artists of the song
+            await parser.draw_text((303, 228), abridged, font=font, fill=text_colour) # Album name - Bottom section
+            await parser.close()
+            await ctx.send(file=Misc.save_image(Misc.add_corners(img, 42)))
         except Exception as e:
-        	return await ctx.send(e)
+            return await ctx.send(e)
 
     @spotify.error
     async def spotify_error(self, ctx, error):
@@ -512,55 +512,55 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Guess the flag from the picture!!", aliases=["gtf"])
     async def guesstheflag(self, ctx):
-    	FlagChosen = choice(self.Country)
+        FlagChosen = choice(self.Country)
 
-    	req = await self.session.get(f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png")
-    	if req.status != 200:
-    		return await ctx.send(f"Sorry {ctx.author.mention} The api is down.")
-    	req.close()
+        req = await self.session.get(f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png")
+        if req.status != 200:
+            return await ctx.send(f"Sorry {ctx.author.mention} The api is down.")
+        req.close()
 
-    	FirstMessage = await ctx.send(embed=Embed(title="Guess the flag!", color=self.bot.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png"))
+        FirstMessage = await ctx.send(embed=Embed(title="Guess the flag!", color=self.bot.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png"))
 
-    	while True:
-    		try:
-    			start = round(time.time.time() * 100)
-    			resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content == FlagChosen['name'], timeout=18)
-    			elapse = round(time.time.time() * 100) - start
-    			if resp.content.lower() == FlagChosen['name'].lower():
-    				if not Wealth._has_account(resp.author.id):
-    					Wealth._create_account(resp.author.id)
-    				RandomCoins = randint(15, 60)
-    				Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
-    				return await ctx.send(embed=Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.bot.color))
-    		except:
-    			await FirstMessage.delete()
-    			return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
+        while True:
+            try:
+                start = round(time.time.time() * 100)
+                resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content == FlagChosen['name'], timeout=18)
+                elapse = round(time.time.time() * 100) - start
+                if resp.content.lower() == FlagChosen['name'].lower():
+                    if not Wealth._has_account(resp.author.id):
+                        Wealth._create_account(resp.author.id)
+                    RandomCoins = randint(15, 60)
+                    Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
+                    return await ctx.send(embed=Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.bot.color))
+            except:
+                await FirstMessage.delete()
+                return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
     
     @commands.command()
     async def steam(self, ctx, user: Optional[Member], *, message = None):
-    	"""Returns a Image of a Steam notifaction!"""
-    	message = message or "Nothing"
-    	user = user or ctx.author
-    	image = Image.open("images/steam.png")
-    	font = ImageFont.truetype("fonts/Arial.ttf", 46, encoding="unic") # Steam's notifaction font.
+        """Returns a Image of a Steam notifaction!"""
+        message = message or "Nothing"
+        user = user or ctx.author
+        image = Image.open("images/steam.png")
+        font = ImageFont.truetype("fonts/Arial.ttf", 46, encoding="unic") # Steam's notifaction font.
 
-    	pfp = await Misc.fetch_pfp(user)
-    	CONVERT = pfp.resize((140,140)) # Resize the Members Avatar.
+        pfp = await Misc.fetch_pfp(user)
+        CONVERT = pfp.resize((140,140)) # Resize the Members Avatar.
 
-    	KKS_MESSAGE_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(message)) # Transliteration if the text is CJK
-    	KKS_NAME_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(user.name)) # Transliteration if the text is CJK
+        KKS_MESSAGE_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(message)) # Transliteration if the text is CJK
+        KKS_NAME_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(user.name)) # Transliteration if the text is CJK
 
-    	MSG_CHECK = KKS_MESSAGE_CONVERT if len(KKS_MESSAGE_CONVERT) <= 25 else f'{KKS_MESSAGE_CONVERT[:22]}'
-    	NAME_CHECK = KKS_NAME_CONVERT if len(KKS_NAME_CONVERT) <= 25 else f'{KKS_NAME_CONVERT[:22]}...'
+        MSG_CHECK = KKS_MESSAGE_CONVERT if len(KKS_MESSAGE_CONVERT) <= 25 else f'{KKS_MESSAGE_CONVERT[:22]}'
+        NAME_CHECK = KKS_NAME_CONVERT if len(KKS_NAME_CONVERT) <= 25 else f'{KKS_NAME_CONVERT[:22]}...'
 
-    	parser = TwemojiParser(image)
-    	await parser.draw_text((262, 77), NAME_CHECK, font=font, fill=(139,195,21)) # Name of discord.Member
-    	await parser.draw_text((264, 132), "is now playing", font=font, fill="grey")
-    	await parser.draw_text((263, 188), MSG_CHECK, font=font, fill=(139,195,21)) # Message/Game name (message)
-    	await parser.close() # Close the session
+        parser = TwemojiParser(image)
+        await parser.draw_text((262, 77), NAME_CHECK, font=font, fill=(139,195,21)) # Name of discord.Member
+        await parser.draw_text((264, 132), "is now playing", font=font, fill="grey")
+        await parser.draw_text((263, 188), MSG_CHECK, font=font, fill=(139,195,21)) # Message/Game name (message)
+        await parser.close() # Close the session
 
-    	image.paste(CONVERT, (92, 92), CONVERT)
-    	return await ctx.send(file=Misc.save_image(image))
+        image.paste(CONVERT, (92, 92), CONVERT)
+        return await ctx.send(file=Misc.save_image(image))
 
 
 def setup(bot):

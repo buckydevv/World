@@ -13,12 +13,12 @@ defaultprefixes = ["World ", "w/", "world "]
 ownerprefix = ["w/", "world ", "World "]
 
 async def get_prefix(world, message):
-	if await world.is_owner(message.author):
-		return commands.when_mentioned_or(*ownerprefix)(world, message)
-	prefixes = load(open('prefixes.json', 'r'))
-	if not str(message.guild.id) in prefixes:
-		return commands.when_mentioned_or(*defaultprefixes)(world, message)
-	return commands.when_mentioned_or(prefixes[str(message.guild.id)])(world, message)
+    if await world.is_owner(message.author):
+        return commands.when_mentioned_or(*ownerprefix)(world, message)
+    prefixes = load(open('prefixes.json', 'r'))
+    if not str(message.guild.id) in prefixes:
+        return commands.when_mentioned_or(*defaultprefixes)(world, message)
+    return commands.when_mentioned_or(prefixes[str(message.guild.id)])(world, message)
 
 # -------
 # Main bot area
@@ -41,32 +41,32 @@ world.remove_command("help")
 @world.command(help="Change the prefix for your discord guild")
 @commands.has_permissions(administrator=True)
 async def changeprefix(ctx, prefix):
-	if len(prefix) > 7:
-		return await ctx.send(f"Sorry {ctx.author.mention} a limit of `7` letters please.")
-	with open('prefixes.json', 'r') as f:
-		prefixes = load(f)
+    if len(prefix) > 7:
+        return await ctx.send(f"Sorry {ctx.author.mention} a limit of `7` letters please.")
+    with open('prefixes.json', 'r') as f:
+        prefixes = load(f)
 
-	prefixes[str(ctx.guild.id)] = prefix
+    prefixes[str(ctx.guild.id)] = prefix
 
-	with open('prefixes.json', 'w') as f:
-		dump(prefixes, f, indent=4)
-	await ctx.send(embed=Embed(
-		title="Custom prefix",
-		description=f"Prefix for {ctx.guild} is now `{prefix}`.\nTry using the help command: `{prefix}help`"
+    with open('prefixes.json', 'w') as f:
+        dump(prefixes, f, indent=4)
+    await ctx.send(embed=Embed(
+        title="Custom prefix",
+        description=f"Prefix for {ctx.guild} is now `{prefix}`.\nTry using the help command: `{prefix}help`"
     ))
 
 
 @world.command()
 async def enablenoprefix(ctx):
-	if await world.is_owner(ctx.author):
-		ownerprefix.append("")
-		await ctx.send(f"Hey {ctx.author.mention} i have enabled `No Prefix mode`.")
+    if await world.is_owner(ctx.author):
+        ownerprefix.append("")
+        await ctx.send(f"Hey {ctx.author.mention} i have enabled `No Prefix mode`.")
 
 @world.command()
 async def disablenoprefix(ctx):
-	if await world.is_owner(ctx.author):
-		ownerprefix.remove("")
-		await ctx.send(f"Hey {ctx.author.mention} i have disabled `No Prefix mode`.")
+    if await world.is_owner(ctx.author):
+        ownerprefix.remove("")
+        await ctx.send(f"Hey {ctx.author.mention} i have disabled `No Prefix mode`.")
 
 @changeprefix.error
 async def changeprefix_error(ctx, error):
