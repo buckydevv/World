@@ -383,9 +383,9 @@ class FunCog(commands.Cog):
                 return await ctx.send(f"Sorry {ctx.author.mention} but that song does not exist!")
             
             spotify = spotify[0]
-            name = ', '.join([f"[{artist['name']}]({artist['external_urls'].get('spotify', 'https://youtube.com/watch?v=dQw4w9WgXcQ')})" for artist in spotify['artists']])
+            name = ', '.join([f"[`{artist['name']}`]({artist['external_urls'].get('spotify', 'https://youtube.com/watch?v=dQw4w9WgXcQ')})" for artist in spotify['artists']])
             duration = time.strftime("%M:%S", time.gmtime(spotify['duration_ms'] // 1000))
-            return await ctx.send(embed=Embed(title=song, color=self.bot.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{spotify['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nDuration: `{duration}`\nSong Link: [`{spotify['name']}`](https://open.spotify.com/track/{spotify['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
+            return await ctx.send(embed=Embed(title=song, color=self.bot.color).add_field(name="Song information", value=f"Artist(s): {name}\nPopularity: `{spotify['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nDuration: `{duration}`\nSong Link: [`{spotify['name']}`](https://open.spotify.com/track/{spotify['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
         
         try:
             user = user or ctx.author
