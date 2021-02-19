@@ -27,10 +27,3 @@ echo [5/5] running bot.py file...
 python bot.py
 
 :end
-
-:: cOpYRiGHT (c) 2021 nUlL & CoNtribUTors
-:: ALl rIGhtS REserVED!
-::
-::     HTtpS://giTHub.cOm/VIeRoferNaNDo
-::
-:: PLeaSe no REMOVe coPyrigHT ShUAnA :D
