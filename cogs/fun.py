@@ -9,7 +9,7 @@ from io import BytesIO
 from os import environ
 from pymongo import MongoClient
 from framework import Misc, Wealth
-from time import time
+import time
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from twemoji_parser import TwemojiParser, emoji_to_url
 from colorthief import ColorThief
@@ -364,31 +364,28 @@ class FunCog(commands.Cog):
         	if not song:
         		return await ctx.send(f"Sorry {ctx.author.mention} please specify a artist's name!")
 
-        	results = self.sp.search(q=song, limit=1, type='artist')
-        	for track in self.sp.search(q=song, limit=1, type='artist'):
-        		items = results['artists']['items']
-
-        		try:
-        			artist = items[0]
-        		except IndexError:
-        			return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
-        		return await ctx.send(embed=Embed(title=artist['name'], color=self.bot.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
+            try:
+                results = self.sp.search(q=song, limit=1, type='artist')['artists']['items']
+        		assert results and results[0]
+        		artist = results[0]
+        	except (KeyError, AssertionError):
+        		return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
+        	return await ctx.send(embed=Embed(title=artist['name'], color=self.bot.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
 
         if option == "--song":
         	if not song:
         		return await ctx.send(f"Sorry {ctx.author.mention} Please specify a song name!")
 
-        	results = self.sp.search(q=song, limit=1, type='track')
-        	for track in results:
-        		items = results['tracks']['items']
-
-        		try:
-        			song = items[0]
-        			spotify = results['tracks']['items'][0]
-        			name = ', '.join([artist['name'] for artist in spotify['artists']])
-        		except IndexError:
-        			return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
-        		return await ctx.send(embed=Embed(title=song['name'], color=self.bot.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{song['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nSong Link: [`{song['name']}`](https://open.spotify.com/track/{song['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
+            try:
+                spotify = self.sp.search(q=song, limit=1, type='track')['tracks']['items']
+                assert spotify and spotify[0]
+            except (KeyError, AssertionError):
+                return await ctx.send(f"Sorry {ctx.author.mention} but that song does not exist!")
+        	
+            spotify = spotify[0]
+            name = ', '.join([f"[{artist['name']}]({artist['external_urls'].get('spotify', 'https://youtube.com/watch?v=dQw4w9WgXcQ')})" for artist in spotify['artists']])
+            duration = time.strftime("%M:%S", time.gmtime(spotify['duration_ms'] // 1000))
+            return await ctx.send(embed=Embed(title=song, color=self.bot.color).add_field(name="Song information", value=f"Artist(s): `{name}`\nPopularity: `{spotify['popularity']}%`\nRelease date: `{spotify['album']['release_date']}`\nDuration: `{duration}`\nSong Link: [`{spotify['name']}`](https://open.spotify.com/track/{spotify['id']})").set_thumbnail(url=spotify['album']['images'][0]['url']))
         
         try:
         	user = user or ctx.author
@@ -441,7 +438,6 @@ class FunCog(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
-
     @commands.command(help="Are you a fast typer?!\nUse `w/fast --rank` to see rank.", aliases=["type", "typingtest"])
     @commands.cooldown(rate=3, per=8, type=commands.BucketType.member)
     async def fast(self, ctx, option: Optional[str], user: Optional[Member]=None):
@@ -485,9 +481,9 @@ class FunCog(commands.Cog):
 
         while True:
             try:
-                start = round(time() * 100)
+                start = round(time.time() * 100)
                 resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content.lower() == word, timeout=18)
-                elapse = round(time() * 100) - start
+                elapse = round(time.time() * 100) - start
                 if resp.content.lower() == word:
                     if not Wealth.collection.find_one({"_id": user.id}):
                         Wealth.collection.insert_one({
@@ -527,9 +523,9 @@ class FunCog(commands.Cog):
 
     	while True:
     		try:
-    			start = round(time() * 100)
+    			start = round(time.time.time() * 100)
     			resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content == FlagChosen['name'], timeout=18)
-    			elapse = round(time() * 100) - start
+    			elapse = round(time.time.time() * 100) - start
     			if resp.content.lower() == FlagChosen['name'].lower():
     				if not Wealth._has_account(resp.author.id):
     					Wealth._create_account(resp.author.id)
