@@ -112,8 +112,8 @@ class EconomyFunCog(commands.Cog):
         result = Wealth.collection.find_one({'_id': user.id})
 
         if not option:
-        	buffer = await self.profile_canvas(user, result)
-        	return await ctx.send(file=buffer)
+            buffer = await self.profile_canvas(user, result)
+            return await ctx.send(file=buffer)
 
         elif option == "--embed":
             paginator = Paginator(ctx, [

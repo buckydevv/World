@@ -201,13 +201,14 @@ class EconomyCog(commands.Cog):
 
     @commands.command(name="balance", aliases=("bal",))
     @require_account()
-    async def balance(self, ctx: commands.Context):
+    async def balance(self, ctx: commands.Context, member: Member):
         """Returns the current balance of the user."""
-        author = self._get_user(ctx.author.id)
+        
+        data = self._get_user(member.id)
         await ctx.send(embed=Embed(
-            title=f"{ctx.author}'s balance",
+            title=f"{member}'s balance",
             color=self.color,
-            description=f"Coins: `{author.coins:.0f}`\nBank: `{author.Bank}`"
+            description=f"Coins: `{data.coins:;}`\nBank: `{data.Bank:,}`"
         ))
 
     @commands.command(name="buy")
