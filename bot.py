@@ -1,8 +1,13 @@
 import discord
+#import os, struct
 from os import environ, listdir
 from json import load, dump
 from discord import Activity, Embed, Intents
 from discord.ext import commands
+from rich import print
+from rich.console import Console
+from rich.table import Table
+console = Console()
 
 __import__("dotenv").load_dotenv()
 
@@ -79,7 +84,7 @@ async def changeprefix_error(ctx, error):
 # Cogs area
 for cog in filter(lambda x: x.endswith(".py"), listdir("cogs/")):
     world.load_extension(f"cogs.{cog[:-3]}")
-    print(f"COG: {cog} is loaded.")
+    print(f"[bold cyan]INFO  [/bold cyan][yellow]COG:[/yellow] [purple]{cog}[/purple] [yellow]is loaded.[/yellow]")
 
 # -------
 # Blacklist area
@@ -115,7 +120,12 @@ async def on_message(message):
 async def on_ready():
     """Dispatched when the bot has successfully connected into Discord."""
     await world.change_presence(status="dnd", activity=Activity(type=2, name="w/help"))
-    print("World connected successfully into Discord!")
+    table = Table()
+    table.add_column("[bold white]Bot info[/bold white]", justify="left", style="bold blue", no_wrap=True)
+    table.add_row(f"[bold cyan]Name:[/bold cyan] {world.user.name}")
+    table.add_row(f"[bold cyan]Latency:[/bold cyan] {float(world.latency*1000):.0f}ms")
+    table.add_row(f"[bold cyan]Guilds:[/bold cyan] {len(world.guilds)}")
+    console.print(table)
 
 @world.event
 async def on_guild_remove(guild):
@@ -124,5 +134,11 @@ async def on_guild_remove(guild):
 
     with open('prefixes.json', 'w') as f:
         dump(prefixes, f, indent=4)
+
+#bitness = struct.calcsize('P') * 8
+#target = 'x64' if bitness > 32 else 'x86'
+#filename = os.path.join(os.path.dirname(os.path.abspath(discord.__file__)), 'bin', f'libopus-0.{target}.dll')
+#discord.opus.load_opus(filename)
+# ^ This is for my project dsr: https://github.com/shuanaongithub/dsr, So just ignore.
 
 world.run(environ["TOKEN"])
