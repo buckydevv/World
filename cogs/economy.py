@@ -208,7 +208,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(
             title=f"{member}'s balance",
             color=self.color,
-            description=f"Coins: `{data.coins:;}`\nBank: `{data.Bank:,}`"
+            description=f"Coins: `{data.coins:,}`\nBank: `{data.Bank:,}`"
         ))
 
     @commands.command(name="buy")
