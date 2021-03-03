@@ -15,6 +15,7 @@ from twemoji_parser import TwemojiParser, emoji_to_url
 from colorthief import ColorThief
 
 from urllib.parse import quote
+from mojang import MojangAPI
 from akinator.async_aki import Akinator
 from spotipy import Spotify as _Spotify
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -86,6 +87,14 @@ class FunCog(commands.Cog):
     async def askali_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/askali <question>`")
+
+    @commands.command(help="Fetch the minecraft skin of a player.")
+    async def mcskin(self, ctx, usid):
+        uuid = MojangAPI.get_uuid(usid)
+        if not uuid:
+            return await ctx.send(f"Sorry {ctx.author.mention} that account either is not real or does not have a skin.")
+        profile = MojangAPI.get_profile(uuid)
+        await ctx.send(embed=Embed(title=f"{profile.name}'s skin", color=self.bot.color).set_image(url=profile.skin_url))
 
     @commands.command(name="f")
     async def f(self, ctx, *, text: commands.clean_content = None):
