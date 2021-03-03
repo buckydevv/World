@@ -22,7 +22,7 @@ class HelpCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @command(name="help", aliases=['h', 'commands'])
+    @command(name="help")
     async def show_help(self, ctx, cmd: Optional[str]):
       """Shows this message."""
       if not cmd:
@@ -100,7 +100,7 @@ class HelpCog(commands.Cog):
         value="`w/gay` | `w/askali` | `w/pp` | `w/8ball` | `w/f` | `w/joke` | `w/emojify` | `w/akinator` | `w/kill` | `w/fast` | `w/mock` | `w/gtf`"
         ).add_field(
         name=":frame_photo: | Image fun",
-        value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/tweet` | `w/blur` | `w/avatar` | `w/qr` | `w/flip` | `w/wide` | `w/steam`",
+        value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/mcskin` | `w/blur` | `w/avatar` | `w/qr` | `w/flip` | `w/wide` | `w/steam`",
         inline=False
       ))
 
