@@ -6,7 +6,6 @@ from framework import Paginator
 from textwrap import dedent
 from discord import Embed, Member, Role, CategoryChannel, __version__
 from discord.ext import commands
-from aiohttp import ClientSession
 
 class InfoCog(commands.Cog):
     """Contains commands that provide useful information."""
@@ -15,7 +14,10 @@ class InfoCog(commands.Cog):
         """Sets up the cog."""
         self.bot = bot
         self.init_time = time()
-        self.session = ClientSession()
+    
+    @property
+    def session(self):
+        return self.bot.http._HTTPClient__session
 
     @commands.command(name="userinfo", aliases=("ui", "user"))
     async def userinfo(self, ctx: commands.Context, member: Optional[Member]):
