@@ -122,7 +122,7 @@ class FunCog(commands.Cog):
             assert isinstance(error, commands.PartialEmojiConversionFailure)
             
             message_content = ctx.message.content.split()[1].lower()
-            if "pp" in message_content:
+            if ("pp" in message_content) or ("tits" in message_content):
                 return await ctx.send(f"{ctx.author.mention}, go to horny jail.")
             
             emoji_url = await emoji_to_url(message_content, session=self.session)
