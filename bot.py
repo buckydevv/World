@@ -100,16 +100,13 @@ async def on_message(message):
     Checks if the message wasn't send by a bot, the message wasn't send
     on DMs and the user isn't blacklisted.
     """
-    if message.author.bot:
+    if message.author.bot or (str(message.author.id) in blacklisted_people):
         return
     elif not message.guild:
         return await message.channel.send((
             "You can't use commands on DMs, invite the bot your server: "
             f"<https://discord.com/oauth2/authorize?client_id={world.user.id}&permissions=8&scope=bot>"
         ))
-
-    if str(message.author.id) in blacklisted_people:
-        return
     
     await world.process_commands(message)
 

@@ -32,10 +32,10 @@ class FunCog(commands.Cog):
         self.goodmessages = ("Wow speedy!", "Nice time!", "That was pretty good!", "Wow, you fast at typing!", "You speedy, that's for sure!")
         self.badmessages = ("How slow can you type?", "That was slow!", "You need to practice more!", "It's ok i won't tell anybody that your a slow typer")
         self.aliaresponses = (
-            "Ali A Kills Himself",
-            "Ali A Ignores And Hits A 360 Noscope",
-            "Ali A Approves",
-            "Ali A Dosnt Approve"
+            "Kills Himself",
+            "Ignores And Hits A 360 Noscope",
+            "Approves",
+            "Doesn't Approve"
         )
         self._8ball_responses = (
             "It is certain.",
@@ -82,7 +82,7 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Ask Alister-A a question!")
     async def askali(self, ctx, *, question):
-        await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - {choice(self.aliaresponses)}", color=self.bot.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
+        await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - Ali A {choice(self.aliaresponses)}", color=self.bot.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
 
     @askali.error
     async def askali_error(self, ctx, error):
