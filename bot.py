@@ -1,4 +1,3 @@
-import discord
 #import os, struct
 from os import environ, listdir
 from json import load, dump
