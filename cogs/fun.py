@@ -1,4 +1,3 @@
-from aiohttp import ClientSession
 from random import randint, choice
 from pykakasi import kakasi
 from discord.ext import commands, tasks
@@ -15,7 +14,6 @@ from twemoji_parser import TwemojiParser, emoji_to_url
 from colorthief import ColorThief
 
 from urllib.parse import quote
-from mojang import MojangAPI
 from akinator.async_aki import Akinator
 from spotipy import Spotify as _Spotify
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -26,21 +24,20 @@ class FunCog(commands.Cog):
     def __init__(self, bot): # all constants is better using self.<variable> rather than declaring it every time a command is invoked
         self.kks = kakasi()
         self.bot = bot
-        self.Country = [{"name":"Afghanistan","code":"AF"},{"name":"Aland Islands","code":"AX"},{"name":"Albania","code":"AL"},{"name":"Algeria","code":"DZ"},{"name":"American Samoa","code":"AS"},{"name":"AndorrA","code":"AD"},{"name":"Angola","code":"AO"},{"name":"Anguilla","code":"AI"},{"name":"Antarctica","code":"AQ"},{"name":"Antigua and Barbuda","code":"AG"},{"name":"Argentina","code":"AR"},{"name":"Armenia","code":"AM"},{"name":"Aruba","code":"AW"},{"name":"Australia","code":"AU"},{"name":"Austria","code":"AT"},{"name":"Azerbaijan","code":"AZ"},{"name":"Bahamas","code":"BS"},{"name":"Bahrain","code":"BH"},{"name":"Bangladesh","code":"BD"},{"name":"Barbados","code":"BB"},{"name":"Belarus","code":"BY"},{"name":"Belgium","code":"BE"},{"name":"Belize","code":"BZ"},{"name":"Benin","code":"BJ"},{"name":"Bermuda","code":"BM"},{"name":"Bhutan","code":"BT"},{"name":"Bolivia","code":"BO"},{"name":"Bosnia and Herzegovina","code":"BA"},{"name":"Botswana","code":"BW"},{"name":"Bouvet Island","code":"BV"},{"name":"Brazil","code":"BR"},{"name":"British Indian Ocean Territory","code":"IO"},{"name":"Brunei Darussalam","code":"BN"},{"name":"Bulgaria","code":"BG"},{"name":"Burkina Faso","code":"BF"},{"name":"Burundi","code":"BI"},{"name":"Cambodia","code":"KH"},{"name":"Cameroon","code":"CM"},{"name":"Canada","code":"CA"},{"name":"Cape Verde","code":"CV"},{"name":"Cayman Islands","code":"KY"},{"name":"Central African Republic","code":"CF"},{"name":"Chad","code":"TD"},{"name":"Chile","code":"CL"},{"name":"China","code":"CN"},{"name":"Christmas Island","code":"CX"},{"name":"Cocos (Keeling) Islands","code":"CC"},{"name":"Colombia","code":"CO"},{"name":"Comoros","code":"KM"},{"name":"Congo","code":"CG"},{"name":"Congo, The Democratic Republic of the","code":"CD"},{"name":"Cook Islands","code":"CK"},{"name":"Costa Rica","code":"CR"},{"name":"Cote D'Ivoire","code":"CI"},{"name":"Croatia","code":"HR"},{"name":"Cuba","code":"CU"},{"name":"Cyprus","code":"CY"},{"name":"Czech Republic","code":"CZ"},{"name":"Denmark","code":"DK"},{"name":"Djibouti","code":"DJ"},{"name":"Dominica","code":"DM"},{"name":"Dominican Republic","code":"DO"},{"name":"Ecuador","code":"EC"},{"name":"Egypt","code":"EG"},{"name":"El Salvador","code":"SV"},{"name":"Equatorial Guinea","code":"GQ"},{"name":"Eritrea","code":"ER"},{"name":"Estonia","code":"EE"},{"name":"Ethiopia","code":"ET"},{"name":"Falkland Islands (Malvinas)","code":"FK"},{"name":"Faroe Islands","code":"FO"},{"name":"Fiji","code":"FJ"},{"name":"Finland","code":"FI"},{"name":"France","code":"FR"},{"name":"French Guiana","code":"GF"},{"name":"French Polynesia","code":"PF"},{"name":"French Southern Territories","code":"TF"},{"name":"Gabon","code":"GA"},{"name":"Gambia","code":"GM"},{"name":"Georgia","code":"GE"},{"name":"Germany","code":"DE"},{"name":"Ghana","code":"GH"},{"name":"Gibraltar","code":"GI"},{"name":"Greece","code":"GR"},{"name":"Greenland","code":"GL"},{"name":"Grenada","code":"GD"},{"name":"Guadeloupe","code":"GP"},{"name":"Guam","code":"GU"},{"name":"Guatemala","code":"GT"},{"name":"Guernsey","code":"GG"},{"name":"Guinea","code":"GN"},{"name":"Guinea-Bissau","code":"GW"},{"name":"Guyana","code":"GY"},{"name":"Haiti","code":"HT"},{"name":"Heard Island and Mcdonald Islands","code":"HM"},{"name":"Holy See (Vatican City State)","code":"VA"},{"name":"Honduras","code":"HN"},{"name":"Hong Kong","code":"HK"},{"name":"Hungary","code":"HU"},{"name":"Iceland","code":"IS"},{"name":"India","code":"IN"},{"name":"Indonesia","code":"ID"},{"name":"Iran, Islamic Republic Of","code":"IR"},{"name":"Iraq","code":"IQ"},{"name":"Ireland","code":"IE"},{"name":"Isle of Man","code":"IM"},{"name":"Israel","code":"IL"},{"name":"Italy","code":"IT"},{"name":"Jamaica","code":"JM"},{"name":"Japan","code":"JP"},{"name":"Jersey","code":"JE"},{"name":"Jordan","code":"JO"},{"name":"Kazakhstan","code":"KZ"},{"name":"Kenya","code":"KE"},{"name":"Kiribati","code":"KI"},{"name":"Korea, Democratic People'S Republic of","code":"KP"},{"name":"Korea, Republic of","code":"KR"},{"name":"Kuwait","code":"KW"},{"name":"Kyrgyzstan","code":"KG"},{"name":"Lao People'S Democratic Republic","code":"LA"},{"name":"Latvia","code":"LV"},{"name":"Lebanon","code":"LB"},{"name":"Lesotho","code":"LS"},{"name":"Liberia","code":"LR"},{"name":"Libyan Arab Jamahiriya","code":"LY"},{"name":"Liechtenstein","code":"LI"},{"name":"Lithuania","code":"LT"},{"name":"Luxembourg","code":"LU"},{"name":"Macao","code":"MO"},{"name":"Macedonia, The Former Yugoslav Republic of","code":"MK"},{"name":"Madagascar","code":"MG"},{"name":"Malawi","code":"MW"},{"name":"Malaysia","code":"MY"},{"name":"Maldives","code":"MV"},{"name":"Mali","code":"ML"},{"name":"Malta","code":"MT"},{"name":"Marshall Islands","code":"MH"},{"name":"Martinique","code":"MQ"},{"name":"Mauritania","code":"MR"},{"name":"Mauritius","code":"MU"},{"name":"Mayotte","code":"YT"},{"name":"Mexico","code":"MX"},{"name":"Micronesia, Federated States of","code":"FM"},{"name":"Moldova, Republic of","code":"MD"},{"name":"Monaco","code":"MC"},{"name":"Mongolia","code":"MN"},{"name":"Montserrat","code":"MS"},{"name":"Morocco","code":"MA"},{"name":"Mozambique","code":"MZ"},{"name":"Myanmar","code":"MM"},{"name":"Namibia","code":"NA"},{"name":"Nauru","code":"NR"},{"name":"Nepal","code":"NP"},{"name":"Netherlands","code":"NL"},{"name":"Netherlands Antilles","code":"AN"},{"name":"New Caledonia","code":"NC"},{"name":"New Zealand","code":"NZ"},{"name":"Nicaragua","code":"NI"},{"name":"Niger","code":"NE"},{"name":"Nigeria","code":"NG"},{"name":"Niue","code":"NU"},{"name":"Norfolk Island","code":"NF"},{"name":"Northern Mariana Islands","code":"MP"},{"name":"Norway","code":"NO"},{"name":"Oman","code":"OM"},{"name":"Pakistan","code":"PK"},{"name":"Palau","code":"PW"},{"name":"Palestinian Territory, Occupied","code":"PS"},{"name":"Panama","code":"PA"},{"name":"Papua New Guinea","code":"PG"},{"name":"Paraguay","code":"PY"},{"name":"Peru","code":"PE"},{"name":"Philippines","code":"PH"},{"name":"Pitcairn","code":"PN"},{"name":"Poland","code":"PL"},{"name":"Portugal","code":"PT"},{"name":"Puerto Rico","code":"PR"},{"name":"Qatar","code":"QA"},{"name":"Reunion","code":"RE"},{"name":"Romania","code":"RO"},{"name":"Russian Federation","code":"RU"},{"name":"RWANDA","code":"RW"},{"name":"Saint Helena","code":"SH"},{"name":"Saint Kitts and Nevis","code":"KN"},{"name":"Saint Lucia","code":"LC"},{"name":"Saint Pierre and Miquelon","code":"PM"},{"name":"Saint Vincent and the Grenadines","code":"VC"},{"name":"Samoa","code":"WS"},{"name":"San Marino","code":"SM"},{"name":"Sao Tome and Principe","code":"ST"},{"name":"Saudi Arabia","code":"SA"},{"name":"Senegal","code":"SN"},{"name":"Serbia and Montenegro","code":"CS"},{"name":"Seychelles","code":"SC"},{"name":"Sierra Leone","code":"SL"},{"name":"Singapore","code":"SG"},{"name":"Slovakia","code":"SK"},{"name":"Slovenia","code":"SI"},{"name":"Solomon Islands","code":"SB"},{"name":"Somalia","code":"SO"},{"name":"South Africa","code":"ZA"},{"name":"South Georgia and the South Sandwich Islands","code":"GS"},{"name":"Spain","code":"ES"},{"name":"Sri Lanka","code":"LK"},{"name":"Sudan","code":"SD"},{"name":"Suriname","code":"SR"},{"name":"Svalbard and Jan Mayen","code":"SJ"},{"name":"Swaziland","code":"SZ"},{"name":"Sweden","code":"SE"},{"name":"Switzerland","code":"CH"},{"name":"Syrian Arab Republic","code":"SY"},{"name":"Taiwan, Province of China","code":"TW"},{"name":"Tajikistan","code":"TJ"},{"name":"Tanzania, United Republic of","code":"TZ"},{"name":"Thailand","code":"TH"},{"name":"Timor-Leste","code":"TL"},{"name":"Togo","code":"TG"},{"name":"Tokelau","code":"TK"},{"name":"Tonga","code":"TO"},{"name":"Trinidad and Tobago","code":"TT"},{"name":"Tunisia","code":"TN"},{"name":"Turkey","code":"TR"},{"name":"Turkmenistan","code":"TM"},{"name":"Turks and Caicos Islands","code":"TC"},{"name":"Tuvalu","code":"TV"},{"name":"Uganda","code":"UG"},{"name":"Ukraine","code":"UA"},{"name":"United Arab Emirates","code":"AE"},{"name":"United Kingdom","code":"GB"},{"name":"United States","code":"US"},{"name":"United States Minor Outlying Islands","code":"UM"},{"name":"Uruguay","code":"UY"},{"name":"Uzbekistan","code":"UZ"},{"name":"Vanuatu","code":"VU"},{"name":"Venezuela","code":"VE"},{"name":"Viet Nam","code":"VN"},{"name":"Virgin Islands, British","code":"VG"},{"name":"Virgin Islands, U.S.","code":"VI"},{"name":"Wallis and Futuna","code":"WF"},{"name":"Western Sahara","code":"EH"},{"name":"Yemen","code":"YE"},{"name":"Zambia","code":"ZM"},{"name":"Zimbabwe","code":"ZW"}]
+        self.countries = {'af': 'afghanistan', 'ax': 'aland islands', 'al': 'albania', 'dz': 'algeria', 'as': 'american samoa', 'ad': 'andorra', 'ao': 'angola', 'ai': 'anguilla', 'aq': 'antarctica', 'ag': 'antigua and barbuda', 'ar': 'argentina', 'am': 'armenia', 'aw': 'aruba', 'au': 'australia', 'at': 'austria', 'az': 'azerbaijan', 'bs': 'bahamas', 'bh': 'bahrain', 'bd': 'bangladesh', 'bb': 'barbados', 'by': 'belarus', 'be': 'belgium', 'bz': 'belize', 'bj': 'benin', 'bm': 'bermuda', 'bt': 'bhutan', 'bo': 'bolivia', 'ba': 'bosnia and herzegovina', 'bw': 'botswana', 'bv': 'bouvet island', 'br': 'brazil', 'io': 'british indian ocean territory', 'bn': 'brunei darussalam', 'bg': 'bulgaria', 'bf': 'burkina faso', 'bi': 'burundi', 'kh': 'cambodia', 'cm': 'cameroon', 'ca': 'canada', 'cv': 'cape verde', 'ky': 'cayman islands', 'cf': 'central african republic', 'td': 'chad', 'cl': 'chile', 'cn': 'china', 'cx': 'christmas island', 'cc': 'cocos (keeling) islands', 'co': 'colombia', 'km': 'comoros', 'cg': 'congo', 'cd': 'congo, the democratic republic of the', 'ck': 'cook islands', 'cr': 'costa rica', 'ci': "cote d'ivoire", 'hr': 'croatia', 'cu': 'cuba', 'cy': 'cyprus', 'cz': 'czech republic', 'dk': 'denmark', 'dj': 'djibouti', 'dm': 'dominica', 'do': 'dominican republic', 'ec': 'ecuador', 'eg': 'egypt', 'sv': 'el salvador', 'gq': 'equatorial guinea', 'er': 'eritrea', 'ee': 'estonia', 'et': 'ethiopia', 'fk': 'falkland islands (malvinas)', 'fo': 'faroe islands', 'fj': 'fiji', 'fi': 'finland', 'fr': 'france', 'gf': 'french guiana', 'pf': 'french polynesia', 'tf': 'french southern territories', 'ga': 'gabon', 'gm': 'gambia', 'ge': 'georgia', 'de': 'germany', 'gh': 'ghana', 'gi': 'gibraltar', 'gr': 'greece', 'gl': 'greenland', 'gd': 'grenada', 'gp': 'guadeloupe', 'gu': 'guam', 'gt': 'guatemala', 'gg': 'guernsey', 'gn': 'guinea', 'gw': 'guinea-bissau', 'gy': 'guyana', 'ht': 'haiti', 'hm': 'heard island and mcdonald islands', 'va': 'holy see (vatican city state)', 'hn': 'honduras', 'hk': 'hong kong', 'hu': 'hungary', 'is': 'iceland', 'in': 'india', 'id': 'indonesia', 'ir': 'iran, islamic republic of', 'iq': 'iraq', 'ie': 'ireland', 'im': 'isle of man', 'il': 'israel', 'it': 'italy', 'jm': 'jamaica', 'jp': 'japan', 'je': 'jersey', 'jo': 'jordan', 'kz': 'kazakhstan', 'ke': 'kenya', 'ki': 'kiribati', 'kp': "korea, democratic people's republic of", 'kr': 'korea, republic of', 'kw': 'kuwait', 'kg': 'kyrgyzstan', 'la': "lao people's democratic republic", 'lv': 'latvia', 'lb': 'lebanon', 'ls': 'lesotho', 'lr': 'liberia', 'ly': 'libyan arab jamahiriya', 'li': 'liechtenstein', 'lt': 'lithuania', 'lu': 'luxembourg', 'mo': 'macao', 'mk': 'macedonia, the former yugoslav republic of', 'mg': 'madagascar', 'mw': 'malawi', 'my': 'malaysia', 'mv': 'maldives', 'ml': 'mali', 'mt': 'malta', 'mh': 'marshall islands', 'mq': 'martinique', 'mr': 'mauritania', 'mu': 'mauritius', 'yt': 'mayotte', 'mx': 'mexico', 'fm': 'micronesia, federated states of', 'md': 'moldova, republic of', 'mc': 'monaco', 'mn': 'mongolia', 'ms': 'montserrat', 'ma': 'morocco', 'mz': 'mozambique', 'mm': 'myanmar', 'na': 'namibia', 'nr': 'nauru', 'np': 'nepal', 'nl': 'netherlands', 'an': 'netherlands antilles', 'nc': 'new caledonia', 'nz': 'new zealand', 'ni': 'nicaragua', 'ne': 'niger', 'ng': 'nigeria', 'nu': 'niue', 'nf': 'norfolk island', 'mp': 'northern mariana islands', 'no': 'norway', 'om': 'oman', 'pk': 'pakistan', 'pw': 'palau', 'ps': 'palestinian territory, occupied', 'pa': 'panama', 'pg': 'papua new guinea', 'py': 'paraguay', 'pe': 'peru', 'ph': 'philippines', 'pn': 'pitcairn', 'pl': 'poland', 'pt': 'portugal', 'pr': 'puerto rico', 'qa': 'qatar', 're': 'reunion', 'ro': 'romania', 'ru': 'russian federation', 'rw': 'rwanda', 'sh': 'saint helena', 'kn': 'saint kitts and nevis', 'lc': 'saint lucia', 'pm': 'saint pierre and miquelon', 'vc': 'saint vincent and the grenadines', 'ws': 'samoa', 'sm': 'san marino', 'st': 'sao tome and principe', 'sa': 'saudi arabia', 'sn': 'senegal', 'cs': 'serbia and montenegro', 'sc': 'seychelles', 'sl': 'sierra leone', 'sg': 'singapore', 'sk': 'slovakia', 'si': 'slovenia', 'sb': 'solomon islands', 'so': 'somalia', 'za': 'south africa', 'gs': 'south georgia and the south sandwich islands', 'es': 'spain', 'lk': 'sri lanka', 'sd': 'sudan', 'sr': 'suriname', 'sj': 'svalbard and jan mayen', 'sz': 'swaziland', 'se': 'sweden', 'ch': 'switzerland', 'sy': 'syrian arab republic', 'tw': 'taiwan, province of china', 'tj': 'tajikistan', 'tz': 'tanzania, united republic of', 'th': 'thailand', 'tl': 'timor-leste', 'tg': 'togo', 'tk': 'tokelau', 'to': 'tonga', 'tt': 'trinidad and tobago', 'tn': 'tunisia', 'tr': 'turkey', 'tm': 'turkmenistan', 'tc': 'turks and caicos islands', 'tv': 'tuvalu', 'ug': 'uganda', 'ua': 'ukraine', 'ae': 'united arab emirates', 'gb': 'united kingdom', 'us': 'united states', 'um': 'united states minor outlying islands', 'uy': 'uruguay', 'uz': 'uzbekistan', 'vu': 'vanuatu', 've': 'venezuela', 'vn': 'viet nam', 'vg': 'virgin islands, british', 'vi': 'virgin islands, u.s.', 'wf': 'wallis and futuna', 'eh': 'western sahara', 'ye': 'yemen', 'zm': 'zambia', 'zw': 'zimbabwe'}
         self.akiObj = Akinator()
         self.gameCache = {}
-        self.session = ClientSession()
         self.sp = _Spotify(auth_manager=SpotifyClientCredentials(client_id=environ["SP_ID"], client_secret=environ["SP_SECRET"]))
         self.collection = MongoClient(environ["MONGODB_URL"])["Coins"]["Points/others"]
-        self.goodmessages = ["Wow speedy!", "Nice time!", "That was pretty good!", "Wow, you fast at typing!", "You speedy, that's for sure!"]
-        self.badmessages = ["How slow can you type?", "That was slow!", "You need to practice more!", "It's ok i won't tell anybody that your a slow typer"]
-        self.aliaresponses = [
-            "Ali A Kills Himself",
-            "Ali A Ignores And Hits A 360 Noscope",
-            "Ali A Approves",
-            "Ali A Dosnt Approve"
-        ]
-        self._8ball_responses = [
+        self.goodmessages = ("Wow speedy!", "Nice time!", "That was pretty good!", "Wow, you fast at typing!", "You speedy, that's for sure!")
+        self.badmessages = ("How slow can you type?", "That was slow!", "You need to practice more!", "It's ok i won't tell anybody that your a slow typer")
+        self.aliaresponses = (
+            "Kills Himself",
+            "Ignores And Hits A 360 Noscope",
+            "Approves",
+            "Doesn't Approve"
+        )
+        self._8ball_responses = (
             "It is certain.",
             "It is decidedly so.",
             "Without a doubt.",
@@ -61,17 +58,21 @@ class FunCog(commands.Cog):
             "My sources say no.",
             "Outlook not so good.",
             "World Thinks Its Very doubtful.",
-        ]
-        self.hearts = ['💔', '💝', '💚', '💙', '💜']
-        self.kills = [
-            "they stole money from your bank",
-            "they ate your cookies",
-            "they tried to steal your phone",
-            "they smelled like poop",
-            "they didn't like you",
-            "they lied to you",
-            "they didnt trust you"
-        ]
+        )
+        self.hearts = ('💔', '💝', '💚', '💙', '💜')
+        self.kills = (
+            "stole money from your bank",
+            "ate your cookies",
+            "tried to steal your phone",
+            "smelled like poop",
+            "didn't like you",
+            "lied to you",
+            "didnt trust you"
+        )
+
+    @property
+    def session(self):
+        return self.bot.http._HTTPClient__session
 
     @commands.command(help="World can make you laugh with his amazing jokes!")
     async def joke(self, ctx):
@@ -81,7 +82,7 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Ask Alister-A a question!")
     async def askali(self, ctx, *, question):
-        await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - {choice(self.aliaresponses)}", color=self.bot.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
+        await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - Ali A {choice(self.aliaresponses)}", color=self.bot.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
 
     @askali.error
     async def askali_error(self, ctx, error):
@@ -89,17 +90,13 @@ class FunCog(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/askali <question>`")
 
     @commands.command(help="Fetch the minecraft skin of a player.")
-    async def mcskin(self, ctx, usid):
-        uuid = MojangAPI.get_uuid(usid)
-        if not uuid:
-            return await ctx.send(f"Sorry {ctx.author.mention} that account either is not real or does not have a skin.")
-        profile = MojangAPI.get_profile(uuid)
-        await ctx.send(embed=Embed(title=f"{profile.name}'s skin", color=self.bot.color).set_image(url=profile.skin_url))
+    async def mcskin(self, ctx, user):
+        req = await self.session.get(f'https://mc-heads.net/body/{quote(user or ctx.author.display_name)[:128]}/600')
+        await ctx.send(file=File(BytesIO(await req.read()), 'skin.png'), embed=Embed(title=f"{profile.name}'s skin", color=self.bot.color).set_image(url='attachment://skin.png'))
 
     @commands.command(name="f")
     async def f(self, ctx, *, text: commands.clean_content = None):
-        reason = f"for **{text}** " if text else ""
-        await ctx.send(embed=Embed(title = f"**{ctx.author.name}** has paid their respect {reason}{choice(self.hearts)}", color=self.bot.color))
+        await ctx.send(embed=Embed(title = f"**{ctx.author.name}** has paid their respect {f'for **{text}** ' if text else ''}{choice(self.hearts)}", color=self.bot.color))
 
     @commands.command(help="Shows a meme from random subreddits.")
     @commands.cooldown(rate=4, per=7, type=commands.BucketType.member)
@@ -125,7 +122,7 @@ class FunCog(commands.Cog):
             assert isinstance(error, commands.PartialEmojiConversionFailure)
             
             message_content = ctx.message.content.split()[1].lower()
-            if "pp" in message_content:
+            if ("pp" in message_content) or ("tits" in message_content):
                 return await ctx.send(f"{ctx.author.mention}, go to horny jail.")
             
             emoji_url = await emoji_to_url(message_content, session=self.session)
@@ -136,9 +133,8 @@ class FunCog(commands.Cog):
 
     @commands.command(aliases=["pepe"])
     async def pp(self, ctx, *, user: Member = None):
-        user = user or ctx.author
         dong = "=" * randint(1, 15)
-        await ctx.send(embed=Embed(title=f"{user.display_name}'s pepe size", description=f"8{dong}D", color=self.bot.color))
+        await ctx.send(embed=Embed(title=f"{(user or ctx.author).display_name}'s pepe size", description=f"8{dong}D", color=self.bot.color))
 
     @commands.command(help="Steal a users avatar.", aliases=["av"])
     async def avatar(self, ctx, *, user: Member=None):
@@ -197,12 +193,12 @@ class FunCog(commands.Cog):
                 await ctx.send(embed=Embed(title="Hurry next time!", description=f"{ctx.author.mention} took too long to respond so we ended the game\nCurrent timeout: `15` Seconds.", color=self.bot.color))
                 del self.gameCache[ctx.channel.id]
                 return await message1.delete(delay=None)
-            if resp.content == "b":
+            if resp.content.lower() == "b":
                 try:
                     gameObj = await self.akiObj.back()
                 except:
                     await ctx.send(embed=Embed(title="Cannot go back any further :(",description="Continue playing anyway", color=self.bot.color))
-            elif resp.content == "q" or resp.content == "quit":
+            elif resp.content.lower() == "q" or resp.content.lower() == "quit":
                 await ctx.send(embed=Embed(title="Game over", description="You have left the game.", color=self.bot.color))
                 del self.gameCache[ctx.channel.id]
                 break
@@ -229,8 +225,7 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Turn text into emojis!.")
     async def emojify(self, ctx, *, stuff):
-        emj = ("".join([":regional_indicator_"+l+":" if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in stuff[:20].lower()]))
-        await ctx.send(embed=Embed(title='Emojify', description=f'{emj}', color=self.bot.color))
+        await ctx.send(("".join([":regional_indicator_"+l+":" if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in stuff[:100].lower()])))
 
     @emojify.error
     async def emojify_error(self, ctx, error):
@@ -239,8 +234,7 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Kill a user")
     async def kill(self, ctx, user: Member):
-        user = user or (ctx.author)
-        await ctx.send(embed=Embed(title="Murder", description=f"{ctx.author.mention} you killed {user.mention} because {choice(self.kills)}", color=self.bot.color))
+        await ctx.send(embed=Embed(title="Murder", description=f"{ctx.author.mention} you killed {(user or ctx.author).mention} because they {choice(self.kills)}", color=self.bot.color))
 
     @commands.command(help="Urban Dictionary")
     @commands.is_nsfw()
@@ -285,24 +279,19 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Flip a users avatar!", aliases=["flipav", "avflip"])
     async def flip(self, ctx, user: Member=None):
-        user = user or ctx.author
-
-        av_img = await Misc.fetch_pfp(user)
+        av_img = await Misc.fetch_pfp(user or ctx.author)
         done = av_img.rotate(180)
         await ctx.send(file=Misc.save_image(done))
 
 
     @commands.command(help="Blur a users avatar!")
     async def blur(self, ctx, user: Member=None):
-        user = user or ctx.author
-
-        av_img = await Misc.fetch_pfp(user)
+        av_img = await Misc.fetch_pfp(user or ctx.author)
         done = av_img.filter(ImageFilter.GaussianBlur(radius=8))
         await ctx.send(file=Misc.save_image(done))
 
     @commands.command(hlep="Generate a fake discord message!", aliases=["fq", "fakeq", "fakemessage", "fakemsg"])
     async def fakequote(self, ctx, user: Optional[Member], *, message):
-        now = datetime.now()
         user = user or ctx.author
 
         font = ImageFont.truetype("fonts/Whitney-Medium.ttf", 22, encoding="unic")
@@ -311,16 +300,12 @@ class FunCog(commands.Cog):
         fontchannel = ImageFont.truetype("fonts/Whitney-Medium.ttf", 16, encoding="unic")
 
         userchar = font.getsize(user.name)[0]
-        color = (255, 255, 255) if (user.color.to_rgb() == (0, 0, 0)) else Misc.hex_to_rgb(str(user.color))
-
         image = Image.open("images/fake.png")
-
-        msg = message if len(message) <= 30 else f'{message[:38]}...'
-
+        
         parser = TwemojiParser(image, parse_discord_emoji=True)
-        await parser.draw_text((80, 30), user.name, font=font, fill=color)
-        await parser.draw_text((88 + userchar, 33), now.strftime("Today at %H:%M"), font=fontsmall, fill='grey')
-        await parser.draw_text((80, 57), msg, font=fontnormal, fill=(220,221,222))
+        await parser.draw_text((80, 30), user.name, font=font, fill=(255, 255, 255) if (user.color.to_rgb() == (0, 0, 0)) else Misc.hex_to_rgb(str(user.color)))
+        await parser.draw_text((88 + userchar, 33), datetime.now().strftime("Today at %H:%M"), font=fontsmall, fill='grey')
+        await parser.draw_text((80, 57), message if len(message) <= 30 else f'{message[:38]}...', font=fontnormal, fill=(220,221,222))
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(user, 50, 50)
@@ -342,7 +327,6 @@ class FunCog(commands.Cog):
         fontnormal = ImageFont.truetype("fonts/karla1.ttf", 18, encoding="unic")
 
         userchars = font.getsize(user.name)[0]
-
         mainimage = Image.open("images/tgg.png")
 
         parser = TwemojiParser(mainimage, parse_discord_emoji=True)
@@ -362,8 +346,7 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Widen a discord avatar!", aliases=["widen", "putin", "wideputin"])
     async def wide(self, ctx, user: Member=None):
-        user = user or ctx.author
-        av_img = await Misc.fetch_pfp(user)
+        av_img = await Misc.fetch_pfp(user or ctx.author)
         await ctx.send(file=Misc.save_image(av_img.resize((350, 180))))
 
     @commands.command(help="Show what you are listening to in a photo!\nYou can also use `w/spotify --artist <artist>` and `w/spotify --song <song>` to find out information about a artist or song.", aliases=["sp"])
@@ -406,25 +389,16 @@ class FunCog(commands.Cog):
             r = await self.session.get(str(spotify_activity.album_cover_url))
             res = BytesIO(await r.read())
             r.close()
-
-            color_thief = ColorThief(res)
-            dominant_color = color_thief.get_color(quality=40)
-
+            
+            dominant_color = ColorThief(res).get_color(quality=40)
+            
             font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
             fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
-
-            title = self.kks.convert(spotify_activity.title)
-            album = self.kks.convert(spotify_activity.album)
             artists = self.kks.convert(spotify_activity.artists)
 
-            title_new = ''.join(item['hepburn'] for item in title)
-            album_new = ''.join(item['hepburn'] for item in album)
-            transliterated_artists = [self.kks.convert(artist) for artist in spotify_activity.artists]
-            artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in transliterated_artists)
-
-            abridged = album_new if len(album_new) <= 30 else f'{album_new[:27]}...'
-            cbridged = title_new if len(title_new) <= 20 else f'{title_new[:17]}...'
-            dbridged = artists_new if len(artists_new) <= 30 else f'{artists_new[:27]}...'
+            title_new = ''.join(item['hepburn'] for item in self.kks.convert(spotify_activity.title))
+            album_new = ''.join(item['hepburn'] for item in self.kks.convert(spotify_activity.album))
+            artists_new = ', '.join(''.join(item['hepburn'] for item in artist) for artist in [self.kks.convert(artist) for artist in spotify_activity.artists])
             text_colour = 'black' if Misc.relative_luminance(dominant_color) > 0.5 else 'white'
 
             img = Image.new('RGB', (999, 395), color=dominant_color)
@@ -434,9 +408,9 @@ class FunCog(commands.Cog):
             img.paste(resized_album, (41, 76))
 
             parser = TwemojiParser(img, parse_discord_emoji=False)
-            await parser.draw_text((300, 90), cbridged, font=fontbold, fill=text_colour) # Top section - Song name
-            await parser.draw_text((303, 170), dbridged, font=font, fill=text_colour) # Middle secion - Artists of the song
-            await parser.draw_text((303, 228), abridged, font=font, fill=text_colour) # Album name - Bottom section
+            await parser.draw_text((300, 90), title_new if len(title_new) <= 20 else f'{title_new[:17]}...', font=fontbold, fill=text_colour) # Top section - Song name
+            await parser.draw_text((303, 170), artists_new if len(artists_new) <= 30 else f'{artists_new[:27]}...', font=font, fill=text_colour) # Middle secion - Artists of the song
+            await parser.draw_text((303, 228), album_new if len(album_new) <= 30 else f'{album_new[:27]}...', font=font, fill=text_colour) # Album name - Bottom section
             await parser.close()
             await ctx.send(file=Misc.save_image(Misc.add_corners(img, 42)))
         except Exception as e:
@@ -452,37 +426,32 @@ class FunCog(commands.Cog):
     async def fast(self, ctx, option: Optional[str], user: Optional[Member]=None):
         user = user or ctx.author
         if option in ("--rank", "rank"):
-            if not Wealth.collection.find_one({"_id": user.id}):
+            result = Wealth.collection.find_one({"_id": user.id})
+        
+            if not result:
                 return await ctx.send(f"Sorry {ctx.author.mention} that user is not ranked yet.")
             
             img = Image.new('RGB', (1000, 300), color=(35, 39, 42))
             font = ImageFont.truetype("fonts/Whitney-Medium.ttf", 65, encoding="unic")
             fontsmall = ImageFont.truetype("fonts/Whitney-Medium.ttf", 49, encoding="unic")
-            result = self.collection.find_one({"_id": user.id})
-            user_points = result['points']
-            rank = self.collection.find({"points":{"$gt":user_points}}).count() + 1
+            rank = self.collection.find({"points":{"$gt": result['points']}}).count() + 1
             CONVERT = await Misc.circle_pfp(user, 180, 180)
             color = (255, 255, 255) if (user.color.to_rgb() == (0, 0, 0)) else user.color.to_rgb()
             name = user.name if len(user.name) <= 16 else f'{user.name[:13]}...'
-            user_points = result['points']
 
             parser = TwemojiParser(img)
             await parser.draw_text((249, 69), name, font=font, fill=color) # Name of author
-            await parser.draw_text((250, 160), f"Global rank: #{rank}, Points: {user_points:,}", font=fontsmall, fill='white') # Current rank, and points
+            await parser.draw_text((250, 160), f"Global rank: #{rank}, Points: {result['points']:,}", font=fontsmall, fill='white') # Current rank, and points
             await parser.close()
 
             img.paste(CONVERT, (50, 67), CONVERT)
             return await ctx.send(file=Misc.save_image(img))
         
         word = choice(Misc.ALL_WORDS)
-
         font = ImageFont.truetype("fonts/Arial-bold.ttf", 25, encoding="unic")
 
         wx, wy = font.getsize(word)
-        offset_y = font.getsize(word)[1]
-        height = offset_y + wy
-
-        img = Image.new('RGB', (wx+30, height), color='lightblue')
+        img = Image.new('RGB', (wx + 30, wy * 2), color='lightblue')
 
         imgdraw = ImageDraw.Draw(img)
         imgdraw.text((14, 9), word, fill='black', font=font)
@@ -500,7 +469,7 @@ class FunCog(commands.Cog):
                             "points": 0
                         })
                     
-                    isfast = choice(self.badmessages) if (elapse/1000 > 6) else choice(self.goodmessages)
+                    isfast = choice(self.badmessages if (elapse/1000 > 6) else self.goodmessages)
                     random_points = randint(10, 45) if (elapse/1000 > 6) else randint(5, 17)
                     Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": random_points}})
                     return await ctx.send(embed=Embed(title="Fastest typer!", description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.bot.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False))
@@ -521,21 +490,20 @@ class FunCog(commands.Cog):
 
     @commands.command(help="Guess the flag from the picture!!", aliases=["gtf"])
     async def guesstheflag(self, ctx):
-        FlagChosen = choice(self.Country)
+        FlagChosen = choice(list(self.countries.keys()))
 
-        req = await self.session.get(f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png")
-        if req.status != 200:
+        req = await self.session.get(f"https://www.countryflags.io/{FlagChosen}/flat/64.png")
+        if req.status >= 400:
             return await ctx.send(f"Sorry {ctx.author.mention} The api is down.")
-        req.close()
-
-        FirstMessage = await ctx.send(embed=Embed(title="Guess the flag!", color=self.bot.color).set_image(url=f"https://www.countryflags.io/{FlagChosen['code'].lower()}/flat/64.png"))
+        
+        FirstMessage = await ctx.send(file=File(BytesIO(await req.read()), 'flag.png'), embed=Embed(title="Guess the flag!", color=self.bot.color).set_image(url="attachment://flag.png"))
 
         while True:
             try:
-                start = round(time.time.time() * 100)
+                start = round(time.time() * 100)
                 resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content == FlagChosen['name'], timeout=18)
-                elapse = round(time.time.time() * 100) - start
-                if resp.content.lower() == FlagChosen['name'].lower():
+                elapse = round(time.time() * 100) - start
+                if resp.content.lower() == self.countries[FlagChosen]:
                     if not Wealth._has_account(resp.author.id):
                         Wealth._create_account(resp.author.id)
                     RandomCoins = randint(15, 60)
@@ -548,7 +516,6 @@ class FunCog(commands.Cog):
     @commands.command()
     async def steam(self, ctx, user: Optional[Member], *, message = None):
         """Returns a Image of a Steam notifaction!"""
-        message = message or "Nothing"
         user = user or ctx.author
         image = Image.open("images/steam.png")
         font = ImageFont.truetype("fonts/Arial.ttf", 46, encoding="unic") # Steam's notifaction font.
@@ -556,7 +523,7 @@ class FunCog(commands.Cog):
         pfp = await Misc.fetch_pfp(user)
         CONVERT = pfp.resize((140,140)) # Resize the Members Avatar.
 
-        KKS_MESSAGE_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(message)) # Transliteration if the text is CJK
+        KKS_MESSAGE_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(message or "Nothing")) # Transliteration if the text is CJK
         KKS_NAME_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(user.name)) # Transliteration if the text is CJK
 
         MSG_CHECK = KKS_MESSAGE_CONVERT if len(KKS_MESSAGE_CONVERT) <= 25 else f'{KKS_MESSAGE_CONVERT[:22]}'
