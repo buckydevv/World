@@ -1,5 +1,5 @@
 import psutil
-from json import dumps, loads, load
+from json import load
 from typing import Optional
 from time import time
 from framework import Paginator
