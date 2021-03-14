@@ -16,7 +16,6 @@ __import__("dotenv").load_dotenv()
 class LoggingCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.color = 0x2F3136
         self.collection = MongoClient(environ["MONGODB_URL"])["Logging"]["Guilds"]
 
     @commands.group(name="logging")
@@ -29,9 +28,9 @@ class LoggingCog(commands.Cog):
     async def create(self, ctx):
         try:
             Guild._create_guild_account(ctx.guild.id)
-            return await ctx.send(embed=Embed(title="Logging", description=f"I have succsesfully setup logging for `{ctx.guild.name}`.", color=self.color))
+            return await ctx.send(embed=Embed(title="Logging", description=f"I have succsesfully setup logging for `{ctx.guild.name}`.", color=self.bot.color))
         except:
-            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} your guild already has a logging system setup!", color=self.color))
+            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} your guild already has a logging system setup!", color=self.bot.color))
 
     @create.error
     async def create_error(self, ctx, error):
@@ -42,10 +41,10 @@ class LoggingCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def shutdown(self, ctx):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
-            return await ctx.send(embed=Embed(title="Shutdown", description=f"Hey {ctx.author.mention} your guild was not found.\nTry using: `w/logging create`", color=self.color))
+            return await ctx.send(embed=Embed(title="Shutdown", description=f"Hey {ctx.author.mention} your guild was not found.\nTry using: `w/logging create`", color=self.bot.color))
 
         self.collection.remove({"_id": ctx.guild.id})
-        await ctx.send(embed=Embed(title="Shutdown", description=f"Hey {ctx.author.mention} i have succsesfully removed your guild's account.", color=self.color))
+        await ctx.send(embed=Embed(title="Shutdown", description=f"Hey {ctx.author.mention} i have succsesfully removed your guild's account.", color=self.bot.color))
 
     @shutdown.error
     async def shutdown_error(self, ctx, error):
@@ -60,11 +59,10 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        
-        if result["Bans"] == channel.id:
-            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Ban Log`.", color=self.color))
+        elif result["Bans"] == channel.id:
+            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Ban Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"Bans": channel.id}})
-        return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Ban Log` to the channel: <#{channel.id}>", color=self.color))
+        return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Ban Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
     @bans.error
     async def bans_error(self, ctx, error):
@@ -78,13 +76,13 @@ class LoggingCog(commands.Cog):
     async def unban(self, ctx, channel: TextChannel):
         if not Guild.collection.find_one({'_id': ctx.guild.id}):
             Guild._create_guild_account(ctx.guild.id)
-        result = self.collection.find({"_id": ctx.guild.id})
+        result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["Unbanned"] == channel.id:
-            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Unban Log`.", color=self.color))
+        elif result["Unbanned"] == channel.id:
+            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Unban Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"Unbanned": channel.id}})
-        await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Unban Log` to the channel: <#{channel.id}>", color=self.color))
+        await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Unban Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
     @unban.error
     async def unban_error(self, ctx, error):
@@ -101,10 +99,10 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["DeletedMessage"] == channel.id:
-            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Deleted messages Log`.", color=self.color))
+        elif result["DeletedMessage"] == channel.id:
+            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Deleted messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"DeletedMessage": channel.id}})
-        return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Deleted messages Log` to the channel: <#{channel.id}>", color=self.color))
+        return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Deleted messages Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
     @deleted.error
     async def deleted_error(self, ctx, error):
@@ -121,10 +119,10 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["EditedMessage"] == channel.id:
-            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Edited messages Log`.", color=self.color))
+        elif result["EditedMessage"] == channel.id:
+            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Edited messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"EditedMessage": channel.id}})
-        await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Edited messages Log` to the channel: <#{channel.id}>", color=self.color))
+        await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Edited messages Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
     @edited.error
     async def edited_error(self, ctx, error):
@@ -141,10 +139,10 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["JoinedServer"] == channel.id:
-            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Welcome messages Log`.", color=self.color))
+        elif result["JoinedServer"] == channel.id:
+            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Welcome messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"JoinedServer": channel.id}})
-        await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Welcome messsages Log` to the channel: <#{channel.id}>", color=self.color))
+        await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Welcome messsages Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
     @welcomes.error
     async def welcomes_error(self, ctx, error):
@@ -161,10 +159,10 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": ctx.guild.id})
         if not result:
             return
-        if result["LeftServer"] == channel.id:
-            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Goodbye messages Log`.", color=self.color))
+        elif result["LeftServer"] == channel.id:
+            return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Goodbye messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"LeftServer": channel.id}})
-        return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Goodbye messsages Log` to the channel: <#{channel.id}>", color=self.color))
+        return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Goodbye messsages Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
     @goodbye.error
     async def goodbye_error(self, ctx, error):
@@ -252,4 +250,3 @@ class LoggingCog(commands.Cog):
 
 def setup(bot):
     bot.add_cog(LoggingCog(bot))
-    print("COG: logging_.py Has been loaded!")
