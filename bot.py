@@ -1,4 +1,4 @@
-#import os, struct
+import discord
 from os import environ, listdir
 from json import load, dump
 from discord import Activity, Embed, Intents
@@ -6,6 +6,7 @@ from discord.ext import commands
 from rich import print
 from rich.console import Console
 from rich.table import Table
+from ctypes.util import find_library
 console = Console()
 
 __import__("dotenv").load_dotenv()
@@ -131,10 +132,9 @@ async def on_guild_remove(guild):
     with open('prefixes.json', 'w') as f:
         dump(prefixes, f, indent=4)
 
-#bitness = struct.calcsize('P') * 8
-#target = 'x64' if bitness > 32 else 'x86'
-#filename = os.path.join(os.path.dirname(os.path.abspath(discord.__file__)), 'bin', f'libopus-0.{target}.dll')
-#discord.opus.load_opus(filename)
-# ^ This is for my project dsr: https://github.com/shuanaongithub/dsr, So just ignore.
+
+if not discord.opus.is_loaded():
+	opus = find_library("opus")
+	discord.opus.load_opus(opus)
 
 world.run(environ["TOKEN"])
