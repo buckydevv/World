@@ -26,7 +26,7 @@ class VoiceRecorder(commands.Cog):
     async def record(self, ctx, seconds: int):
         if not ctx.author.voice:
             return await ctx.send("You are not in a voice channel, Please connect to one and then run the command.")
-        elif seconds >= 60:
+        elif seconds > 60:
             return await ctx.send("Sorry, `60` Seconds is max.")
         
         self.vc = await ctx.author.voice.channel.connect()
