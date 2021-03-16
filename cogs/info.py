@@ -137,7 +137,7 @@ class InfoCog(commands.Cog):
                 > <:Worldsmile:768145778493227058> Guild info
                 Prefix: `{prefixes.get(str(ctx.guild.id), 'w/, World')}`
                 Latency: `{round(self.bot.latency * 1000)}ms`
-                Response Time: `{(time() - ctx.message.created_at.timestamp())*1000:, .0f}ms`
+                Response Time: `{(time() - ctx.message.created_at.timestamp())*1000:,.0f}ms`
                 > <:Worldsipjuice:768201555811631134> Command info
                 Total commands: `{len(self.bot.commands)}`
                 Commands used today: `{y['data'][0]['commands']}`

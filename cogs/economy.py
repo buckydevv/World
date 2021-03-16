@@ -208,7 +208,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(
             title=f"{user}'s balance",
             color=self.color,
-            description=f"Coins: `{data.coins:, .0f}`\nBank: `{data.Bank:, .0f}`"
+            description=f"Coins: `{data.coins:,.0f}`\nBank: `{data.Bank:,.0f}`"
         ))
 
     @commands.command(name="buy")
@@ -327,7 +327,7 @@ class EconomyCog(commands.Cog):
             _data = list(filter(lambda x: x.get('coins', 0) == bal and x["_id"] not in ids, data))[0]
             ids.append(_data["_id"])
             user = ctx.bot.get_user(_data["_id"])
-            description += f"{i + 1}. **{user.name if user else '`Unknown`'}** {_data['coins']:, .0f} :moneybag:" + "\n"
+            description += f"{i + 1}. **{user.name if user else '`Unknown`'}** {_data['coins']:,.0f} :moneybag:" + "\n"
         
         return await ctx.send(embed=Embed(title="World Leaderboard", color=self.color, description=description))
 
