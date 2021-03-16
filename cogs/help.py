@@ -48,7 +48,7 @@ class HelpCog(commands.Cog):
     @commands.command(help="Shows other category.")
     async def other(self, ctx):
       await ctx.send(embed=Embed(
-        title="Other commands", 
+        title="Other commands",
         color=self.bot.color,
         ).add_field(
         name="<:shufflelogo:765652804387471430> | Random Commands",
@@ -63,7 +63,7 @@ class HelpCog(commands.Cog):
     @commands.command(help="Shows moderation category.")
     async def mod(self, ctx):
       await ctx.send(embed=Embed(
-        title="Moderation commands", 
+        title="Moderation commands",
         color=self.bot.color,
         ).add_field(
         name="<:memberlogo:765649915031846912> | Member Commands",
@@ -77,7 +77,7 @@ class HelpCog(commands.Cog):
     @commands.command(help="Shows logging category.")
     async def logs(self, ctx):
       await ctx.send(embed=Embed(
-        title="Logging commands", 
+        title="Logging commands",
         color=self.bot.color,
         ).add_field(
         name="<:discordlogo:765648661039677481> | Guild Commands",
@@ -93,7 +93,7 @@ class HelpCog(commands.Cog):
     @commands.command(hlep="Shows Fun category.")
     async def fun(self, ctx):
       await ctx.send(embed=Embed(
-        title="Fun commands", 
+        title="Fun commands",
         color=self.bot.color,
         ).add_field(
         name="<:Worldcool:768201555492864030> | Normal fun",
@@ -108,7 +108,7 @@ class HelpCog(commands.Cog):
     @commands.command(help="Shows economy category.")
     async def economy(self, ctx):
       await ctx.send(embed=Embed(
-        title="Economy commands", 
+        title="Economy commands",
         color=self.bot.color,
         ).add_field(
         name="<:account:765642079920980009> | Account Commands",

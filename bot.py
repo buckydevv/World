@@ -1,14 +1,12 @@
-import discord
 from os import environ, listdir
 from json import load, dump
-from discord import Activity, Embed, Intents
+from discord import Activity, Embed, Intents, opus
 from discord.ext import commands
 from rich import print
 from rich.console import Console
 from rich.table import Table
 from ctypes.util import find_library
 console = Console()
-
 __import__("dotenv").load_dotenv()
 
 # -------
@@ -36,9 +34,6 @@ world = commands.Bot(
 )
 setattr(world, "color", 0x2F3136)
 world.remove_command("help")
-
-# -------
-
 
 # -------
 # Command area 
@@ -79,8 +74,6 @@ async def changeprefix_error(ctx, error):
        await ctx.send(f"Sorry {ctx.author.mention} you don't have permissions to change the prefix!")
 
 # -------
-
-# -------
 # Cogs area
 for cog in filter(lambda x: x.endswith(".py"), listdir("cogs/")):
     world.load_extension(f"cogs.{cog[:-3]}")
@@ -110,7 +103,6 @@ async def on_message(message):
     
     await world.process_commands(message)
 
-
 # -------
 # Event area
 @world.event
@@ -132,9 +124,7 @@ async def on_guild_remove(guild):
     with open('prefixes.json', 'w') as f:
         dump(prefixes, f, indent=4)
 
-
-if not discord.opus.is_loaded():
-	opus = find_library("opus")
-	discord.opus.load_opus(opus)
+if not opus.is_loaded():
+    opus.load_opus(find_library("opus"))
 
 world.run(environ["TOKEN"])

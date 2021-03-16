@@ -155,7 +155,7 @@ class EconomyCog(commands.Cog):
         """Sets up the cog."""
         self.color = color
 
-    @commands.command(name="shop", aliases=("items",))
+    @commands.command(name="shop", aliases=("items", ))
     async def shop(self, ctx: commands.Context):
         """Returns all items you can buy or sell."""
         await ctx.send(embed=Embed(
@@ -181,14 +181,14 @@ class EconomyCog(commands.Cog):
             color=self.color
         ))
 
-    @commands.command(name="inventory", aliases=("inv",))
+    @commands.command(name="inventory", aliases=("inv", ))
     @require_account()
     async def inventory(self, ctx: commands.Context):
         """Returns the current items from the user inventory."""
 
         author = self._get_user(ctx.author.id)
         await ctx.send(embed=Embed(title=f"{ctx.author}'s inventory", color=self.color
-        ).add_field(name="Coins", value=f":moneybag: {author.coins:,}"
+        ).add_field(name="Coins", value=f":moneybag: {author.coins:, }"
         ).add_field(name="Apples", value=f":apple: {author.apple}"
         ).add_field(name="Cookies", value=f":cookie: {author.cookie}"
         ).add_field(name="Chocolate bars", value=f":chocolate_bar: {author.choc}"
@@ -199,7 +199,7 @@ class EconomyCog(commands.Cog):
         ).add_field(name="Fish", value=f":fish: {author.Fish}"
         ).set_thumbnail(url=ctx.author.avatar_url))
 
-    @commands.command(name="balance", aliases=("bal",))
+    @commands.command(name="balance", aliases=("bal", ))
     @require_account()
     async def balance(self, ctx: commands.Context, member: Member=None):
         """Returns the current balance of the user."""
@@ -208,7 +208,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(
             title=f"{user}'s balance",
             color=self.color,
-            description=f"Coins: `{data.coins:,.0f}`\nBank: `{data.Bank:,.0f}`"
+            description=f"Coins: `{data.coins:, .0f}`\nBank: `{data.Bank:, .0f}`"
         ))
 
     @commands.command(name="buy")
@@ -285,7 +285,7 @@ class EconomyCog(commands.Cog):
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:, } seconds.")
         elif isinstance(error, UserNotFound):
             await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
 
@@ -296,7 +296,7 @@ class EconomyCog(commands.Cog):
         if isinstance(error, NotEnoughItems) or isinstance(error, commands.errors.BadArgument):
             return await ctx.send(error)
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            return await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:, } seconds.")
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             return await ctx.send(f"Sorry {ctx.author.mention} You missed the `item` or `amount` arguments.")
 
@@ -308,7 +308,7 @@ class EconomyCog(commands.Cog):
         Wealth.collection.delete_one({"_id": ctx.author.id})
         return await ctx.send(embed=Embed(title="Goodbye", color=self.color, description=f"Hey {ctx.author.mention} I have successfully removed your World account."))
 
-    @commands.command(name="leaderboard", aliases=("lb",))
+    @commands.command(name="leaderboard", aliases=("lb", ))
     @commands.cooldown(1, 10, BucketType.member) # better have cooldown
     async def leaderboard(self, ctx: commands.Context):
         """Fetches the global leaderboard."""
@@ -327,7 +327,7 @@ class EconomyCog(commands.Cog):
             _data = list(filter(lambda x: x.get('coins', 0) == bal and x["_id"] not in ids, data))[0]
             ids.append(_data["_id"])
             user = ctx.bot.get_user(_data["_id"])
-            description += f"{i + 1}. **{user.name if user else '`Unknown`'}** {_data['coins']:,.0f} :moneybag:" + "\n"
+            description += f"{i + 1}. **{user.name if user else '`Unknown`'}** {_data['coins']:, .0f} :moneybag:" + "\n"
         
         return await ctx.send(embed=Embed(title="World Leaderboard", color=self.color, description=description))
 
@@ -336,7 +336,7 @@ class EconomyCog(commands.Cog):
         """Handles errors when running the rob command."""
         error = getattr(error, "original", error)
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:, } seconds.")
 
     @commands.command(name="create")
     async def create(self, ctx: commands.Context):
@@ -475,7 +475,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(
             title="You have begged.",
             color=self.color,
-            description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins:,}` Coins"
+            description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins:, }` Coins"
         ))
 
     @roulette.error
@@ -491,7 +491,7 @@ class EconomyCog(commands.Cog):
     async def beg_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the beg command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:,} seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:, } seconds.")
 
     @gamble.error
     async def gamble_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
@@ -523,7 +523,7 @@ class EconomyCog(commands.Cog):
     async def daily_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the daily command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:,} hours.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:, } hours.")
 
     @commands.command(name="weekly")
     @commands.cooldown(1, 604800, BucketType.member)
@@ -546,7 +546,7 @@ class EconomyCog(commands.Cog):
     async def weekly_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the weekly command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:,} days.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:, } days.")
 
     @commands.command(name="transfer")
     @require_account()

@@ -84,12 +84,12 @@ class EconomyFunCog(commands.Cog):
             main.paste(pfp_resize, (0, 0), pfp_resize)
         
         draw.text((60, 5), user.display_name, font=font, fill=(255, 255, 255))
-        draw.text((10, 60), f"Created account {Misc._delayfstr(result['AccountCreated'])} ago\nLast transfer: {Misc._delayfstr(result['LastTransfer'])} ago\nMarried to: {result['MarriedTo']}\nReputation: {result['Reputation']:,}", font=fontmm, fill=(255, 255, 255))
+        draw.text((10, 60), f"Created account {Misc._delayfstr(result['AccountCreated'])} ago\nLast transfer: {Misc._delayfstr(result['LastTransfer'])} ago\nMarried to: {result['MarriedTo']}\nReputation: {result['Reputation']:, }", font=fontmm, fill=(255, 255, 255))
     
         cursor = 60
         for item in self.items_order:
-            width = font.getsize(f"{result[item]:,}")[0]
-            draw.text((564 - width, cursor), f"{result[item]:,}", font=fontm, fill=(255, 255, 255))
+            width = font.getsize(f"{result[item]:, }")[0]
+            draw.text((564 - width, cursor), f"{result[item]:, }", font=fontm, fill=(255, 255, 255))
             cursor += 40
 
         cursor = 10
@@ -131,9 +131,9 @@ class EconomyFunCog(commands.Cog):
                 - World Noob
                 `Cost 900 Coins!`
                 - World Beginner
-                `Cost 3,500 Coins!`
+                `Cost 3, 500 Coins!`
                 - World Leader
-                `Cost 9,500 Coins!`
+                `Cost 9, 500 Coins!`
             """),
             color=self.bot.color
         ))
@@ -153,7 +153,7 @@ class EconomyFunCog(commands.Cog):
         
         await ctx.send(embed=Embed(
             title="World Badge",
-            description=f"You have bought `World {full_name}` for `{price:,}` Coins. {emoji}",
+            description=f"You have bought `World {full_name}` for `{price:, }` Coins. {emoji}",
             color=self.bot.color
         ))
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": -price}})
@@ -352,9 +352,9 @@ class EconomyFunCog(commands.Cog):
         random_coins = randint(1, 50)
         fishing_ctx = { # using it here because it has randint() in it
             "https://im-a-dev.xyz/1kKJXQSr.png": None, # key_name, amount_added_to_db, message
-            "https://im-a-dev.xyz/ImWqkaSy.png": ("Fish", 1, f"Great, looks like you have caught a fish! you now have a total of `{(doc['Fish'] + 1):,}` Fish!"),
-            "https://im-a-dev.xyz/sqPSfhJJ.png": ("cookie", 5, f"Wow, you caught a box of cookies while fishing?! you now have a total of `{(doc['cookie'] + 5):,}` Cookies!"),
-            "https://im-a-dev.xyz/syTQUdrV.png": ("coins", random_coins, f"Wow, you caught a bag of coins while fishing?!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{(doc['coins'] + random_coins):,}` Coins!")
+            "https://im-a-dev.xyz/ImWqkaSy.png": ("Fish", 1, f"Great, looks like you have caught a fish! you now have a total of `{(doc['Fish'] + 1):, }` Fish!"),
+            "https://im-a-dev.xyz/sqPSfhJJ.png": ("cookie", 5, f"Wow, you caught a box of cookies while fishing?! you now have a total of `{(doc['cookie'] + 5):, }` Cookies!"),
+            "https://im-a-dev.xyz/syTQUdrV.png": ("coins", random_coins, f"Wow, you caught a bag of coins while fishing?!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{(doc['coins'] + random_coins):, }` Coins!")
         }        
 
         if not fishing_ctx[random]: # they didn't caught anything
@@ -396,8 +396,8 @@ class EconomyFunCog(commands.Cog):
         trash_ctx = {
             "https://im-a-dev.xyz/i8HiGmwU.png": None, # key_name, amount_added_to_db, message
             "https://im-a-dev.xyz/ogWxLI7K.png": ("Reputation", 1, f"Wow, You found some Reputation in the trash! Good job, You now have a total of `{(doc['Reputation'] + 1)}` Rep points!"),
-            "https://im-a-dev.xyz/zqyCJ9sH.png": ("cookie", random_cookies, f"Amazing, You found `{random_cookies}` cookies in the trash bin, You now have `{(doc['cookie'] + random_cookies):,}` Cookies!"),
-            "https://im-a-dev.xyz/om3vsD0s.png": ("coins", random_coins, f"Nice you found a bag of coins in the trash bin!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{(doc['coins'] + random_coins):,}` Coins!")
+            "https://im-a-dev.xyz/zqyCJ9sH.png": ("cookie", random_cookies, f"Amazing, You found `{random_cookies}` cookies in the trash bin, You now have `{(doc['cookie'] + random_cookies):, }` Cookies!"),
+            "https://im-a-dev.xyz/om3vsD0s.png": ("coins", random_coins, f"Nice you found a bag of coins in the trash bin!\nCoins in the bag: `{random_coins}`\nyou now have a total of `{(doc['coins'] + random_coins):, }` Coins!")
         }        
 
         if not trash_ctx[random]: # they didn't caught anything
