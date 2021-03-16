@@ -188,7 +188,7 @@ class EconomyCog(commands.Cog):
 
         author = self._get_user(ctx.author.id)
         await ctx.send(embed=Embed(title=f"{ctx.author}'s inventory", color=self.color
-        ).add_field(name="Coins", value=f":moneybag: {author.coins:, }"
+        ).add_field(name="Coins", value=f":moneybag: {author.coins:,}"
         ).add_field(name="Apples", value=f":apple: {author.apple}"
         ).add_field(name="Cookies", value=f":cookie: {author.cookie}"
         ).add_field(name="Chocolate bars", value=f":chocolate_bar: {author.choc}"
@@ -285,7 +285,7 @@ class EconomyCog(commands.Cog):
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send(f"Sorry {ctx.author.mention} Member not found, or invalid coin amount.")
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:, } seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
         elif isinstance(error, UserNotFound):
             await ctx.send(f"Sorry {ctx.author.mention} Your target does not have a World account.")
 
@@ -296,7 +296,7 @@ class EconomyCog(commands.Cog):
         if isinstance(error, NotEnoughItems) or isinstance(error, commands.errors.BadArgument):
             return await ctx.send(error)
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            return await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:, } seconds.")
+            return await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
         elif isinstance(error, commands.errors.MissingRequiredArgument):
             return await ctx.send(f"Sorry {ctx.author.mention} You missed the `item` or `amount` arguments.")
 
@@ -336,7 +336,7 @@ class EconomyCog(commands.Cog):
         """Handles errors when running the rob command."""
         error = getattr(error, "original", error)
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:, } seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} You're on cooldown. Try again in {error.retry_after:,} seconds.")
 
     @commands.command(name="create")
     async def create(self, ctx: commands.Context):
@@ -475,7 +475,7 @@ class EconomyCog(commands.Cog):
         await ctx.send(embed=Embed(
             title="You have begged.",
             color=self.color,
-            description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins:, }` Coins"
+            description=f"Amount given from World: `{amount_of_coins}` Coins\nCurrent balance: `{user.coins + amount_of_coins:,}` Coins"
         ))
 
     @roulette.error
@@ -491,7 +491,7 @@ class EconomyCog(commands.Cog):
     async def beg_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the beg command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:, } seconds.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after:,} seconds.")
 
     @gamble.error
     async def gamble_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
@@ -523,7 +523,7 @@ class EconomyCog(commands.Cog):
     async def daily_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the daily command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:, } hours.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 3600:,} hours.")
 
     @commands.command(name="weekly")
     @commands.cooldown(1, 604800, BucketType.member)
@@ -546,7 +546,7 @@ class EconomyCog(commands.Cog):
     async def weekly_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
         """Handles errors when running the weekly command."""
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:, } days.")
+            await ctx.send(f"Sorry {ctx.author.mention} Try again in {error.retry_after / 86400:,} days.")
 
     @commands.command(name="transfer")
     @require_account()

@@ -192,7 +192,7 @@ class LoggingCog(commands.Cog):
 
         parser = TwemojiParser(mainimage)
         await parser.draw_text((275, 230), f"Welcome {check_length}", font=font, fill='black')
-        await parser.draw_text((279, 300), f"We now have {member.guild.member_count:, } members!", font=fontsmall, fill='black')
+        await parser.draw_text((279, 300), f"We now have {member.guild.member_count:,} members!", font=fontsmall, fill='black')
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(member, 200, 200)

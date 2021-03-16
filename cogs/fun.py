@@ -362,7 +362,7 @@ class FunCog(commands.Cog):
                 artist = results[0]
             except (KeyError, AssertionError):
                 return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
-            return await ctx.send(embed=Embed(title=artist['name'], color=self.bot.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:, }`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
+            return await ctx.send(embed=Embed(title=artist['name'], color=self.bot.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
 
         if option == "--song":
             if not song:
@@ -441,7 +441,7 @@ class FunCog(commands.Cog):
 
             parser = TwemojiParser(img)
             await parser.draw_text((249, 69), name, font=font, fill=color) # Name of author
-            await parser.draw_text((250, 160), f"Global rank: #{rank}, Points: {result['points']:, }", font=fontsmall, fill='white') # Current rank, and points
+            await parser.draw_text((250, 160), f"Global rank: #{rank}, Points: {result['points']:,}", font=fontsmall, fill='white') # Current rank, and points
             await parser.close()
 
             img.paste(CONVERT, (50, 67), CONVERT)
