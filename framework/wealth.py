@@ -1,5 +1,4 @@
 from os import environ
-from discord.ext import commands
 from pymongo import MongoClient
 from datetime import datetime
 from random import choice
