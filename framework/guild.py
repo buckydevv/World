@@ -1,11 +1,10 @@
 from os import environ
-from discord.ext import commands
 from pymongo import MongoClient
+collection = MongoClient(environ["MONGODB_URL"])["Logging"]["Guilds"]
 
 __import__("dotenv").load_dotenv()
-class Guild:
-    collection = MongoClient(environ["MONGODB_URL"])["Logging"]["Guilds"]
 
+class Guild:
     def _create_guild_account(guild_id: int):
         """Create a World guild account."""
         obj = {
