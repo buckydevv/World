@@ -532,7 +532,7 @@ class EconomyCog(commands.Cog):
         """Gives to the user a weekly account of money."""
         Wealth.collection.update_one(
             {
-                "_id": user._id
+                "_id": ctx.author._id
             },
             {
                 "$inc": {
