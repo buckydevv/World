@@ -92,7 +92,7 @@ class FunCog(commands.Cog):
     @commands.command(help="Fetch the minecraft skin of a player.")
     async def mcskin(self, ctx, user):
         req = await self.session.get(f'https://mc-heads.net/body/{quote(user or ctx.author.display_name)[:128]}/600')
-        await ctx.send(file=File(BytesIO(await req.read()), 'skin.png'), embed=Embed(title=f"{profile.name}'s skin", color=self.bot.color).set_image(url='attachment://skin.png'))
+        await ctx.send(file=File(BytesIO(await req.read()), 'skin.png'), embed=Embed(title=f"{req.name}'s skin", color=self.bot.color).set_image(url='attachment://skin.png'))
 
     @commands.command(name="f")
     async def f(self, ctx, *, text: commands.clean_content = None):
@@ -211,7 +211,7 @@ class FunCog(commands.Cog):
 
         await self.akiObj.win()
         del self.gameCache[ctx.channel.id]
-        await ctx.send(embed=Embed(title="I have outsmarted your outsmarting", color=self.bot.color).add_field(name="I think...", value="it is {0.first_guess[name]} {0.first_guess[description]}?\n\nSorry if im wrong, Akinator has tried.".format(akiObj)).set_image(url=self.akiObj.first_guess['absolute_picture_path']))
+        await ctx.send(embed=Embed(title="I have outsmarted your outsmarting", color=self.bot.color).add_field(name="I think...", value="it is {0.first_guess[name]} {0.first_guess[description]}?\n\nSorry if im wrong, Akinator has tried.".format(self.akiObj)).set_image(url=self.akiObj.first_guess['absolute_picture_path']))
 
 
     @commands.command(aliases=["8ball"])
