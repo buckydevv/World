@@ -1,5 +1,4 @@
 from discord.ext import commands
-from discord import Embed, Color
 from .wealth import Wealth
 
 def require_account():
