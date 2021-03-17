@@ -1,13 +1,9 @@
 from os import environ
 from discord import File
 from aggdraw import Draw, Brush
-from discord.ext import commands
 from time import time
 from io import BytesIO
-from pymongo import MongoClient
 from PIL import Image, ImageDraw, ImageOps, ImageColor
-from twemoji_parser import TwemojiParser
-from colorthief import ColorThief
 from datetime import datetime
 from json import loads
 
