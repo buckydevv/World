@@ -141,7 +141,7 @@ class InfoCog(commands.Cog):
                 > <:Worldsipjuice:768201555811631134> Command info
                 Total commands: `{len(self.bot.commands)}`
                 Commands used today: `{y['data'][0]['commands']}`
-                Popular commands: `w/{y['data'][0]['popular'][0]['name']}`, `w/{y['data'][0]['popular'][1]['name']}`, `w/{y['data'][0]['popular'][2]['name']}`,\n`w/{y['data'][0]['popular'][3]['name']}`, `w/{y['data'][0]['popular'][4]['name']}`
+                Popular commands: `w/{y['data'][0]['popular'][0]['name']}`, `w/{y['data'][0]['popular'][1]['name']}`, `w/{y['data'][0]['popular'][2]['name']}`, \n`w/{y['data'][0]['popular'][3]['name']}`, `w/{y['data'][0]['popular'][4]['name']}`
                 """)
             ))
         except:

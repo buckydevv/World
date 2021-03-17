@@ -6,18 +6,15 @@ from asyncio import sleep
 #from dsr.recognize import dsr
 from discord import File
 
-
 def on_stopped(sink, *args):
     pass
 
 def args_to_filters(args):
-    filters = {}
     try:
         seconds = int(args)
     except ValueError:
         return "You must provide a integer value"
-    filters.update({'time': seconds})
-    return filters
+    return {'time': seconds}
 
 class VoiceRecorder(commands.Cog):
     def __init__(self, bot):
@@ -29,11 +26,12 @@ class VoiceRecorder(commands.Cog):
     async def record(self, ctx, seconds: int):
         if not ctx.author.voice:
             return await ctx.send("You are not in a voice channel, Please connect to one and then run the command.")
-        if seconds >=60:
+        elif seconds > 60:
             return await ctx.send("Sorry, `60` Seconds is max.")
+        
         self.vc = await ctx.author.voice.channel.connect()
         self.vc.start_recording(self.sink(encoding='wav', filters=args_to_filters(seconds), output_path="recordings"), on_stopped, ctx.channel)
-        fm = await ctx.send(f"The recording has started!")
+        fm = await ctx.send("The recording has started!")
         await sleep(seconds + 1)
         #self.sink.format_audio(self) # This was for DSR, But having troubles with it :z
         ssrc = self.vc.rssrc(ctx.author) # Get ID and File name
@@ -46,7 +44,6 @@ class VoiceRecorder(commands.Cog):
         #await sleep(seconds)
         #await ctx.send(receive) # Send what DSR recognized.
         
-    
     @record.error
     async def record_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):

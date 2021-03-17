@@ -78,7 +78,7 @@ class FunCog(commands.Cog):
     async def joke(self, ctx):
         req = await self.session.get("https://icanhazdadjoke.com", headers={"Accept": "application/json"})
         r = await req.json()
-        await ctx.send(embed=Embed(title="Epic joke!",description=r["joke"], color=self.bot.color))
+        await ctx.send(embed=Embed(title="Epic joke!", description=r["joke"], color=self.bot.color))
 
     @commands.command(help="Ask Alister-A a question!")
     async def askali(self, ctx, *, question):
@@ -197,7 +197,7 @@ class FunCog(commands.Cog):
                 try:
                     gameObj = await self.akiObj.back()
                 except:
-                    await ctx.send(embed=Embed(title="Cannot go back any further :(",description="Continue playing anyway", color=self.bot.color))
+                    await ctx.send(embed=Embed(title="Cannot go back any further :(", description="Continue playing anyway", color=self.bot.color))
             elif resp.content.lower() == "q" or resp.content.lower() == "quit":
                 await ctx.send(embed=Embed(title="Game over", description="You have left the game.", color=self.bot.color))
                 del self.gameCache[ctx.channel.id]
@@ -305,7 +305,7 @@ class FunCog(commands.Cog):
         parser = TwemojiParser(image, parse_discord_emoji=True)
         await parser.draw_text((80, 30), user.name, font=font, fill=(255, 255, 255) if (user.color.to_rgb() == (0, 0, 0)) else Misc.hex_to_rgb(str(user.color)))
         await parser.draw_text((88 + userchar, 33), datetime.now().strftime("Today at %H:%M"), font=fontsmall, fill='grey')
-        await parser.draw_text((80, 57), message if len(message) <= 30 else f'{message[:38]}...', font=fontnormal, fill=(220,221,222))
+        await parser.draw_text((80, 57), message if len(message) <= 30 else f'{message[:38]}...', font=fontnormal, fill=(220, 221, 222))
         await parser.close()
 
         CONVERT = await Misc.circle_pfp(user, 50, 50)
@@ -501,14 +501,13 @@ class FunCog(commands.Cog):
         while True:
             try:
                 start = round(time.time() * 100)
-                resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content == FlagChosen['name'], timeout=18)
+                resp = await self.bot.wait_for("message", check=lambda message: message.channel == ctx.channel and message.guild == ctx.guild and message.content.lower() == self.countries[FlagChosen]['name'], timeout=18)
                 elapse = round(time.time() * 100) - start
-                if resp.content.lower() == self.countries[FlagChosen]:
-                    if not Wealth._has_account(resp.author.id):
-                        Wealth._create_account(resp.author.id)
-                    RandomCoins = randint(15, 60)
-                    Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
-                    return await ctx.send(embed=Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.bot.color))
+                if not Wealth._has_account(resp.author.id):
+                    Wealth._create_account(resp.author.id)
+                RandomCoins = randint(15, 60)
+                Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
+                return await ctx.send(embed=Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.bot.color))
             except:
                 await FirstMessage.delete()
                 return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
@@ -521,7 +520,7 @@ class FunCog(commands.Cog):
         font = ImageFont.truetype("fonts/Arial.ttf", 46, encoding="unic") # Steam's notifaction font.
 
         pfp = await Misc.fetch_pfp(user)
-        CONVERT = pfp.resize((140,140)) # Resize the Members Avatar.
+        CONVERT = pfp.resize((140, 140)) # Resize the Members Avatar.
 
         KKS_MESSAGE_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(message or "Nothing")) # Transliteration if the text is CJK
         KKS_NAME_CONVERT = ''.join(item['hepburn'] for item in self.kks.convert(user.name)) # Transliteration if the text is CJK
@@ -530,9 +529,9 @@ class FunCog(commands.Cog):
         NAME_CHECK = KKS_NAME_CONVERT if len(KKS_NAME_CONVERT) <= 25 else f'{KKS_NAME_CONVERT[:22]}...'
 
         parser = TwemojiParser(image)
-        await parser.draw_text((262, 77), NAME_CHECK, font=font, fill=(139,195,21)) # Name of discord.Member
+        await parser.draw_text((262, 77), NAME_CHECK, font=font, fill=(139, 195, 21)) # Name of discord.Member
         await parser.draw_text((264, 132), "is now playing", font=font, fill="grey")
-        await parser.draw_text((263, 188), MSG_CHECK, font=font, fill=(139,195,21)) # Message/Game name (message)
+        await parser.draw_text((263, 188), MSG_CHECK, font=font, fill=(139, 195, 21)) # Message/Game name (message)
         await parser.close() # Close the session
 
         image.paste(CONVERT, (92, 92), CONVERT)

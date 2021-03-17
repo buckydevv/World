@@ -71,10 +71,9 @@ class ModCog(commands.Cog):
     async def purge(self, ctx, amount: int):
         if amount >= 100:
             return await ctx.send(f"Sorry {ctx.author.mention} `100` is max limit.")
-        if amount <= 1:
+        elif amount <= 1:
             return await ctx.send(f"Sorry {ctx.author.mention} Please purge more than `1` message")
-        else:
-            await ctx.channel.purge(limit=amount)
+        return await ctx.channel.purge(limit=amount)
 
     @purge.error
     async def purge_error(self, ctx, error):
@@ -82,7 +81,6 @@ class ModCog(commands.Cog):
             await ctx.send(f'Sorry {ctx.author.mention} Please Type `w/purge <amount>')
         elif isinstance(error, commands.CheckFailure):
             await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-        
 
     @commands.command(help="Unban a user.")
     @commands.has_permissions(ban_members=True)
@@ -135,7 +133,7 @@ class ModCog(commands.Cog):
         emoji = ''
 
         while True:
-            if emoji=='✅':
+            if emoji == '✅':
                 try:
                     await channel.delete()
                     nuked_channel = await channel.clone()
@@ -144,18 +142,17 @@ class ModCog(commands.Cog):
                     break
                 except Exception as e:
                     return await ctx.send(embed=Embed(title="Error:", description=e, color=self.bot.color))
-            elif emoji=='❎':
-                await message.edit(embed=Embed(
+            elif emoji == '❎':
+                return await message.edit(embed=Embed(
                     title="Nuke Failed",
                     description=f"You Chose not to nuke `{channel}`",
                     color=self.bot.color
                 ))
-                break
 
             res = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id == ctx.author.id and r.message.id == message.id, timeout=15)
             if not res:
                 break
-            if res[1].id != 700292147311542282:
+            elif res[1].id != 700292147311542282:
                 emoji = str(res[0].emoji)
 
         await message.clear_reactions()
@@ -232,8 +229,7 @@ class ModCog(commands.Cog):
     @commands.command(help="Snipe a edited message.")
     async def editsnipe(self, ctx):
         try:
-            badwords = ["nigger", "nig", "coon", "nigga", "retard", "rapist", "rape", "niggar", "faggot", "fag", "dyke", "whore"]
-            if self.editSnipeCache[ctx.channel.id]["bcontent"] in badwords:
+            if self.editSnipeCache[ctx.channel.id]["bcontent"] in self.badwords:
                 return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to snipe!")
             await ctx.send(embed=Embed(title="Edit Snipe", colour=self.bot.color, timestamp=datetime.utcnow()
             ).add_field(name="User", value=self.editSnipeCache[ctx.channel.id]["user"]

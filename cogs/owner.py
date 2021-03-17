@@ -130,7 +130,7 @@ class OwnerCog(commands.Cog):
                 break
             if res.id != 700292147311542282:
                 emoji = str(res[0].emoji)
-                await message.remove_reaction(res[0].emoji,res[1])
+                await message.remove_reaction(res[0].emoji, res[1])
 
         await message.clear_reactions()
 

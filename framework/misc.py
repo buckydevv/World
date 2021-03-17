@@ -44,9 +44,9 @@ class Misc:
         draw = Draw(mask)
         brush = Brush('white')
         width, height = mask.size
-        draw.pieslice((0,0,radius*2, radius*2), 90, 180, None, brush)
+        draw.pieslice((0, 0, radius*2, radius*2), 90, 180, None, brush)
         draw.pieslice((width - radius*2, 0, width, radius*2), 0, 90, None, brush)
-        draw.pieslice((0, height - radius * 2, radius*2, height),180, 270, None, brush)
+        draw.pieslice((0, height - radius * 2, radius*2, height), 180, 270, None, brush)
         draw.pieslice((width - radius * 2, height - radius * 2, width, height), 270, 360, None, brush)
         draw.rectangle((radius, radius, width - radius, height - radius), brush)
         draw.rectangle((radius, 0, width - radius, radius), brush)
@@ -71,7 +71,7 @@ class Misc:
         buffer_avatar.seek(0)
         av_img = Image.open(buffer_avatar)
 
-        resize = av_img.resize((x,y));
+        resize = av_img.resize((x, y));
         size_bigger = (resize.size[0] * 3, resize.size[1] * 3)
         maskimage = Image.new('L', size_bigger, 0)
         draw = ImageDraw.Draw(maskimage)

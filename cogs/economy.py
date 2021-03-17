@@ -155,7 +155,7 @@ class EconomyCog(commands.Cog):
         """Sets up the cog."""
         self.color = color
 
-    @commands.command(name="shop", aliases=("items",))
+    @commands.command(name="shop", aliases=("items", ))
     async def shop(self, ctx: commands.Context):
         """Returns all items you can buy or sell."""
         await ctx.send(embed=Embed(
@@ -181,7 +181,7 @@ class EconomyCog(commands.Cog):
             color=self.color
         ))
 
-    @commands.command(name="inventory", aliases=("inv",))
+    @commands.command(name="inventory", aliases=("inv", ))
     @require_account()
     async def inventory(self, ctx: commands.Context):
         """Returns the current items from the user inventory."""
@@ -199,7 +199,7 @@ class EconomyCog(commands.Cog):
         ).add_field(name="Fish", value=f":fish: {author.Fish}"
         ).set_thumbnail(url=ctx.author.avatar_url))
 
-    @commands.command(name="balance", aliases=("bal",))
+    @commands.command(name="balance", aliases=("bal", ))
     @require_account()
     async def balance(self, ctx: commands.Context, member: Member=None):
         """Returns the current balance of the user."""
@@ -308,7 +308,7 @@ class EconomyCog(commands.Cog):
         Wealth.collection.delete_one({"_id": ctx.author.id})
         return await ctx.send(embed=Embed(title="Goodbye", color=self.color, description=f"Hey {ctx.author.mention} I have successfully removed your World account."))
 
-    @commands.command(name="leaderboard", aliases=("lb",))
+    @commands.command(name="leaderboard", aliases=("lb", ))
     @commands.cooldown(1, 10, BucketType.member) # better have cooldown
     async def leaderboard(self, ctx: commands.Context):
         """Fetches the global leaderboard."""

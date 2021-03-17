@@ -13,13 +13,12 @@ class Premium(commands.Cog):
         self.campaign_response = self.api_client.fetch_campaign()
         self.campaign_id = self.campaign_response.data()[0].id()
         self.pledges = []
-        self.cursor= None
-
+        self.cursor = None
 
     @commands.command()
     async def wow(self, ctx):
-    	for result in self.api_client.fetch_page_of_pledges(self.campaign_id, 25, cursor=self.cursor, fields={'pledge': ['total_historical_amount_cents', 'declined_since']}):
-    		await ctx.send(result)
+        for result in self.api_client.fetch_page_of_pledges(self.campaign_id, 25, cursor=self.cursor, fields={'pledge': ['total_historical_amount_cents', 'declined_since']}):
+            await ctx.send(result)
 
 def setup(bot):
     bot.add_cog(Premium(bot))
