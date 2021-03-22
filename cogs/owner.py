@@ -1,13 +1,10 @@
-import discord
-from discord import Embed
+from discord import Embed, Color
 from datetime import datetime
 from asyncio import sleep as _sleep
 from traceback import format_exc
 from discord.ext import commands
-TOKEN = '||Think Ima Give You My Token!?||'
 
 class OwnerCog(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -68,7 +65,6 @@ class OwnerCog(commands.Cog):
     @commands.command(name="eval")
     @commands.is_owner()
     async def eval_(self, ctx: commands.Context, *, code: str):
-        import traceback
         code = code.strip("`")
         if code.startswith(("py\n", "python\n")):
             code = "\n".join(code.split("\n")[1:])
@@ -82,18 +78,16 @@ class OwnerCog(commands.Cog):
 
             await locals()["__function"]()
         except:
-            await ctx.send(embed=Embed(title="Error!", description=f"```{format_exc()}```", color=discord.Color.red()).set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png")))
+            await ctx.send(embed=Embed(title="Error!", description=f"```{format_exc()}```", color=Color.red()).set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png")))
     
     @eval_.error
     async def eval__error(self, ctx, error):
-        await ctx.send(embed=Embed(title="Error!", description=f"```{error}```", color=discord.Color.red()).set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png")))
+        await ctx.send(embed=Embed(title="Error!", description=f"```{error}```", color=Color.red()).set_footer(text=f"Invoker: {ctx.author}", icon_url=ctx.author.avatar_url_as(format="png")))
 
     @commands.command()
     @commands.is_owner()
     async def selfpurge(self, ctx, amount: int):
-        def world(m):
-            return self.bot.user.id == m.author.id
-        await ctx.message.channel.purge(limit=amount, check=world, bulk=False)
+        await ctx.message.channel.purge(limit=amount, check=lambda m: self.bot.user.id == m.author.id)
         await ctx.send(embed=Embed(title="Purged", description=f"{ctx.author.mention} i have successfully purged `{amount}` of messages in <#{ctx.message.channel.id}>", color=ctx.author.color), delete_after=3)
         await _sleep(3)
         await ctx.message.delete()

@@ -1,13 +1,11 @@
 import wavelink
-import asyncio
 import re
 import itertools
-import async_timeout
+from async_timeout import timeout
 from discord.ext import commands
-from typing import Union
 from discord import Embed, Member, VoiceChannel, VoiceState
 from datetime import timedelta
-from asyncio import TimeoutError
+from asyncio import TimeoutError, Queue
 
 URL_REG = re.compile(r'https?://(?:www\.)?.+')
 
@@ -29,7 +27,7 @@ class Player(wavelink.Player):
         if self.context:
             self.dj = self.context.author
 
-        self.queue = asyncio.Queue()
+        self.queue = Queue()
         self.controller = None
 
         self.waiting = False
@@ -39,7 +37,7 @@ class Player(wavelink.Player):
             return
         try:
             self.waiting = True
-            with async_timeout.timeout(120):
+            with timeout(120):
                 track = await self.queue.get()
         except TimeoutError:
             return await self.disconnect()
@@ -141,7 +139,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         await player.set_volume(45)
 
-        if not ctx.author.voice:
+        if not channel:
             return await ctx.send(f"Sorry {ctx.author.mention} Please connect to the channel in order to play a song.")
 
         if not tracks:

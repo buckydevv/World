@@ -1,13 +1,10 @@
 from os import environ
 from PIL import Image, ImageFont
-from typing import Optional
 from twemoji_parser import TwemojiParser
 from discord import TextChannel
 from pymongo import MongoClient
 from discord.ext import commands
-from urllib.parse import urlparse, quote
-from discord.ext.commands import has_permissions, MissingPermissions
-from discord import Embed, File, Message
+from discord import Embed, Message
 from datetime import datetime
 from framework import Guild, Misc
 
@@ -181,7 +178,6 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": member.guild.id})
         if (not result) or (not result["JoinedServer"]):
             return
-        picture = await Misc.fetch_pfp(member)
 
         font = ImageFont.truetype("fonts/Arial-bold.ttf", 60, encoding="unic")
         fontsmall = ImageFont.truetype("fonts/Arial-bold.ttf", 45, encoding="unic")
@@ -205,7 +201,6 @@ class LoggingCog(commands.Cog):
         result = self.collection.find_one({"_id": member.guild.id})
         if (not result) or (not result["LeftServer"]):
             return
-        picture = await Misc.fetch_pfp(member)
 
         font = ImageFont.truetype("fonts/Arial-bold.ttf", 60, encoding="unic")
         fontsmall = ImageFont.truetype("fonts/Arial-bold.ttf", 45, encoding="unic")

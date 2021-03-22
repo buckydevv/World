@@ -46,10 +46,20 @@ class VoiceRecorder(commands.Cog):
 
         remove(f"recordings/{ssrc[ctx.author.id]}.wav") # Remove the file with `os.remove` as this will save lots of space.
 
+<<<<<<< Updated upstream
         #receive = dsr.listen(f"recordings/{ssrc[ctx.author.id]}.wav") # This will listen to the .wav file and recognize it, Then it will return text of what was said.
         #await ctx.send("Checking file...", delete_after=seconds) # Just a pre-message
         #await sleep(seconds) # `seconds` is the argument that the user passed in the command. (How long the file will be... But in some cases the file extends or shortens depends on the bot's ping i think. So in the future i could just check the actual file length and set it to a variable.)
         #await ctx.send(receive) # Send what was recognized.
+=======
+        #try:
+           # receive = dsr.listen(f"recordings/{ssrc[ctx.author.id]}.wav") # This will listen to the .wav file and recognize it, Then it will return text of what was said.
+            #await ctx.send("Checking file...", delete_after=seconds) # Just a pre-message
+           # await sleep(seconds) # `seconds` is the argument that the user passed in the command. (How long the file will be... But in some cases the file extends or shortens depends on the bot's ping i think. So in the future i could just check the actual file length and set it to a variable.)
+           # await ctx.send(receive) # Send what was recognized.
+        #except Exception as e:
+            #await ctx.send(e)
+>>>>>>> Stashed changes
         
     @record.error
     async def record_error(self, ctx, error):

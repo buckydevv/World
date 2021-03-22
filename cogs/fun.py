@@ -1,6 +1,6 @@
 from random import randint, choice
 from pykakasi import kakasi
-from discord.ext import commands, tasks
+from discord.ext import commands
 from discord import Embed, File, PartialEmoji, Member, Spotify
 from datetime import datetime
 from typing import Optional
@@ -177,8 +177,6 @@ class FunCog(commands.Cog):
 
         gameObj = await self.akiObj.start_game(child_mode=True)
 
-        currentChannel = ctx.channel
-
         self.gameCache.update(
             {ctx.channel.id: {
                 "user": ctx.author,
@@ -297,7 +295,6 @@ class FunCog(commands.Cog):
         font = ImageFont.truetype("fonts/Whitney-Medium.ttf", 22, encoding="unic")
         fontsmall = ImageFont.truetype("fonts/Whitney-Medium.ttf", 16, encoding="unic")
         fontnormal = ImageFont.truetype("fonts/Whitney-Medium.ttf", 20, encoding="unic")
-        fontchannel = ImageFont.truetype("fonts/Whitney-Medium.ttf", 16, encoding="unic")
 
         userchar = font.getsize(user.name)[0]
         image = Image.open("images/fake.png")
@@ -324,7 +321,6 @@ class FunCog(commands.Cog):
 
         font = ImageFont.truetype("fonts/karla1.ttf", 19, encoding="unic")
         fontsmall = ImageFont.truetype("fonts/karla1.ttf", 15, encoding="unic")
-        fontnormal = ImageFont.truetype("fonts/karla1.ttf", 18, encoding="unic")
 
         userchars = font.getsize(user.name)[0]
         mainimage = Image.open("images/tgg.png")
@@ -349,7 +345,7 @@ class FunCog(commands.Cog):
         av_img = await Misc.fetch_pfp(user or ctx.author)
         await ctx.send(file=Misc.save_image(av_img.resize((350, 180))))
 
-    @commands.command(help="Show what you are listening to in a photo!\nYou can also use `w/spotify --artist <artist>` and `w/spotify --song <song>` to find out information about a artist or song.", aliases=["sp"])
+    @commands.command(help="Show what you are listening to in a photo!\nYou can also use `w/spotify --artist <artist>` and `w/spotify --song <song>` to find out information about a artist or song. You can also do `w/spotify --current` to show information on the current song you are listening to within spotify.", aliases=["sp"])
     @commands.cooldown(rate=2, per=8, type=commands.BucketType.member)
     async def spotify(self, ctx, user: Optional[Member], option: Optional[str], *, song: Optional[str]):
         if option == "--artist":
@@ -363,6 +359,22 @@ class FunCog(commands.Cog):
             except (KeyError, AssertionError):
                 return await ctx.send(f"Sorry {ctx.author.mention} but that artist does not exist!")
             return await ctx.send(embed=Embed(title=artist['name'], color=self.bot.color).add_field(name="Artist information", value=f"Followers: `{artist['followers']['total']:,}`\nPopularity: `{artist['popularity']}%`\nArtist Link: [`{artist['name']}`](https://open.spotify.com/artist/{artist['id']})").set_thumbnail(url=artist['images'][0]['url']))
+
+        elif option == "--current":
+            user = user or ctx.author
+            try:
+                spotify_activity = next((activity for activity in user.activities if isinstance(activity, Spotify)), None)
+                if not spotify_activity:
+                    return await ctx.send(f"Sorry {ctx.author.mention} you are not listening to Spotify")
+                result = self.sp.search(q=spotify_activity.title, limit=1, type='track')['tracks']['items']
+                assert result and result[0]
+            except(KeyError, AssertionError):
+                return await ctx.send(f"Sorry {ctx.author.mention} but i could not find your current song information.")
+            
+            res = result[0]
+            name = ', '.join([f"[`{artist['name']}`]({artist['external_urls'].get('spotify', 'https://youtube.com/watch?v=dQw4w9WgXcQ')})" for artist in res['artists']])
+            duration = time.strftime("%M:%S", time.gmtime(res['duration_ms'] // 1000))
+            return await ctx.send(embed=Embed(title=spotify_activity.title, color=self.bot.color).add_field(name="Song information", value=f"Artist(s): {name}\nPopularity: `{res['popularity']}%`\nRelease date: `{res['album']['release_date']}`\nDuration: `{duration}`\nSong Link: [`{res['name']}`](https://open.spotify.com/track/{res['id']})").set_thumbnail(url=res['album']['images'][0]['url']))
 
         if option == "--song":
             if not song:
@@ -394,7 +406,6 @@ class FunCog(commands.Cog):
             
             font = ImageFont.truetype("fonts/spotify.ttf", 42, encoding="unic")
             fontbold = ImageFont.truetype("fonts/spotify-bold.ttf", 53, encoding="unic")
-            artists = self.kks.convert(spotify_activity.artists)
 
             title_new = ''.join(item['hepburn'] for item in self.kks.convert(spotify_activity.title))
             album_new = ''.join(item['hepburn'] for item in self.kks.convert(spotify_activity.album))

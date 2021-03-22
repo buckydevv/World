@@ -1,15 +1,12 @@
 from random import randint, seed
 from textwrap import dedent
 from dataclasses import dataclass
-from os import environ
 from typing import Literal, Union
 from discord import Embed, Member
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 from datetime import datetime
 from framework import require_account, Wealth
-import motor.motor_asyncio
-
 
 @dataclass
 class User:
@@ -532,7 +529,11 @@ class EconomyCog(commands.Cog):
         """Gives to the user a weekly account of money."""
         Wealth.collection.update_one(
             {
+<<<<<<< Updated upstream
                 "_id": ctx.author._id
+=======
+                "_id": ctx.author.id
+>>>>>>> Stashed changes
             },
             {
                 "$inc": {

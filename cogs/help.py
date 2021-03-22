@@ -1,5 +1,4 @@
 from typing import Optional
-from discord.ext.commands import Cog
 from discord import Embed
 from discord.ext.commands import command
 from discord.utils import get

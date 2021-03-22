@@ -1,11 +1,7 @@
-from os import environ
 from textwrap import dedent
 from random import randint
 from discord import Embed, Member
-from discord.ext.commands import command
 from discord.ext import commands
-from discord.ext.commands import Cog
-from pymongo import MongoClient
 from datetime import datetime
 from typing import Optional
 from PIL import Image, ImageFont, ImageDraw
@@ -57,7 +53,6 @@ class EconomyFunCog(commands.Cog):
     @commands.command(help="Info on your last given rep point.")
     @require_account()
     async def repinfo(self, ctx):
-        now = datetime.now()
         data = Wealth.collection.find_one({"_id": ctx.author.id})
         if not data:
             return await ctx.send(f"Sorry {ctx.author.mention} you havent gave anyone a rep point!\nTry using the command `rep` to give a reputation point to someone you think deserves it.")
@@ -177,8 +172,6 @@ class EconomyFunCog(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention} but you can't marry yourself!")
 
         result = Wealth.collection.find_one({'_id': ctx.author.id})
-        Marriedto_ = result["MarriedTo"]
-        MarriedDate = result["MarriedDate"]
 
         if result["MarriedTo"] == str(user):
             ctx.command.reset_cooldown(ctx)
@@ -233,8 +226,6 @@ class EconomyFunCog(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention} but you can't divorce yourself!")
 
         result = Wealth.collection.find_one({'_id': ctx.author.id})
-        Marriedto_ = result["MarriedTo"]
-        MarriedDate = result["MarriedDate"]
 
         if result["MarriedTo"] == "Nobody":
             ctx.command.reset_cooldown(ctx)
@@ -313,7 +304,7 @@ class EconomyFunCog(commands.Cog):
 
         emoji = ''
 
-        while True: # sodaasdsaijdaubsjsdad
+        while True:
             for _emoji, _image_url, _amount, _message in self.shoot_ctx:
                 if emoji == _emoji:
                     await message.delete()
@@ -329,7 +320,7 @@ class EconomyFunCog(commands.Cog):
                 if not res:
                     break
 
-                if res[1].id != 700292147311542282: # use ID instead of user name
+                if res[1].id != 700292147311542282:
                     emoji = str(res[0].emoji)
 
             except:
