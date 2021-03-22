@@ -529,11 +529,7 @@ class EconomyCog(commands.Cog):
         """Gives to the user a weekly account of money."""
         Wealth.collection.update_one(
             {
-<<<<<<< Updated upstream
-                "_id": ctx.author._id
-=======
                 "_id": ctx.author.id
->>>>>>> Stashed changes
             },
             {
                 "$inc": {

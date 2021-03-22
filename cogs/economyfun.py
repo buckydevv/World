@@ -254,19 +254,33 @@ class EconomyFunCog(commands.Cog):
 
     @commands.command(help="Deposit money into your World bank account", aliases=["dep"])
     @require_account()
-    async def deposit(self, ctx, amount: int):
+    async def deposit(self, ctx, amount: Optional[int], option: Optional[str]):
+        if option == "all" or "--all":
+            if Wealth.collection.find_one({"_id": ctx.author.id})["coins"] <= 0:
+                return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money.", color=self.bot.color))
+            res = Wealth.collection.find_one({"_id": ctx.author.id})["coins"]
+            Wealth._deposit_coins(ctx.author.id, res)
+            return await ctx.send(embed=Embed(title="Deposit", description=f"{ctx.author.mention} You have deposited `{res}` coin(s)", color=self.bot.color))
+
         if amount < 0:
             return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
 
         if Wealth.collection.find_one({"_id": ctx.author.id})["coins"] < amount:
-            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money."))
+            return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't deposit because you don't have that much money.", color=self.bot.color))
 
         Wealth._deposit_coins(ctx.author.id, amount)
         return await ctx.send(embed=Embed(title="Deposit", description=f"{ctx.author.mention} You have deposited `{amount}` coin(s)", color=self.bot.color))
 
     @commands.command(help="Withdraw money from your World bank account.", aliases=["with"])
     @require_account()
-    async def withdraw(self, ctx, amount: int):
+    async def withdraw(self, ctx, amount: Optional[int], option: Optional[str]):
+        if option == "all" or "--all":
+            if Wealth.collection.find_one({"_id": ctx.author.id})["Bank"] <= 0:
+                return await ctx.send(embed=Embed(title="Error!", description=f"Sorry {ctx.author.mention} You can't withdraw because you don't have that much money in the bank.", color=self.bot.color))
+            bank = Wealth.collection.find_one({"_id": ctx.author.id})["Bank"]
+            Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": bank,"Bank": -bank}})
+            return await ctx.send(embed=Embed(title="Withdraw", description=f"{ctx.author.mention} you have just withdrawn `{bank}` coins.", color=self.bot.color))
+
         if amount < 0:
             return await ctx.send(f"Sorry {ctx.author.mention} No signed integers or 0!")
 
