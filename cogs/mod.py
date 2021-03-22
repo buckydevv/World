@@ -114,7 +114,9 @@ class ModCog(commands.Cog):
     @commands.command(help="Lockdown the current channel.")
     @commands.has_permissions(manage_channels=True)
     async def lock(self, ctx):
-        await ctx.message.channel.set_permissions(ctx.guild.default_role, read_messages=True, send_messages=False)
+        for role in ctx.guild.roles:
+            if not role.permissions.manage_channels:
+                await ctx.channel.set_permissions(role, send_messages=False)
         await ctx.send(embed=Embed(title="Lockdown", description=f"{ctx.author.mention} has locked this channel.", color=self.bot.color))
 
     @commands.command(help="Nuke a specified channel.")
@@ -166,7 +168,8 @@ class ModCog(commands.Cog):
     @commands.command(help="Unlock the current channel.")
     @commands.has_permissions(manage_channels=True)
     async def unlock(self, ctx):
-        await ctx.message.channel.set_permissions(ctx.guild.default_role, read_messages=True, send_messages=True)
+        for role in ctx.guild.roles:
+            await ctx.channel.set_permissions(role, send_messages=True)
         await ctx.send(embed=Embed(title="Lockdown over", description=f"{ctx.author.mention} has unlocked this channel!", color=self.bot.color))
 
     @commands.command(help="Set the slowmode of the channel.")
