@@ -19,6 +19,7 @@ class Misc:
     }
     
     ALL_WORDS = loads(open("framework/words.json", "r").read())
+    ALL_EMOJIS = loads(open("framework/emojis.json", "r").read())
 
     def add_corners(im, rad):
         """Round a PNG image"""

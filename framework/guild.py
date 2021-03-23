@@ -22,8 +22,4 @@ class Guild:
         }
         
         collection.insert_one(obj)
-<<<<<<< Updated upstream
         return obj
-=======
-        return obj
->>>>>>> Stashed changes

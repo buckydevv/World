@@ -546,7 +546,10 @@ class FunCog(commands.Cog):
         await parser.close() # Close the session
 
         image.paste(CONVERT, (92, 92), CONVERT)
-        return await ctx.send(file=Misc.save_image(image))
+
+    @commands.command(help="Returns a random emoji out of all the emojis.", aliases=["re", "ranemoji"])
+    async def randomemoji(self, ctx):
+        return await ctx.send(f":{choice(Misc.ALL_EMOJIS)}:")
 
 
 def setup(bot):

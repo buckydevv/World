@@ -96,7 +96,7 @@ class HelpCog(commands.Cog):
         color=self.bot.color,
         ).add_field(
         name="<:Worldcool:768201555492864030> | Normal fun",
-        value="`w/gay` | `w/askali` | `w/pp` | `w/8ball` | `w/f` | `w/joke` | `w/emojify` | `w/akinator` | `w/kill` | `w/fast` | `w/mock` | `w/gtf` | `w/record`"
+        value="`w/gay` | `w/askali` | `w/pp` | `w/8ball` | `w/f` | `w/joke` | `w/emojify` | `w/akinator` | `w/kill` | `w/fast` | `w/mock` | `w/gtf` | `w/record` | `w/randomemoji`"
         ).add_field(
         name=":frame_photo: | Image fun",
         value="`w/fakequote` | `w/tweet` | `w/topgg` | `w/mcskin` | `w/blur` | `w/avatar` | `w/qr` | `w/flip` | `w/wide` | `w/steam`",
