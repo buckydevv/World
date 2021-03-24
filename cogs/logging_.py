@@ -29,11 +29,6 @@ class LoggingCog(commands.Cog):
         except:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} your guild already has a logging system setup!", color=self.bot.color))
 
-    @create.error
-    async def create_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-
     @logging.command(name="shutdown", aliases=["delete"])
     @commands.has_permissions(administrator=True)
     async def shutdown(self, ctx):
@@ -42,11 +37,6 @@ class LoggingCog(commands.Cog):
 
         self.collection.remove({"_id": ctx.guild.id})
         await ctx.send(embed=Embed(title="Shutdown", description=f"Hey {ctx.author.mention} i have succsesfully removed your guild's account.", color=self.bot.color))
-
-    @shutdown.error
-    async def shutdown_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
 
     @logging.command(name="bans", aliases=["discordbans", "banlog"])
     @commands.has_permissions(administrator=True)
@@ -57,13 +47,6 @@ class LoggingCog(commands.Cog):
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"Bans": channel.id}})
         return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Ban Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
-    @bans.error
-    async def bans_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging bans <channel>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-
     @logging.command(name="unban", aliases=["discordunban", "unbanlog", "unbanslog", "unbans"])
     @commands.has_permissions(administrator=True)
     async def unban(self, ctx, channel: TextChannel):
@@ -72,13 +55,6 @@ class LoggingCog(commands.Cog):
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Unban Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"Unbanned": channel.id}})
         await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Unban Log` to the channel: <#{channel.id}>", color=self.bot.color))
-
-    @unban.error
-    async def unban_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging unban <channel>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
 
     @logging.command(name="deleted", aliases=["discorddeleted", "delmsg"])
     @commands.has_permissions(administrator=True)
@@ -89,13 +65,6 @@ class LoggingCog(commands.Cog):
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"DeletedMessage": channel.id}})
         return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Deleted messages Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
-    @deleted.error
-    async def deleted_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging deleted <channel>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-
     @logging.command(name="edited", aliases=["discordedited", "editmsg"])
     @commands.has_permissions(administrator=True)
     async def edited(self, ctx, channel: TextChannel):
@@ -104,13 +73,6 @@ class LoggingCog(commands.Cog):
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Edited messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"EditedMessage": channel.id}})
         await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Edited messages Log` to the channel: <#{channel.id}>", color=self.bot.color))
-
-    @edited.error
-    async def edited_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging edited <channel>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
 
     @logging.command(name="welcomes", aliases=["joiner", "joins", "join", "welcomemessages", "welcomemsg", "welcome"])
     @commands.has_permissions(administrator=True)
@@ -121,13 +83,6 @@ class LoggingCog(commands.Cog):
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"JoinedServer": channel.id}})
         await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Welcome messsages Log` to the channel: <#{channel.id}>", color=self.bot.color))
 
-    @welcomes.error
-    async def welcomes_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging welcomes <channel>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-
     @logging.command(name="goodbye", aliases=["memberleave", "bye", "leftserver", "leaving", "goodbyes"])
     @commands.has_permissions(administrator=True)
     async def goodbye(self, ctx, channel: TextChannel):
@@ -136,13 +91,6 @@ class LoggingCog(commands.Cog):
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Goodbye messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"LeftServer": channel.id}})
         return await ctx.send(embed=Embed(title="Logging", description=f"{ctx.author.mention} I have succsesfully updated your `Goodbye messsages Log` to the channel: <#{channel.id}>", color=self.bot.color))
-
-    @goodbye.error
-    async def goodbye_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/logging goodbye <channel>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):

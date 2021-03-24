@@ -8,7 +8,7 @@ class ModCog(commands.Cog):
         self.bot = bot
         self.snipeCache = {}
         self.editSnipeCache = {}
-        self.badwords = ("nigger", "nig", "coon", "nigga", "retard", "rapist", "rape", "niggar", "faggot", "fag", "dyke", "whore", "nullisqt")
+        self.badwords = ("nigger", "nig", "coon", "nigga", "retard", "rapist", "rape", "niggar", "faggot", "fag", "dyke", "whore")
 
     @commands.command(help="Ban a specified Discord Member.")
     @commands.has_permissions(ban_members=True)
@@ -19,13 +19,6 @@ class ModCog(commands.Cog):
         except:
             return await ctx.send(f"Sorry {ctx.author.mention} That person has higher or the same permissions as me!")
 
-    @ban.error
-    async def ban_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/ban <member> <reason>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-
     @commands.command(help="Kick a specified Discord member.")
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: Member, *, reason=None):
@@ -34,13 +27,6 @@ class ModCog(commands.Cog):
             await ctx.send(embed=Embed(title="Kick", description=f"Hey {ctx.author.mention} you have succsesfully kicked {member}", color=self.bot.color))
         except:
             return await ctx.send(f"Sorry {ctx.author.mention} That person has higher or the same permission as me!")
-
-    @kick.error
-    async def kick_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/kick <member> <reason>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
 
     @commands.command(help="Mute a specified discord member")
     @commands.has_permissions(manage_messages=True)
@@ -59,13 +45,6 @@ class ModCog(commands.Cog):
         await user.add_roles(createrole)
         return await ctx.send(embed=Embed(title="Muted", description=f"Hey {ctx.author.mention} you have succsesfully muted {user}", color=self.bot.color))
 
-    @mute.error
-    async def mute_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/mute <member> <reason>`")
-
     @commands.command(help="Delete specified messages.")
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, amount: int):
@@ -75,12 +54,6 @@ class ModCog(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention} Please purge more than `1` message")
         return await ctx.channel.purge(limit=amount)
 
-    @purge.error
-    async def purge_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f'Sorry {ctx.author.mention} Please Type `w/purge <amount>')
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
 
     @commands.command(help="Unban a user.")
     @commands.has_permissions(ban_members=True)
@@ -93,12 +66,6 @@ class ModCog(commands.Cog):
                 await ctx.guild.unban(user)
                 return await ctx.send(embed=Embed(title="Unban", description=f"Hey {ctx.author.mention} you have succsesfully unbanned {member}", color=self.bot.color))
 
-    @unban.error
-    async def unban_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!, Or that user is not banned!')
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/unban <member>`")
 
     @commands.command(help="Start a poll and let users react!")
     async def poll(self, ctx, *, desc):
@@ -106,10 +73,6 @@ class ModCog(commands.Cog):
         await message.add_reaction("👍")
         await message.add_reaction("👎")
 
-    @poll.error
-    async def poll_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/poll <text>`")
 
     @commands.command(help="Lockdown the current channel.")
     @commands.has_permissions(manage_channels=True)
@@ -158,11 +121,6 @@ class ModCog(commands.Cog):
                 emoji = str(res[0].emoji)
 
         await message.clear_reactions()
-        
-    @nuke.error
-    async def nuke_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
 
  
     @commands.command(help="Unlock the current channel.")
@@ -192,28 +150,6 @@ class ModCog(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention} that user is not muted?")
         await user.remove_roles(role)
         return await ctx.send(embed=Embed(title="Unmute", description=f"Hey {ctx.author.mention} you have succsesfully unmuted {user}!", color=self.bot.color))
-
-    @unmute.error
-    async def unmute_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/unmute <member> <reason>`")
-        elif isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!')
-
-    @slowmode.error
-    async def slowmode_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
-   
-    @lock.error
-    async def lock_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
-        
-    @unlock.error
-    async def unlock_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f'Sorry {ctx.author.mention} you don\'t have the permissions to do this!') 
 
     @commands.command(help="Snipe a deleted message.")
     async def snipe(self, ctx):

@@ -68,11 +68,6 @@ async def disablenoprefix(ctx):
         ownerprefix.remove("")
         await ctx.send(f"Hey {ctx.author.mention} i have disabled `No Prefix mode`.")
 
-@changeprefix.error
-async def changeprefix_error(ctx, error):
-   if isinstance(error, commands.errors.CheckFailure):
-       await ctx.send(f"Sorry {ctx.author.mention} you don't have permissions to change the prefix!")
-
 # -------
 # Cogs area
 for cog in filter(lambda x: x.endswith(".py"), listdir("cogs/")):
@@ -124,7 +119,7 @@ async def on_guild_remove(guild):
     with open('prefixes.json', 'w') as f:
         dump(prefixes, f, indent=4)
 
-if not opus.is_loaded():
-    opus.load_opus(find_library("opus"))
+#if not opus.is_loaded():
+ #   opus.load_opus(find_library("opus"))
 
 world.run(environ["TOKEN"])

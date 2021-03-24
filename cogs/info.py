@@ -52,12 +52,6 @@ class InfoCog(commands.Cog):
             inline=False
         ).set_thumbnail(url=user.avatar_url))
 
-    @userinfo.error
-    async def userinfo_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
-        """Handles errors while running the userinfo command."""
-        if isinstance(error, commands.errors.BadArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} That member doesn't exist.")
-
     @commands.command(name="serverinfo", aliases=("server", "guild"))
     async def serverinfo(self, ctx: commands.Context):
         """Shows information about the server."""
@@ -91,10 +85,6 @@ class InfoCog(commands.Cog):
             value=f"{role.mention}\nUsers: `{len(role.members)}`\nColor: `{role.color}`\nMentionable: `{role.mentionable}`\nDisplayed: `{role.hoist}`"
         ))
 
-    @roleinfo.error
-    async def roleinfo_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/roleinfo <role>`")
 
     @commands.command(aliases=["ci", "catinfo"])
     async def categoryinfo(self, ctx, *, category: CategoryChannel):
@@ -105,11 +95,6 @@ class InfoCog(commands.Cog):
             name=f"{category.name} - Info",
             value=f"Type: `{category.type}`\nText channels: `{len(category.text_channels)}`\nVoice channels: `{len(category.voice_channels)}`\nNsfw: `{category.is_nsfw()}`"
         ))
-
-    @categoryinfo.error
-    async def categoryinfo_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/categoryinfo <category>`")
 
     @commands.command(name="botinfo", aliases=("bot", "about"))
     async def botinfo(self, ctx: commands.Context):
@@ -184,12 +169,6 @@ class InfoCog(commands.Cog):
             """),
             inline=False
         ).set_thumbnail(url=ctx.author.avatar_url))
-
-    @suggest.error
-    async def suggest_error(self, ctx: commands.Context, error: commands.errors.CommandInvokeError):
-        """Handles errors while running suggest command."""
-        if isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f"Hey {ctx.author.mention} You missed the `suggestion` parameter.")
 
     @commands.command(name="uptime")
     async def uptime(self, ctx: commands.Context):

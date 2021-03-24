@@ -53,13 +53,6 @@ class VoiceRecorder(commands.Cog):
            # await ctx.send(receive) # Send what was recognized.
         #except Exception as e:
             #await ctx.send(e)
-        
-    @record.error
-    async def record_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Try again in {error.retry_after:.2f}s.")
-        elif isinstance(error, commands.BadArgument):
-            return await ctx.send("Try `w/record 10`, This will record your voice in the vc for 10 seconds.")
 
 def setup(bot):
     bot.add_cog(VoiceRecorder(bot))

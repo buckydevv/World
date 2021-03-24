@@ -84,10 +84,6 @@ class FunCog(commands.Cog):
     async def askali(self, ctx, *, question):
         await ctx.send(embed=Embed(title="Ask Alister-A", description=f"{ctx.author.mention} - Ali A {choice(self.aliaresponses)}", color=self.bot.color).set_thumbnail(url="https://tenor.com/view/ali-a-hue-funny-dance-gif-12395829"))
 
-    @askali.error
-    async def askali_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/askali <question>`")
 
     @commands.command(help="Fetch the minecraft skin of a player.")
     async def mcskin(self, ctx, user):
@@ -105,19 +101,12 @@ class FunCog(commands.Cog):
         res = await r.json()
         await ctx.send(embed=Embed(title=f"Title: {res['title']}\nSubreddit: r/{res['subreddit']}", color=self.bot.color).set_image(url=res["image"]).set_footer(text=f"👍Ups:{res['ups']}"))
 
-    @meme.error
-    async def meme_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
-
     @commands.command(help="Enlarge a discord emoji!")
     async def enlarge(self, ctx, emoji: PartialEmoji):
         await ctx.send(embed=Embed(title="Enlarge", description=f"`{emoji.name}` was enlarged.", color=self.bot.color).set_image(url=emoji.url))
 
     @enlarge.error
     async def enlarge_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            return await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/enlarge <emoji>`")
         try:
             assert isinstance(error, commands.PartialEmojiConversionFailure)
             
@@ -152,21 +141,11 @@ class FunCog(commands.Cog):
         await ctx.send(embed=Embed(color=self.bot.color).set_image(url=res["message"]))
         await r.close(close_session=False)
 
-    @tweet.error
-    async def tweet_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/tweet <username> <message>`")
-
     @commands.command(help="Is that user gay?.")
     async def gay(self, ctx, *, user: Member=None):
         user = user or ctx.author
         randomPercentage = randint(1, 100)
         await ctx.send(embed=Embed(title="Gayrate!", description=f"**{user.display_name}** is {randomPercentage}% gay", color=self.bot.color).set_thumbnail(url=user.avatar_url))
-
-    @gay.error
-    async def gay_error(self, ctx, error):
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(f':regional_indicator_x: Sorry {ctx.author.mention} Please Mention A User')
 
     @commands.command(aliases=["aki"])
     async def akinator(self, ctx: commands.Context):
@@ -216,19 +195,11 @@ class FunCog(commands.Cog):
     async def _8ball(self, ctx, *, question):
         await ctx.send(embed=Embed(title=":8ball: The Almighty 8ball :8ball:", description=f"Question = `{question}`\n **Answer**: :8ball: {choice(self._8ball_responses)} :8ball:", color=self.bot.color))
 
-    @_8ball.error
-    async def _8ball_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/8ball <question>`")
-
     @commands.command(help="Turn text into emojis!.")
     async def emojify(self, ctx, *, stuff):
         await ctx.send(("".join([":regional_indicator_"+l+":" if l in "abcdefghijklmnopqrstuvwyx" else [":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:"][int(l)] if l.isdigit() else ":question:" if l == "?" else ":exclamation:" if l == "!" else l for l in stuff[:100].lower()])))
 
-    @emojify.error
-    async def emojify_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/emojify <text>`")
+
 
     @commands.command(help="Kill a user")
     async def kill(self, ctx, user: Member):
@@ -249,11 +220,6 @@ class FunCog(commands.Cog):
             res = list1[0]
             await ctx.send(embed=Embed(title=res['word'], description=res['definition'], color=self.bot.color).add_field(name="Example", value=res['example']).set_footer(text=f"👍 {res['thumbs_up']} | 👎{res['thumbs_down']}"))
 
-    @urban.error
-    async def urban_error(self, ctx, error):
-        if isinstance(error, commands.errors.NSFWChannelRequired):
-            return await ctx.send(embed=Embed(title="NSFW", description=f"Sorry {ctx.author.mention} but this command is nsfw and this is not a nsfw channel.", color=self.bot.color).set_image(url="https://media.discordapp.net/attachments/265156286406983680/728328135942340699/nsfw.gif"))
-
     @commands.command(help="Advice from world.")
     async def advice(self, ctx):
         r = await self.session.get(f"https://api.adviceslip.com/advice", headers={"Accept": "application/json"})
@@ -264,10 +230,6 @@ class FunCog(commands.Cog):
     async def qr(self, ctx, *, text):
         await ctx.send(embed=Embed(title="Qr code", description=f"Generated `{text}`", color=self.bot.color).set_image(url=f"http://api.qrserver.com/v1/create-qr-code/?data={quote(text)}&margin=25"))
 
-    @qr.error
-    async def qr_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/qr <text>`")
 
     @commands.command(help="This command will show you a cute duck", aliases=['quack', 'duk'])
     async def duck(self, ctx):
@@ -309,11 +271,6 @@ class FunCog(commands.Cog):
         image.paste(CONVERT, (20, 30), CONVERT)
         await ctx.send(file=Misc.save_image(image))
 
-    @fakequote.error
-    async def fakequote_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/fakequote <user> <text>`")
-
     @commands.command(help="Write a top.gg Review", aliases=["tgg", "topggreview", "topggbotreview", "botreview"])
     async def topgg(self, ctx, user: Optional[Member], *, message):
         user = user or ctx.author
@@ -334,11 +291,6 @@ class FunCog(commands.Cog):
         CONVERT = await Misc.circle_pfp(user, 41, 41)
         mainimage.paste(CONVERT, (62, 46), CONVERT)
         await ctx.send(file=Misc.save_image(mainimage))
-
-    @topgg.error
-    async def topgg_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/topgg <user> <text>`")
 
     @commands.command(help="Widen a discord avatar!", aliases=["widen", "putin", "wideputin"])
     async def wide(self, ctx, user: Member=None):
@@ -427,11 +379,6 @@ class FunCog(commands.Cog):
         except Exception as e:
             return await ctx.send(e)
 
-    @spotify.error
-    async def spotify_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
-
     @commands.command(help="Are you a fast typer?!\nUse `w/fast --rank` to see rank.", aliases=["type", "typingtest"])
     @commands.cooldown(rate=3, per=8, type=commands.BucketType.member)
     async def fast(self, ctx, option: Optional[str], user: Optional[Member]=None):
@@ -493,11 +440,6 @@ class FunCog(commands.Cog):
         if not text:
             return await ctx.send(f"Sorry {ctx.author.mention} you forgot to add some text for me to mock.")
         return await ctx.send("".join([choice([index.lower(), index.upper()]) for index in list(text)]))
-
-    @fast.error
-    async def fast_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
     @commands.command(help="Guess the flag from the picture!!", aliases=["gtf"])
     async def guesstheflag(self, ctx):

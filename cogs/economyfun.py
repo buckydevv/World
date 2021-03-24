@@ -43,13 +43,6 @@ class EconomyFunCog(commands.Cog):
 
         await ctx.send(embed=Embed(title="Reputation", description=f"{ctx.author.mention} You added `+1` Reputation to {user.mention}", color=self.bot.color))
 
-    @reputation.error
-    async def reputation_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/rep <@user>`")
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
-
     @commands.command(help="Info on your last given rep point.")
     @require_account()
     async def repinfo(self, ctx):
@@ -154,10 +147,6 @@ class EconomyFunCog(commands.Cog):
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {"coins": -price}})
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$set": {f"BadgeSlot{order}": emoji}})
 
-    @buybadge.error
-    async def buybadge_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/buybadge <BadgeName>`")
 
 
     @commands.command(help="Marry a specified user!")
@@ -210,12 +199,6 @@ class EconomyFunCog(commands.Cog):
             await msg.delete()
             return await ctx.send(embed=Embed(title="Marry", description=f"{user.mention} didn't want to marry {ctx.author.mention}", color=self.bot.color))
 
-    @marry.error
-    async def marry_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/marry <@user>`")
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
     @commands.command(help="Divorce a specified user!")
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
@@ -242,14 +225,6 @@ class EconomyFunCog(commands.Cog):
         }})
 
         return await ctx.send(embed=Embed(title="Divorce", description=f"{ctx.author.mention} has divorced {user.mention}", color=self.bot.color))
-
-
-    @divorce.error
-    async def divorce_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/divorce <@user>`")
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 
     @commands.command(help="Deposit money into your World bank account", aliases=["dep"])
@@ -294,17 +269,6 @@ class EconomyFunCog(commands.Cog):
         }})
         await ctx.send(embed=Embed(title="Withdraw", description=f"{ctx.author.mention} you have just withdrawn `{amount}` coins.", color=self.bot.color))
 
-    @deposit.error
-    async def deposit_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/deposit <amount>`")
-
-
-    @withdraw.error
-    async def withdraw_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Sorry {ctx.author.mention} Please Type `w/withdraw <amount>`")
-
 
     @commands.command(help="World shootout", aliases=["shoot", "worldshoot"])
     @commands.cooldown(rate=1, per=15, type=commands.BucketType.member)
@@ -343,11 +307,6 @@ class EconomyFunCog(commands.Cog):
 
         await message.clear_reactions()
 
-    @shootout.error
-    async def shootout_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
-
     @commands.command(help="Fish for things in the lake", aliases=["fish", "worldfishing"])
     @commands.cooldown(rate=1, per=120, type=commands.BucketType.member)
     @require_account()
@@ -369,10 +328,6 @@ class EconomyFunCog(commands.Cog):
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {key_name: amount_added_to_db}})
         return await ctx.send(embed=Embed(title="Fishing", description=message, color=self.bot.color).set_image(url=random))
 
-    @fishing.error
-    async def fishing_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
     @commands.command(help="What badges do you have?", aliases=["mybadges", "showbadges", "badge"])
     @require_account()
@@ -411,11 +366,6 @@ class EconomyFunCog(commands.Cog):
         key_name, amount_added_to_db, message = trash_ctx[random]
         Wealth.collection.update_one({"_id": ctx.author.id}, {"$inc": {key_name: amount_added_to_db}})
         return await ctx.send(embed=Embed(title="Trash Search", description=message, color=self.bot.color).set_image(url=random))
-
-    @trash.error
-    async def trash_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"Sorry {ctx.author.mention} This command in on cooldown, Try again in {round(error.retry_after)} seconds.")
 
 def setup(bot):
     bot.add_cog(EconomyFunCog(bot))
