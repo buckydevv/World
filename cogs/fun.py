@@ -10,7 +10,7 @@ from pymongo import MongoClient
 from framework import Misc, Wealth
 import time
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from twemoji_parser import TwemojiParser, emoji_to_url
+from twemoji_parser import TwemojiParser, emoji_to_url, image
 from colorthief import ColorThief
 
 from urllib.parse import quote
@@ -488,10 +488,24 @@ class FunCog(commands.Cog):
         await parser.close() # Close the session
 
         image.paste(CONVERT, (92, 92), CONVERT)
+        return await ctx.send(file=Misc.save_image(image))
 
     @commands.command(help="Returns a random emoji out of all the emojis.", aliases=["re", "ranemoji"])
     async def randomemoji(self, ctx):
         return await ctx.send(f":{choice(Misc.ALL_EMOJIS)}:")
+
+    @commands.command(help="Search something in google...", alises=["gs", "googlesearch"])
+    async def google(self, ctx, *, text):
+        image = Image.open("images/google.png")
+        font = ImageFont.truetype("fonts/Arial.ttf", 20, encoding="unic")
+
+        query = text if len(text) <=57 else f"{text[:54]}..."
+
+        parser = TwemojiParser(image, parse_discord_emoji=False)
+        await parser.draw_text((116,208), query.lower(), font=font, fill=(0,0,0))
+        await parser.close()
+
+        return await ctx.send(file=Misc.save_image(image))
 
 
 def setup(bot):

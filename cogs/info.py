@@ -129,7 +129,7 @@ class InfoCog(commands.Cog):
                 Popular commands: `w/{y['data'][0]['popular'][0]['name']}`, `w/{y['data'][0]['popular'][1]['name']}`, `w/{y['data'][0]['popular'][2]['name']}`, \n`w/{y['data'][0]['popular'][3]['name']}`, `w/{y['data'][0]['popular'][4]['name']}`
                 """)
             ))
-        except:
+        except AssertionError:
             return await ctx.send(f"Sorry {ctx.author.mention} a error has occured and will be fixed soon!")
 
     @commands.command(name="vote")
