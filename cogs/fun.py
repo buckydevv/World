@@ -494,7 +494,7 @@ class FunCog(commands.Cog):
     async def randomemoji(self, ctx):
         return await ctx.send(f":{choice(Misc.ALL_EMOJIS)}:")
 
-    @commands.command(help="Search something in google...", alises=["gs", "googlesearch"])
+    @commands.command(help="Search something in google...", aliases=["gs", "googlesearch"])
     async def google(self, ctx, *, text):
         image = Image.open("images/google.png")
         font = ImageFont.truetype("fonts/Arial.ttf", 20, encoding="unic")
