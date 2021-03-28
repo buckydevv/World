@@ -42,9 +42,13 @@ class VoiceRecorder(commands.Cog):
         await self.vc.disconnect() # Disconnect from the VoiceChannel after the recording state has finished(We can check this with `if self.vc.recoding`.)
 
         await fm.edit(content="Here is the recording i have took!") # Send a pre-message
-        await ctx.send(file=File(f"recordings/{ssrc[ctx.author.id]}.wav")) # Semd the actual file from the directory
+        try:
+            await ctx.send(file=File(f"recordings/{ssrc[ctx.author.id]}.wav")) # Semd the actual file from the directory
+        except Exception: return await ctx.send(f"Sorry {ctx.author.mention} Unfortunatly a Error has occured. Please use `w/suggest <what happened>` To report the problem to the developers.")
+        await sleep(2) # So we don't delete it instantly.
 
         remove(f"recordings/{ssrc[ctx.author.id]}.wav") # Remove the file with `os.remove` as this will save lots of space.
+
 
         #try:
            # receive = dsr.listen(f"recordings/{ssrc[ctx.author.id]}.wav") # This will listen to the .wav file and recognize it, Then it will return text of what was said.

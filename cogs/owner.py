@@ -1,3 +1,4 @@
+from typing import Optional
 from discord import Embed, Color
 from datetime import datetime
 from asyncio import sleep as _sleep
@@ -127,7 +128,6 @@ class OwnerCog(commands.Cog):
                 await message.remove_reaction(res[0].emoji, res[1])
 
         await message.clear_reactions()
-
 
 def setup(bot):
     bot.add_cog(OwnerCog(bot))

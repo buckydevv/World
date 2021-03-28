@@ -7,6 +7,10 @@ class WorldError(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        error = getattr(error, 'original', error)
+        if isinstance(error, commands.CommandOnCooldown):
+            return await ctx.send(f"Sorry {ctx.author.mention} but `{ctx.command.name}` is on cooldown. Please retry in `{round(error.retry_after):.0f} seconds.`")
+            
         if hasattr(ctx.command, 'on_error'):
             return
             
@@ -16,15 +20,13 @@ class WorldError(commands.Cog):
             if ctx.cog._get_overridden_method(ctx.cog.cog_command_error) is not None:
                 return
 
-        error = getattr(error, 'original', error)
-
         embed = Embed(
             title="New error",
             description=f"Name: {ctx.author}, ID: {ctx.author.id}",
             color=self.bot.color
             ).add_field(
                 name="info:",
-                value=f"COG: `{ctx.command.cog_name}`, CMD: `{ctx.command.name}`"
+                value=f"CMD: `{ctx.command.name}`"
             )
         await channel.send(embed=embed)
         await channel.send(f"```\n{ctx.author} - {error}\n```")
@@ -41,8 +43,6 @@ class WorldError(commands.Cog):
             return await ctx.send(f"Sorry {ctx.author.mention}, World is missing the permissons to do this. Please give World the correct permissons")
         elif isinstance(error, commands.ChannelNotFound):
             return await ctx.send(f"Sorry {ctx.author.mention} but that channel was not found! Maybe make it visible for me!")
-        elif isinstance(error, commands.CommandOnCooldown):
-            return await ctx.send(f"Sorry {ctx.author.mention} but `{ctx.command.name}` is on cooldown. Please retry in `{round(error.retry_after):.0f} seconds.`")
         elif isinstance(error, commands.MemberNotFound):
             return await ctx.send(f"Sorry {ctx.author.mention} but that Member was not found!")
         elif isinstance(error, commands.MissingRequiredArgument):

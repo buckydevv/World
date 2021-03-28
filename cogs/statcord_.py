@@ -5,7 +5,7 @@ from statcord import Client
 class StatcordPost(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.key = "statcord.com"
+        self.key = "statcord.com-key"
         self.api = Client(self.bot,self.key)
         self.api.start_loop()
 

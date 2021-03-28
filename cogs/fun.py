@@ -461,7 +461,7 @@ class FunCog(commands.Cog):
                 RandomCoins = randint(15, 60)
                 Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": RandomCoins}})
                 return await ctx.send(embed=Embed(title="Guess the flag", description=f"{resp.author.mention} guessed the country right!\nThe country was `{FlagChosen['name']}`\nTime took: `{elapse/1000}s`\nCoins earned: `{RandomCoins}`", color=self.bot.color))
-            except:
+            except TimeoutError:
                 await FirstMessage.delete()
                 return await ctx.send(f"Sorry {ctx.author.mention} nobody guessed the flag! It was: `{FlagChosen['name']}`")
     
