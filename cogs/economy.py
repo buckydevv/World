@@ -26,12 +26,6 @@ class User:
     Fish: int
     LastTransfer: str
     #Premium: str -> Being added soon
-    #Wallet: int -> Being added soon
-    #Tickets: int -> Being added soon
-    #TicketReason: str -> Being added soon
-    #WorldFriends: int -> Being added soon
-    #IsBlacklisted: str -> Being added soon
-    #CurrentJob: str -> Being added soon
 
 
 class Item(type):

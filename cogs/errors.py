@@ -6,15 +6,15 @@ class WorldError(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx, error):#
+        channel = self.bot.get_channel(824027831407214615)
         error = getattr(error, 'original', error)
+        channel.send(error)
         if isinstance(error, commands.CommandOnCooldown):
             return await ctx.send(f"Sorry {ctx.author.mention} but `{ctx.command.name}` is on cooldown. Please retry in `{round(error.retry_after):.0f} seconds.`")
             
         if hasattr(ctx.command, 'on_error'):
             return
-            
-        channel = self.bot.get_channel(824027831407214615)
 
         if ctx.cog:
             if ctx.cog._get_overridden_method(ctx.cog.cog_command_error) is not None:

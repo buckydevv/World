@@ -383,9 +383,9 @@ class FunCog(commands.Cog):
     @commands.cooldown(rate=3, per=8, type=commands.BucketType.member)
     async def fast(self, ctx, option: Optional[str], user: Optional[Member]=None):
         user = user or ctx.author
-        if option in ("--rank", "rank"):
-            result = Wealth.collection.find_one({"_id": user.id})
-        
+        if option == "--rank" or "rank":
+            result = Wealth.pointscollection.find_one({"_id": user.id})
+            
             if not result:
                 return await ctx.send(f"Sorry {ctx.author.mention} that user is not ranked yet.")
             
@@ -429,7 +429,7 @@ class FunCog(commands.Cog):
                     
                     isfast = choice(self.badmessages if (elapse/1000 > 6) else self.goodmessages)
                     random_points = randint(10, 45) if (elapse/1000 > 6) else randint(5, 17)
-                    Wealth.collection.update_one({"_id": resp.author.id}, {"$inc": {"coins": random_points}})
+                    Wealth.pointscollection.update_one({"_id": resp.author.id}, {"$inc": {"points": random_points}})
                     return await ctx.send(embed=Embed(title="Fastest typer!", description=f"{resp.author.mention} typed the word `{word}` first, also has earned `{random_points}` Points.", color=self.bot.color).add_field(name=":alarm_clock: | Time information", value=f"Time took in milliseconds: `{elapse}ms`\nTime took in seconds: `{elapse/1000}s`").add_field(name="<:Worldcool:768201555492864030> | Message from World", value=f"{isfast}", inline=False))
             except:
                 await game.delete()

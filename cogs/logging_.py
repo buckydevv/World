@@ -32,7 +32,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="shutdown", aliases=["delete"])
     @commands.has_permissions(administrator=True)
     async def shutdown(self, ctx):
-        if not Guild.collection.find_one({'_id': ctx.guild.id}):
+        if not self.collection.find_one({'_id': ctx.guild.id}):
             return await ctx.send(embed=Embed(title="Shutdown", description=f"Hey {ctx.author.mention} your guild was not found.\nTry using: `w/logging create`", color=self.bot.color))
 
         self.collection.remove({"_id": ctx.guild.id})
@@ -41,7 +41,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="bans", aliases=["discordbans", "banlog"])
     @commands.has_permissions(administrator=True)
     async def bans(self, ctx, channel: TextChannel):
-        result = Guild.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
+        result = self.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
         if result["Bans"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Ban Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"Bans": channel.id}})
@@ -50,7 +50,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="unban", aliases=["discordunban", "unbanlog", "unbanslog", "unbans"])
     @commands.has_permissions(administrator=True)
     async def unban(self, ctx, channel: TextChannel):
-        result = Guild.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
+        result = self.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
         if result["Unbanned"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Unban Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"Unbanned": channel.id}})
@@ -59,7 +59,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="deleted", aliases=["discorddeleted", "delmsg"])
     @commands.has_permissions(administrator=True)
     async def deleted(self, ctx, channel: TextChannel):
-        result = Guild.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
+        result = self.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
         if result["DeletedMessage"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Deleted messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"DeletedMessage": channel.id}})
@@ -68,7 +68,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="edited", aliases=["discordedited", "editmsg"])
     @commands.has_permissions(administrator=True)
     async def edited(self, ctx, channel: TextChannel):
-        result = Guild.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
+        result = self.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
         if result["EditedMessage"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Edited messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"EditedMessage": channel.id}})
@@ -77,7 +77,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="welcomes", aliases=["joiner", "joins", "join", "welcomemessages", "welcomemsg", "welcome"])
     @commands.has_permissions(administrator=True)
     async def welcomes(self, ctx, channel: TextChannel):
-        result = Guild.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
+        result = self.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
         if result["JoinedServer"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Welcome messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"JoinedServer": channel.id}})
@@ -86,7 +86,7 @@ class LoggingCog(commands.Cog):
     @logging.command(name="goodbye", aliases=["memberleave", "bye", "leftserver", "leaving", "goodbyes"])
     @commands.has_permissions(administrator=True)
     async def goodbye(self, ctx, channel: TextChannel):
-        result = Guild.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
+        result = self.collection.find_one({'_id': ctx.guild.id}) or Guild._create_guild_account(ctx.guild.id)
         if result["LeftServer"] == channel.id:
             return await ctx.send(embed=Embed(title="Logging", description=f"Sorry {ctx.author.mention} <#{channel.id}> has already been set as your `Goodbye messages Log`.", color=self.bot.color))
         self.collection.update_one({"_id": ctx.guild.id}, {"$set": {"LeftServer": channel.id}})

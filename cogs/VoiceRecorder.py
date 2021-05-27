@@ -13,7 +13,7 @@ def args_to_filters(args):
     try:
         seconds = int(args)
     except ValueError:
-        return "You must provide a integer value"
+        return "You never provided a number!"
     return {'time': seconds}
 
 class VoiceRecorder(commands.Cog):
@@ -24,13 +24,15 @@ class VoiceRecorder(commands.Cog):
         self.maxrecint = 60 # This is for how long the bot can record inside of the VoiceChannel.
         self.sink = discord.Sink # Sink class, This is not in the official discord.py package.
 
-    @commands.command(help="Record your voice in a Discord VoiceChannel")
+    @commands.command(help="The bot joins the VoiceChannel and starts recording your voice within the time limit you set it, Sometimes if the bot's latency is high it might record a few seconds more. Also don't worry all audio files are deleted after being sent. This is not really inside of the discord.py official package but my owner edited it from a pull request. If there is a bug in this command please use `w/suggest <BUG>`")
     @commands.cooldown(1, 30, BucketType.user)
     async def record(self, ctx, seconds: int):
         if not ctx.author.voice:
             return await ctx.send("You are not in a voice channel, Please connect to one and then run the command.")
         elif seconds > 60:
             return await ctx.send(f"Sorry, {self.maxrecint} Seconds is max.")
+        elif seconds < 5:
+            return await ctx.send(f"Sorry {ctx.author.mention} Please choose a number between 5-60.")
         
         self.vc = await ctx.author.voice.channel.connect() # Connect to the author's VoiceChannel.
         self.vc.start_recording(self.sink(encoding=self.encoding, filters=args_to_filters(seconds), output_path=self.output_path), on_stopped, ctx.channel) # Start the recording state.
@@ -45,7 +47,7 @@ class VoiceRecorder(commands.Cog):
         try:
             await ctx.send(file=File(f"recordings/{ssrc[ctx.author.id]}.wav")) # Semd the actual file from the directory
         except Exception: return await ctx.send(f"Sorry {ctx.author.mention} Unfortunatly a Error has occured. Please use `w/suggest <what happened>` To report the problem to the developers.")
-        await sleep(2) # So we don't delete it instantly.
+        await sleep(4) # So we don't delete it instantly.
 
         remove(f"recordings/{ssrc[ctx.author.id]}.wav") # Remove the file with `os.remove` as this will save lots of space.
 

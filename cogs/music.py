@@ -380,6 +380,6 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     async def djinfo(self, ctx):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         await ctx.send(f"{player.dj} is the voice channel\'s dj!")
-            
+   
 def setup(bot):
     bot.add_cog(Music(bot))

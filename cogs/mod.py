@@ -178,7 +178,6 @@ class ModCog(commands.Cog):
         except:
             return await ctx.send(f"Sorry {ctx.author.mention} there is nothing to editsnipe!")
 
-
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         self.snipeCache.update(

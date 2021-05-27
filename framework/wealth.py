@@ -1,11 +1,12 @@
 from os import environ
-from pymongo import MongoClient
+from pymongo import MongoClient, collection
 from datetime import datetime
 from random import choice
 __import__("dotenv").load_dotenv()
 
 class Wealth:
     collection = MongoClient(environ["MONGODB_URL"])["Coins"]["UserCoins"]
+    pointscollection = MongoClient(environ["MONGODB_URL"])["Coins"]["Points/others"]
 
     def _create_account(user_id: int):
         """Create a World account."""
@@ -33,12 +34,7 @@ class Wealth:
             "Premium": "No",
             "Developer": "No",
             "Bank": 0,
-            "Wallet": 0,
             "Tickets": 0,
-            "TicketReason": "No reason",
-            "WorldFriends": 0,
-            "IsBlacklisted": "No",
-            "CurrentJob": "No job",
             "LastWithdraw": "No date",
             "LastTransfer": "No date",
             "MarriedTo": "Nobody",
