@@ -383,7 +383,7 @@ class FunCog(commands.Cog):
     @commands.cooldown(rate=3, per=8, type=commands.BucketType.member)
     async def fast(self, ctx, option: Optional[str], user: Optional[Member]=None):
         user = user or ctx.author
-        if option == "--rank" or "rank":
+        if option == "--rank":
             result = Wealth.pointscollection.find_one({"_id": user.id})
             
             if not result:

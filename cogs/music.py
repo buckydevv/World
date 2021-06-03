@@ -6,6 +6,14 @@ from discord.ext import commands
 from discord import Embed, Member, VoiceChannel, VoiceState
 from datetime import timedelta
 from asyncio import TimeoutError, Queue
+from os import environ
+from dotenv import load_dotenv
+from pymongo import MongoClient
+from typing import Optional
+from framework import Paginator, decorators
+
+load_dotenv()
+cluster = MongoClient(environ["MONGODB_URL"])
 
 URL_REG = re.compile(r'https?://(?:www\.)?.+')
 
@@ -51,6 +59,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         setattr(self.bot, "wavelink", wavelink.Client(bot=self.bot))
 
         self.bot.loop.create_task(self.start_nodes())
+
+        self.upc = cluster["musicplaylist"]["userplaylists"]
 
     async def start_nodes(self):
         await self.bot.wait_until_ready() # Wait until bot is ready to make a connection!
@@ -137,7 +147,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         tracks = await self.bot.wavelink.get_tracks(query)
         channel = getattr(ctx.author.voice, 'channel', VoiceChannel)
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
-        await player.set_volume(45)
+        await player.set_volume(35)
 
         if not channel:
             return await ctx.send(f"Sorry {ctx.author.mention} Please connect to the channel in order to play a song.")
@@ -234,7 +244,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(aliases=['q'])
     async def queue(self, ctx):
-        """Return the next upcoming 5 songs."""
+        """Return the next upcoming 10 songs."""
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
 
         if not player.current or not player.queue._queue:
@@ -376,10 +386,93 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await player.set_eq(wavelink.Equalizer.build(levels=[(0, -0.02), (1, -0.01), (2, 0.08), (3, 0.1), (4, 0.15), (5, 0.1), (6, 0.03), (7, -0.02), (8, -0.035), (9, -0.05), (10, -0.05), (11, -0.05), (12, -0.05), (13, -0.05), (14, -0.05)], name="pop"))
         return await ctx.send(f"Hey {ctx.author.mention} I have added some pop into the sound!")
 
-    @commands.command(aliases=["dj", "whodk", "whoisdj"])
+    @commands.command(help="Shows the channelsc current DJ.", aliases=["dj", "whodk", "whoisdj"])
     async def djinfo(self, ctx):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
         await ctx.send(f"{player.dj} is the voice channel\'s dj!")
-   
+
+    @commands.command(help="Create a playlist with up to 25 songs!\nUse `w/playlist --add <song name>` to add a song.\n`w/playlist --remove <song name>` to remove a song.\n`w/playlist --view` to view what songs are in your playlist.\nYou can use `w/playlist --play` this will play your playlist.", aliases=["cp"])
+    async def playlist(self, ctx, option: Optional[str], *, query: Optional[str]):
+        if not self.upc.find_one({"_id": ctx.author.id}):
+            self.upc.insert_one({
+                "_id": ctx.author.id,
+                "songs": "Nothing",
+            })
+            return await ctx.send(f"Sorry {ctx.author.mention} i had to create a playlist document for you, To add that song please re-run the command.")
+
+        if option == "--add":
+            query = query.strip('<>')
+            if not URL_REG.match(query):
+                query = f'ytsearch:{query}'
+
+            tracks = await self.bot.wavelink.get_tracks(query)
+
+            if len(self.upc.find_one({"_id": ctx.author.id})["songs"]) >= 25:
+                return await ctx.send(f"Sorry {ctx.author.mention} but `25` songs is the max amount in the playlist. Please remove some songs if you want to add new ones.")
+
+            if tracks[0].info["title"] in self.upc.find_one({"_id": ctx.author.id})["songs"]:
+                return await ctx.send(f'Sorry {ctx.author.mention} but `{tracks[0].info["title"]}` is already in your playlist.')
+            
+            if self.upc.find_one({"_id": ctx.author.id})["songs"] == "Nothing":
+                self.upc.update({'_id': ctx.author.id}, {'$set': {'songs': [tracks[0].info["title"]]}})
+            else:
+                tracklist = self.upc.find_one({"_id": ctx.author.id})["songs"]
+                tracklist.append(tracks[0].info["title"])
+                self.upc.update({'_id': ctx.author.id}, {'$set': {'songs': tracklist}})
+                
+                await ctx.send(embed=Embed(title="Song added", description=f"{ctx.author.mention} `{tracks[0].info['title']}` has been added to your playlist,\nToo see the playlist please use `w/playlist --view`.\nTo remove this song please use `w/playlist --remove <song>`", color=self.bot.color))
+        
+        elif option == "--remove":
+            query = query.strip('<>')
+            if not URL_REG.match(query):
+                query = f'ytsearch:{query}'
+
+            tracks = await self.bot.wavelink.get_tracks(query)
+
+            if not tracks[0].info["title"] in self.upc.find_one({"_id": ctx.author.id})["songs"]:
+                return await ctx.send(f'Sorry {ctx.author.mention} but `{tracks[0].info["title"]}` isn\'t in your playlist! To see your playlist please use `w/playlist --view`')
+
+            if self.upc.find_one({"_id": ctx.author.id})["songs"] == "Nothing":
+                return await ctx.send(f"Sorry {ctx.author.mention} but there isn\'t any songs in your playlist just yet. Please use `w/playlist --add <song name>` to get started.")
+            else:
+                tracklist = self.upc.find_one({"_id": ctx.author.id})["songs"]
+                tracklist.remove(tracks[0].info["title"])
+                self.upc.update({'_id': ctx.author.id}, {'$set': {'songs': tracklist}})
+
+                await ctx.send(embed=Embed(title="Song removed", description=f"{ctx.author.mention} `{tracks[0].info['title']}` has been removed from your playlist, Too see the playlist please use `w/playlist --view`.", color=self.bot.color))
+
+        elif option == "--view":
+            if self.upc.find_one({"_id": ctx.author.id})["songs"] == "Nothing":
+                return await ctx.send(f"Sorry {ctx.author.mention} but there isn\'t any songs in your playlist just yet. Please use `w/playlist --add <song name>` to get started.")
+            else:
+                tracklist = self.upc.find_one({"_id": ctx.author.id})["songs"]
+                try:
+                    await ctx.send(embed=Embed(title=f"{ctx.author}\'s playlist", description='\n'.join(tracklist), color=self.bot.color))
+                except Exception:
+                    await ctx.send('\n'.join(tracklist))
+
+        elif option == "--play":
+            channel = getattr(ctx.author.voice, 'channel', VoiceChannel)
+            player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, cls=Player, context=ctx)
+            await player.set_volume(35)
+
+            if not channel:
+                return await ctx.send(f"Sorry {ctx.author.mention} Please connect to the channel in order to play your playlist!")
+
+            if not player.is_connected:
+                await ctx.invoke(self.connect)
+
+            tracklist = self.upc.find_one({"_id": ctx.author.id})["songs"]
+            for track in tracklist:
+                query = f'ytsearch:{track}'
+                tracks = await self.bot.wavelink.get_tracks(query)
+                song = Track(tracks[0].id, tracks[0].info, requester=ctx.author)
+                await player.queue.put(song)
+                
+            if not player.is_playing:
+                await player.invoke_next()
+            
+            await ctx.send(embed=Embed(title="World music", description=f"Hey {ctx.author.mention} Your playlist has now started playling.", color=self.bot.color))
+
 def setup(bot):
     bot.add_cog(Music(bot))

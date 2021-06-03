@@ -129,7 +129,7 @@ class HelpCog(commands.Cog):
         color=self.bot.color
         ).add_field(
           name="<:WorldMusic:769916606489821264> | Music commands",
-          value="`w/connect` | `w/play` | `w/stop` | `w/pause` | `w/unpause` | `w/skip` | `w/volume` | `w/np` | `w/queue` | `w/swapdj` | `w/djinfo` |",
+          value="`w/connect` | `w/play` | `w/stop` | `w/pause` | `w/unpause` | `w/skip` | `w/volume` | `w/np` | `w/queue` | `w/swapdj` | `w/djinfo` | `w/playlist` |",
           inline=False
         ).add_field(
           name="<:Worldeq:802323153061281840> | Equalizer commands",
