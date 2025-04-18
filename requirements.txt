@@ -1,6 +1,6 @@
 aggdraw==1.3.12
 aiohttp==3.6.3
-akinator.py==4.1.0
+akinator.py==0.2.5
 async-timeout==3.0.1
 attrs==20.3.0
 certifi==2020.12.5
@@ -15,7 +15,7 @@ idna==2.10
 klepto==0.2.0
 motor==2.3.0
 multidict==4.7.6
-Pillow==8.1.0
+Pillow==8.4.0
 pox==0.2.9
 psutil==5.8.0
 pycparser==2.20
@@ -26,8 +26,8 @@ python-dotenv==0.15.0
 requests==2.25.1
 six==1.15.0
 spotipy==2.16.1
-twemoji-parser==0.4.2
-typing-extensions==3.7.4.3
+git+https://github.com/edugomez102/twemoji-parser.git
+typing-extensions>=4.1.0
 urllib3==1.26.3
 wavelink==0.9.6
 yarl==1.5.1
