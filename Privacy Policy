@@ -1,0 +1,35 @@
+Privacy Policy for World Bot
+
+Thanks for using World, a Discord bot that offers a range of great features. Here's what you need to know about how we handle your data!
+
+What We Collect
+We only store what’s needed for the bot to work properly. This includes:
+
+Your Discord ID and username
+
+Server and channel IDs
+
+Some basic server logs (like message edits/deletes or joins/goodbyes)
+
+We don’t collect any sensitive info like passwords or emails!
+
+Why We Store It
+We save this stuff so the bot can:
+
+Remember your economy progress
+
+Save your playlists
+
+Keep track of some server activity if logging is on
+
+Basically, it's all so your experience using the bot is smooth and consistent.
+
+Where It's Stored
+Everything is stored in a secure MongoDB database. We keep it safe and only use it for the bot's features.
+
+Third-Party Stuff
+We sometimes use external APIs (like for music, games, or fun commands). They might process stuff like a song name or search term, but we don’t give them your saved data.
+
+Removing Your Data
+You can remove your data whenever you want. Just use the built-in commands or contact the dev in the support server.
+
